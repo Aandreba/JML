@@ -1,20 +1,18 @@
 package Mathx;
 
-import java.io.File;
-import java.util.Random;
-
 final public class Mathf {
     final public static float PI = (float) StrictMath.PI;
     final public static float E = (float) StrictMath.E;
+    final public static float SQRT2 = (float) Math.sqrt(2);
+    final public static float HALFPI = PI / 2;
+    final public static float PI2 = 2 * PI;
+
     final private static float TO_RADIANS = PI / 180;
     final private static float TO_DEGREES = 180 / PI;
 
     static {
-        System.load(System.getProperty("user.dir") + "/lib/mathf_osx.dylib");
-    }
-
-    private static final class RandomNumberGeneratorHolder {
-        static final Random randomNumberGenerator = new Random();
+        System.loadLibrary("mathf_win");
+        //System.load(System.getProperty("user.dir") + "/lib/mathf_osx.dylib");
     }
 
     public native static float sin (float x);
@@ -55,7 +53,7 @@ final public class Mathf {
         return floor == x ? floor : floor + 1;
     }
     public static int round (float x) { return Math.round(x); }
-    public static float random () { return RandomNumberGeneratorHolder.randomNumberGenerator.nextFloat(); };
+    public static float random () { return Rand.getFloat(); };
     public static float abs (float x) { return Math.abs(x); }
     public static float max (float x, float y) { return Math.max(x, y); }
     public static float min (float x, float y) { return Math.min(x, y); }

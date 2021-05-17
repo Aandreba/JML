@@ -40,6 +40,10 @@ public class Matf {
     }
 
     public void set (int row, Vecf value) {
+        if (value.getSize() != getCols()) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
         values[row] = value;
     }
 
@@ -146,8 +150,49 @@ public class Matf {
         return forEach(b, (x, y) -> x / y);
     }
 
-    public Matf inverse () {
-        return scalMul(1 / det());
+    public Matf inverse() {
+        int rows = getRows();
+        if (rows != getCols()) {
+            throw new ArithmeticException("Tried to invert non-square matrix");
+        }
+
+        return adj().scalMul(1 / det());
+    }
+
+    public Matf cofactor () {
+        int rows = getRows();
+        if (rows != getCols()) {
+            throw new ArithmeticException("Tried to calculate cofactor of non-square matrix");
+        }
+
+        if (rows == 2) {
+            return new Matf(new Vecf(get(1, 1), -get(0, 1)), new Vecf(-get(1, 0), get(0, 0)));
+        }
+
+        int rowsm1 = rows - 1;
+        Matf matrix = new Matf(rows, rows);
+
+        for (int i=0;i<rows;i++) {
+            for (int j=0;j<rows;j++) {
+                Matf det = new Matf(rowsm1, rowsm1);
+
+                for (int x=0;x<rowsm1;x++) {
+                    int X = x < i ? x : x + 1;
+                    for (int y=0;y<rowsm1;y++) {
+                        int Y = y < j ? y : y + 1;
+                        det.set(x, y, get(X, Y));
+                    }
+                }
+
+                matrix.set(i, j, ((i+j) & 1) == 1 ? -det.det() : det.det());
+            }
+        }
+
+        return matrix;
+    }
+
+    public Matf adj () {
+        return cofactor().T();
     }
 
     public float det () {

@@ -11,11 +11,11 @@ public class Vecf {
         this.values = new float[size];
     }
 
-    public Vecf(float[] values) {
+    public Vecf(float... values) {
         this.values = values;
     }
 
-    public Vecf(Vecf initialValues, float[] finalValues) {
+    public Vecf(Vecf initialValues, float... finalValues) {
         int vecSize = initialValues.getSize();
         this.values = new float[vecSize + finalValues.length];
 

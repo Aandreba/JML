@@ -1,13 +1,13 @@
-import Mathx.Extra.Floatx;
-import Mathx.Number.Half;
+import Imaginary.Complex;
+import Imaginary.Complexf;
 import Mathx.Mathf;
 
 public class Main {
     public static void main (String... args) {
-        float x = 0.15625f;
-        Half half = new Half(x);
+        Complexf f = Complexf.fromPolar(5, Mathf.toRadians(45));
+        Complex d = Complex.fromPolar(2, Math.toRadians(90));
 
-        Floatx.printBits(Mathf.PI);
-        System.out.println(half.floatValue());
+        System.out.println(f+", "+d);
+        System.out.println(d.pow(f.toDouble()));
     }
 }

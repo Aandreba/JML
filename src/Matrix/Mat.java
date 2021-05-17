@@ -1,5 +1,6 @@
 package Matrix;
 import Vector.Vec;
+import Vector.Vecf;
 
 import java.util.Arrays;
 
@@ -42,6 +43,10 @@ public class Mat {
     }
 
     public void set (int row, Vec value) {
+        if (value.getSize() != getCols()) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
         values[row] = value;
     }
 
@@ -148,8 +153,49 @@ public class Mat {
         return forEach(b, (x, y) -> x / y);
     }
 
-    public Mat inverse () {
-        return scalMul(1 / det());
+    public Mat inverse() {
+        int rows = getRows();
+        if (rows != getCols()) {
+            throw new ArithmeticException("Tried to invert non-square matrix");
+        }
+
+        return adj().scalMul(1 / det());
+    }
+
+    public Mat cofactor () {
+        int rows = getRows();
+        if (rows != getCols()) {
+            throw new ArithmeticException("Tried to calculate cofactor of non-square matrix");
+        }
+
+        if (rows == 2) {
+            return new Mat(new Vec(get(1, 1), -get(0, 1)), new Vec(-get(1, 0), get(0, 0)));
+        }
+
+        int rowsm1 = rows - 1;
+        Mat matrix = new Mat(rows, rows);
+
+        for (int i=0;i<rows;i++) {
+            for (int j=0;j<rows;j++) {
+                Mat det = new Mat(rowsm1, rowsm1);
+
+                for (int x=0;x<rowsm1;x++) {
+                    int X = x < i ? x : x + 1;
+                    for (int y=0;y<rowsm1;y++) {
+                        int Y = y < j ? y : y + 1;
+                        det.set(x, y, get(X, Y));
+                    }
+                }
+
+                matrix.set(i, j, ((i+j) & 1) == 1 ? -det.det() : det.det());
+            }
+        }
+
+        return matrix;
+    }
+
+    public Mat adj () {
+        return cofactor().T();
     }
 
     public double det () {
