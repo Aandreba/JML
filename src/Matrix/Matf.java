@@ -1,7 +1,10 @@
 package Matrix;
+
+import References.Single.Ref2Df;
+import Vector.Vec;
 import Vector.Vecf;
 
-public class Matf {
+public class Matf implements Ref2Df {
     final protected Vecf[] values;
 
     public Matf (int rows, int cols) {
@@ -19,6 +22,10 @@ public class Matf {
         float apply (int row, int col);
     }
 
+    public interface MatfForEachVecf {
+        Vecf apply (int row);
+    }
+
     public int getRows () {
         return values.length;
     }
@@ -27,6 +34,7 @@ public class Matf {
         return values[0].getSize();
     }
 
+    @Override
     public float get (int row, int col) {
         return values[row].get(col);
     }
@@ -47,6 +55,10 @@ public class Matf {
         values[row] = value;
     }
 
+    public boolean isSquare () {
+        return getRows() == getCols();
+    }
+
     private int finalRows (Matf b) {
         return Math.min(getRows(), b.getRows());
     }
@@ -59,7 +71,7 @@ public class Matf {
         int rows = finalRows(b);
         int cols = finalCols(b);
 
-        Matf matrix = new Matf(rows, 0);
+        Matf matrix = new Matf(rows, cols);
         for (int i=0;i<rows;i++) {
             for (int j=0;j<cols;j++) {
                 matrix.set(i, j, forEach.apply(get(i, j), b.get(i, j)));
@@ -83,6 +95,21 @@ public class Matf {
         return matrix;
     }
 
+    public static Matf forEach (int rows, int cols, MatfForEachVecf forEach) {
+        Matf matrix = new Matf(rows, cols);
+
+        for (int i=0;i<rows;i++) {
+            Vecf vector = forEach.apply(i);
+            if (vector.getSize() > cols) {
+                throw new IllegalArgumentException();
+            }
+
+            matrix.set(i, vector);
+        }
+
+        return matrix;
+    }
+
     public static Matf forEach (int rows, int cols, MatfForEachIndex forEach) {
         Matf matrix = new Matf(rows, cols);
 
@@ -99,6 +126,10 @@ public class Matf {
         return forEach(b, Float::sum);
     }
 
+    public Matf add (Vecf b) {
+        return forEach(getRows(), getCols(), (i,j) -> get(i, j) + b.get(j));
+    }
+
     public Matf add (float b) {
         return forEach(b, Float::sum);
     }
@@ -107,8 +138,20 @@ public class Matf {
         return forEach(b, (x, y) -> x - y);
     }
 
+    public Matf subtr (Vecf b) {
+        return forEach(getRows(), getCols(), (i,j) -> get(i, j) - b.get(j));
+    }
+
     public Matf subtr (float b) {
         return forEach(b, (x, y) -> x - y);
+    }
+
+    public Matf invSubtr (Vecf b) {
+        return forEach(getRows(), getCols(), (i,j) -> b.get(j) - get(i, j));
+    }
+
+    public Matf invSubtr (float b) {
+        return forEach(b, (x, y) -> y - x);
     }
 
     public Matf mul (Matf b) {
@@ -138,6 +181,10 @@ public class Matf {
         return forEach(b, (x, y) -> x * y);
     }
 
+    public Matf scalMul (Vecf b) {
+        return forEach(getRows(), getCols(), (i,j) -> get(i, j) * b.get(j));
+    }
+
     public Matf scalMul (float b) {
         return forEach(b, (x, y) -> x * y);
     }
@@ -146,8 +193,20 @@ public class Matf {
         return forEach(b, (x, y) -> x / y);
     }
 
+    public Matf scalDiv (Vecf b) {
+        return forEach(getRows(), getCols(), (i,j) -> get(i, j) / b.get(j));
+    }
+
     public Matf scalDiv (float b) {
         return forEach(b, (x, y) -> x / y);
+    }
+
+    public Matf scalInvDiv (Vecf b) {
+        return forEach(getRows(), getCols(), (i,j) -> b.get(j) / get(i, j));
+    }
+
+    public Matf scalInvDiv (float b) {
+        return forEach(b, (x, y) -> y / x);
     }
 
     public Matf inverse() {
@@ -230,11 +289,23 @@ public class Matf {
     }
 
     public Mat toDouble () {
-        return Mat.forEach(getRows(), getCols(), this::get);
+        return Mat.forEach(getRows(), getCols(), (Mat.MatForEachIndex) this::get);
+    }
+
+    public Vecf toVectorRow () {
+        return Vecf.fromRef(rowMajor());
+    }
+
+    public Vecf toVectorCol () {
+        return Vecf.fromRef(colMajor());
     }
 
     public static Matf identity (int k) {
         return forEach(k, k, (i, j) -> i == j ? 1 : 0);
+    }
+
+    public static Matf fromRef (Ref2Df ref) {
+        return ref instanceof Matf ? (Matf) ref : forEach(ref.getRows(), ref.getCols(), (MatfForEachIndex) ref::get);
     }
 
     @Override
@@ -251,7 +322,7 @@ public class Matf {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         for (int i=0;i<getRows();i++) {
-            builder.append(", ").append(get(i));
+            builder.append(", ").append(get(i).toString());
         }
 
         return "{ "+builder.substring(2)+" }";

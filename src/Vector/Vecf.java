@@ -1,10 +1,10 @@
 package Vector;
 
 import Mathx.Mathf;
-import Matrix.Mat;
 import Matrix.Matf;
+import References.Single.Ref1Df;
 
-public class Vecf {
+public class Vecf implements Ref1Df {
     final protected float[] values;
 
     public Vecf(int size) {
@@ -132,7 +132,7 @@ public class Vecf {
         return forEach(b, (x, y) -> x / y);
     }
 
-    public Vecf invSiv (float b) {
+    public Vecf invDiv(float b) {
         return forEach(b, (x, y) -> y / x);
     }
 
@@ -177,6 +177,19 @@ public class Vecf {
         return vector;
     }
 
+    public float sum () {
+        float val = 0;
+        for (int i=0;i<getSize();i++) {
+            val += get(i);
+        }
+
+        return val;
+    }
+
+    public float mean () {
+        return sum() / getSize();
+    }
+
     public Vecf sub (int... pos) {
         Vecf vector = new Vecf(pos.length);
         for (int i=0;i<pos.length;i++) {
@@ -201,6 +214,10 @@ public class Vecf {
 
     public Matf colMatrix () {
         return rowMatrix().T();
+    }
+
+    public static Vecf fromRef (Ref1Df ref) {
+        return ref instanceof Vecf ? (Vecf) ref : forEach(ref.getSize(), ref::get);
     }
 
     @Override

@@ -1,16 +1,26 @@
 package Mathx;
 
 import Matrix.Mat;
+import Matrix.Matf;
 import Vector.Vec;
 import Vector.Vecf;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Random;
 
 final public class Rand {
     final private static Random random = new Random();
-
     private static boolean haveNextNextGaussian = false;
     private static float nextNextGaussian = 0;
+
+    public static boolean getBool() {
+        return random.nextBoolean();
+    }
+
+    public static boolean getBool(float pro) {
+        return random.nextFloat() <= pro;
+    }
 
     public static byte[] getBytes (int bytes) {
         byte[] result = new byte[bytes];
@@ -137,5 +147,57 @@ final public class Rand {
         }
 
         return vector;
+    }
+
+    public static Mat getMat (int rows, int cols) {
+        return Mat.forEach(rows, cols, (i,j) -> Rand.getDouble());
+    }
+
+    public static Mat getMat (int rows, int cols, double from, double to) {
+        return Mat.forEach(rows, cols, (i,j) -> Rand.getDouble(from, to));
+    }
+
+    public static Matf getMatf (int rows, int cols) {
+        return Matf.forEach(rows, cols, (i,j) -> Rand.getFloat());
+    }
+
+    public static Matf getMatf (int rows, int cols, float from, float to) {
+        return Matf.forEach(rows, cols, (i,j) -> Rand.getFloat(from, to));
+    }
+
+    public static int choiceIndex(Vecf weights) {
+        weights = weights.div(weights.sum());
+
+        float x = Rand.getFloat();
+        float y = 0;
+
+        for (int i=0;i<weights.getSize();i++) {
+            y += weights.get(i);
+            if (y >= x) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    public static int choiceIndex (float... weights) {
+        return choiceIndex(new Vecf(weights));
+    }
+
+    public static <T> T choice (T[] values, Vecf weights) {
+        return values[choiceIndex(weights)];
+    }
+
+    public static <T> T choice (T[] values, float... weights) {
+        return values[choiceIndex(weights)];
+    }
+
+    public static <T> T choice (List<T> values, Vecf weights) {
+        return values.get(choiceIndex(weights));
+    }
+
+    public static <T> T choice (List<T> values, float... weights) {
+        return values.get(choiceIndex(weights));
     }
 }

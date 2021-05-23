@@ -1,10 +1,11 @@
 package Matrix;
+
+import References.Double.Ref1D;
+import References.Double.Ref2D;
 import Vector.Vec;
 import Vector.Vecf;
 
-import java.util.Arrays;
-
-public class Mat {
+public class Mat implements Ref2D {
     final protected Vec[] values;
 
     public Mat (int rows, int cols) {
@@ -20,6 +21,10 @@ public class Mat {
 
     public interface MatForEachIndex {
         double apply (int row, int col);
+    }
+
+    public interface MatForEachVec {
+        Vec apply (int row);
     }
 
     public int getRows () {
@@ -48,6 +53,10 @@ public class Mat {
         }
 
         values[row] = value;
+    }
+
+    public boolean isSquare () {
+        return getRows() == getCols();
     }
 
     private int finalRows (Mat b) {
@@ -86,6 +95,21 @@ public class Mat {
         return matrix;
     }
 
+    public static Mat forEach (int rows, int cols, MatForEachVec forEach) {
+        Mat matrix = new Mat(rows, cols);
+
+        for (int i=0;i<rows;i++) {
+            Vec vector = forEach.apply(i);
+            if (vector.getSize() > cols) {
+                throw new IllegalArgumentException();
+            }
+
+            matrix.set(i, vector);
+        }
+
+        return matrix;
+    }
+
     public static Mat forEach (int rows, int cols, MatForEachIndex forEach) {
         Mat matrix = new Mat(rows, cols);
 
@@ -102,6 +126,10 @@ public class Mat {
         return forEach(b, Double::sum);
     }
 
+    public Mat add (Vec b) {
+        return forEach(getRows(), getCols(), (i,j) -> get(i, j) + b.get(j));
+    }
+
     public Mat add (double b) {
         return forEach(b, Double::sum);
     }
@@ -110,8 +138,20 @@ public class Mat {
         return forEach(b, (x, y) -> x - y);
     }
 
+    public Mat subtr (Vec b) {
+        return forEach(getRows(), getCols(), (i,j) -> get(i, j) - b.get(j));
+    }
+
     public Mat subtr (double b) {
         return forEach(b, (x, y) -> x - y);
+    }
+
+    public Mat invSubtr (Vec b) {
+        return forEach(getRows(), getCols(), (i,j) -> b.get(j) - get(i, j));
+    }
+
+    public Mat invSubtr (double b) {
+        return forEach(b, (x, y) -> y - x);
     }
 
     public Mat mul (Mat b) {
@@ -141,6 +181,10 @@ public class Mat {
         return forEach(b, (x, y) -> x * y);
     }
 
+    public Mat scalMul (Vec b) {
+        return forEach(getRows(), getCols(), (i,j) -> get(i, j) * b.get(j));
+    }
+
     public Mat scalMul (double b) {
         return forEach(b, (x, y) -> x * y);
     }
@@ -149,8 +193,20 @@ public class Mat {
         return forEach(b, (x, y) -> x / y);
     }
 
+    public Mat scalDiv (Vec b) {
+        return forEach(getRows(), getCols(), (i,j) -> get(i, j) / b.get(j));
+    }
+
     public Mat scalDiv (double b) {
         return forEach(b, (x, y) -> x / y);
+    }
+
+    public Mat scalInvDiv (Vec b) {
+        return forEach(getRows(), getCols(), (i,j) -> b.get(j) / get(i, j));
+    }
+
+    public Mat scalInvDiv (double b) {
+        return forEach(b, (x, y) -> y / x);
     }
 
     public Mat inverse() {
@@ -236,8 +292,20 @@ public class Mat {
         return Matf.forEach(getRows(), getCols(), (i, j) -> (float) get(i, j));
     }
 
+    public Vec toVectorRow () {
+        return Vec.fromRef(rowMajor());
+    }
+
+    public Vec toVectorCol () {
+        return Vec.fromRef(colMajor());
+    }
+
     public static Mat identity (int k) {
         return forEach(k, k, (i, j) -> i == j ? 1 : 0);
+    }
+
+    public static Mat fromRef (Ref2D ref) {
+        return ref instanceof Mat ? (Mat) ref : forEach(ref.getRows(), ref.getCols(), (MatForEachIndex) ref::get);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package Mathx;
 
+import java.io.IOException;
+
 final public class Mathf {
     final public static float PI = (float) StrictMath.PI;
     final public static float E = (float) StrictMath.E;
@@ -11,8 +13,16 @@ final public class Mathf {
     final private static float TO_DEGREES = 180 / PI;
 
     static {
-        System.loadLibrary("mathf_win");
-        //System.load(System.getProperty("user.dir") + "/lib/mathf_osx.dylib");
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("win")) {
+            System.loadLibrary("mathf_win");
+        } else if (os.contains("mac")) {
+            try {
+                NativeUtils.loadLibraryFromJar("/OSX/mathf_osx.dylib");
+            } catch (IOException e) {
+                System.load(System.getProperty("user.dir") + "/lib/OSX/mathf_osx.dylib");
+            }
+        }
     }
 
     public native static float sin (float x);

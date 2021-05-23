@@ -1,7 +1,10 @@
 package Vector;
-import Matrix.Mat;
 
-public class Vec {
+import Matrix.Mat;
+import References.Double.Ref1D;
+import java.util.Iterator;
+
+public class Vec implements Ref1D {
     final protected double[] values;
 
     public Vec (int size) {
@@ -84,6 +87,23 @@ public class Vec {
         return vector;
     }
 
+    @Override
+    public Iterator<Double> iterator() {
+        return new Iterator<Double>() {
+            int i = 0;
+
+            @Override
+            public boolean hasNext() {
+                return i < getSize();
+            }
+
+            @Override
+            public Double next() {
+                return get(i++);
+            }
+        };
+    }
+
     public static Vec forEach (int size, VecForEachIndex forEach) {
         Vec vector = new Vec(size);
         for (int i=0;i<size;i++) {
@@ -129,7 +149,7 @@ public class Vec {
         return forEach(b, (x, y) -> x / y);
     }
 
-    public Vec invSiv (double b) {
+    public Vec invDiv(double b) {
         return forEach(b, (x, y) -> y / x);
     }
 
@@ -174,7 +194,20 @@ public class Vec {
         return vector;
     }
 
-    public Vec sub (int... pos) {
+    public double sum () {
+        double val = 0;
+        for (int i=0;i<getSize();i++) {
+            val += get(i);
+        }
+
+        return val;
+    }
+
+    public double mean () {
+        return sum() / getSize();
+    }
+
+    public Vec sub (int... pos) { // Subvector
         Vec vector = new Vec(pos.length);
         for (int i=0;i<pos.length;i++) {
             vector.set(i, get(pos[i]));
@@ -198,6 +231,10 @@ public class Vec {
 
     public Mat colMatrix () {
         return rowMatrix().T();
+    }
+
+    public static Vec fromRef (Ref1D ref) {
+        return ref instanceof Vec ? (Vec) ref : forEach(ref.getSize(), ref::get);
     }
 
     @Override
