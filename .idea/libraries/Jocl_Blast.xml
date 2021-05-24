@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Jocl-Blast" type="repository">
+    <properties maven-id="org.jocl:jocl-blast:1.5.2" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/jocl-blast-1.5.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jocl-2.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/jocl-blast-1.5.2-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jocl-2.0.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>

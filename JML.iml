@@ -9,5 +9,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Win" level="project" />
     <orderEntry type="library" name="OSX" level="project" />
+    <orderEntry type="library" name="Jocl-Blast" level="project" />
   </component>
 </module>

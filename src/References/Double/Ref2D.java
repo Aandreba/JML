@@ -73,6 +73,17 @@ public interface Ref2D extends Iterable<Ref1D> {
         };
     }
 
+    default double[][] toArray () {
+        double[][] array = new double[getRows()][getCols()];
+        for (int i=0;i<array.length;i++) {
+            for (int j=0;j<array[i].length;j++) {
+                array[i][j] = get(i, j);
+            }
+        }
+
+        return array;
+    }
+
     default Ref2Df toFloat () {
         return new Ref2Df() {
             @Override

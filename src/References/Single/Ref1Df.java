@@ -15,6 +15,15 @@ public interface Ref1Df extends Iterable<Float> {
         }
     }
 
+    default float[] toArray () {
+        float[] array = new float[getSize()];
+        for (int i=0;i<array.length;i++) {
+            array[i] = get(i);
+        }
+
+        return array;
+    }
+
     default Ref1D toDouble () {
         return new Ref1D() {
             @Override
