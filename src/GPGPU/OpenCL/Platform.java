@@ -1,6 +1,9 @@
 package GPGPU.OpenCL;
 
 import org.jocl.*;
+
+import java.util.Objects;
+
 import static org.jocl.CL.*;
 
 final public class Platform {
@@ -15,6 +18,14 @@ final public class Platform {
         this.version = Query.getString(this, CL_PLATFORM_VERSION);
         this.name = Query.getString(this, CL_PLATFORM_NAME);
         this.vendor = Query.getString(this, CL_PLATFORM_VENDOR);
+    }
+
+    @Override
+    public boolean equals (Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Platform device = (Platform) o;
+        return Objects.equals(id, device.id);
     }
 
     @Override

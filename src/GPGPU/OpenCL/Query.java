@@ -1,10 +1,15 @@
 package GPGPU.OpenCL;
 
-import org.jocl.Pointer;
-import org.jocl.Sizeof;
+import org.jocl.*;
+import org.jocl.blast.CLBlast;
+
 import static org.jocl.CL.*;
 
 public class Query {
+    static {
+        CL.setExceptionsEnabled(true);
+        CLBlast.setExceptionsEnabled(true);
+    }
     // Platform
     public static int[] getInts (Platform platform, int param, int vals) {
         int[] values = new int[vals];
@@ -65,5 +70,9 @@ public class Query {
         clGetDeviceInfo(device.id, param, buffer.length, Pointer.to(buffer), null);
 
         return new String(buffer, 0, buffer.length-1);
+    }
+
+    public static void awaitEvents (cl_event... events) {
+        clWaitForEvents(events.length, events);
     }
 }

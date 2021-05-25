@@ -3,12 +3,13 @@ package GPGPU.OpenCL;
 import org.jocl.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 
 import static org.jocl.CL.*;
 
 final public class Device {
     final private static Device[] DEVICES = loadDevices();
-    public static Device DEFAULT = getFirst();
+    final public static Device DEFAULT = getFirst();
 
     final public cl_device_id id;
     final public Platform platform;
@@ -65,6 +66,19 @@ final public class Device {
                 ", hasErrorCorrectionSupport=" + hasErrorCorrectionSupport +
                 ", hasDedicatedMemory=" + hasDedicatedMemory +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Device device = (Device) o;
+        return Objects.equals(id, device.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     public static Device[] getDevices () {
