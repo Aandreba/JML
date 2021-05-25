@@ -1,7 +1,11 @@
 package References.Single;
 
-import References.Double.Ref1D;
+import Imaginary.Comp;
+import Imaginary.Compf;
+import References.Double.Complex.Ref2Di;
 import References.Double.Ref2D;
+import References.Single.Complex.Ref2Dif;
+
 import java.util.Iterator;
 
 public interface Ref2Df extends Iterable<Ref1Df> {
@@ -75,9 +79,7 @@ public interface Ref2Df extends Iterable<Ref1Df> {
     default float[][] toArray () {
         float[][] array = new float[getRows()][getCols()];
         for (int i=0;i<array.length;i++) {
-            for (int j=0;j<array[i].length;j++) {
-                array[i][j] = get(i, j);
-            }
+            array[i] = get(i).toArray();
         }
 
         return array;
@@ -103,6 +105,30 @@ public interface Ref2Df extends Iterable<Ref1Df> {
             @Override
             public void set (int row, int col, double val) {
                 Ref2Df.this.set(row, col, (float) val);
+            }
+        };
+    }
+
+    default Ref2Dif toComplex () {
+        return new Ref2Dif() {
+            @Override
+            public int getRows() {
+                return Ref2Df.this.getRows();
+            }
+
+            @Override
+            public int getCols() {
+                return Ref2Df.this.getCols();
+            }
+
+            @Override
+            public Compf get (int row, int col) {
+                return new Compf(Ref2Df.this.get(row, col), 0);
+            }
+
+            @Override
+            public void set(int row, int col, Compf val) {
+                Ref2Df.this.set(row, col, val.real);
             }
         };
     }

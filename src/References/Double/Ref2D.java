@@ -1,6 +1,7 @@
 package References.Double;
 
-import Matrix.Mat;
+import Imaginary.Comp;
+import References.Double.Complex.Ref2Di;
 import References.Single.Ref2Df;
 
 import java.util.Iterator;
@@ -76,9 +77,7 @@ public interface Ref2D extends Iterable<Ref1D> {
     default double[][] toArray () {
         double[][] array = new double[getRows()][getCols()];
         for (int i=0;i<array.length;i++) {
-            for (int j=0;j<array[i].length;j++) {
-                array[i][j] = get(i, j);
-            }
+            array[i] = get(i).toArray();
         }
 
         return array;
@@ -104,6 +103,30 @@ public interface Ref2D extends Iterable<Ref1D> {
             @Override
             public void set(int row, int col, float val) {
                 Ref2D.this.set(row, col, val);
+            }
+        };
+    }
+
+    default Ref2Di toComplex () {
+        return new Ref2Di() {
+            @Override
+            public int getRows() {
+                return Ref2D.this.getRows();
+            }
+
+            @Override
+            public int getCols() {
+                return Ref2D.this.getCols();
+            }
+
+            @Override
+            public Comp get (int row, int col) {
+                return new Comp(Ref2D.this.get(row, col), 0);
+            }
+
+            @Override
+            public void set(int row, int col, Comp val) {
+                Ref2D.this.set(row, col, val.real);
             }
         };
     }

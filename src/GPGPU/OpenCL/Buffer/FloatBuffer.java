@@ -7,48 +7,21 @@ import References.Single.Ref1Df;
 import org.jocl.*;
 import static org.jocl.CL.*;
 
-public class FloatBuffer implements Ref1Df {
+public class FloatBuffer extends Buffer implements Ref1Df {
     final public int size;
-    final private int byteSize;
-    private cl_mem id;
-    private CommandQueue queue;
 
     public FloatBuffer (CommandQueue queue, int size) {
+        super(queue, Sizeof.cl_float * size);
         this.size = size;
-        this.byteSize = Sizeof.cl_float * size;
-        this.queue = queue;
-        this.id = clCreateBuffer(queue.context.id, CL_MEM_READ_WRITE, byteSize, null, null);
     }
 
     public FloatBuffer (Context context, int size) {
         this(new CommandQueue(context), size);
     }
 
-    public cl_mem getId () {
-        return id;
-    }
-
-    public CommandQueue getQueue () {
-        return queue;
-    }
-
-    public void setQueue (CommandQueue queue) {
-        cl_mem buffer = clCreateBuffer(queue.context.id, CL_MEM_READ_WRITE, byteSize, null, null);
-
-        cl_event event = new cl_event();
-        clEnqueueWriteBuffer(queue.id, buffer, true, 0, byteSize, Pointer.to(toArray()), 0, null, null);
-
-        Query.awaitEvents(event);
-        this.queue = queue;
-        this.id = buffer;
-    }
-
-    public Context getContext () {
-        return queue.context;
-    }
-
-    public void setContext (Context context) {
-        setQueue(new CommandQueue(context));
+    public FloatBuffer (Context context, float... values) {
+        this(context, values.length);
+        set(values);
     }
 
     @Override
@@ -66,6 +39,16 @@ public class FloatBuffer implements Ref1Df {
         clEnqueueReadBuffer(queue.id, this.id, CL_TRUE, Sizeof.cl_float * pos, Sizeof.cl_float, Pointer.to(array), 0, null, null);
 
         return array[0];
+    }
+
+    public void set (int offset, float... vals) {
+        if (vals.length != size) {
+            throw new IllegalArgumentException();
+        }
+
+        cl_event event = new cl_event();
+        clEnqueueWriteBuffer(queue.id, this.id, CL_TRUE, Sizeof.cl_float * offset, Sizeof.cl_float * vals.length, Pointer.to(vals), 0, null, event);
+        Query.awaitEvents(event);
     }
 
     public void set (float... vals) {
@@ -103,10 +86,5 @@ public class FloatBuffer implements Ref1Df {
 
         Query.awaitEvents(event);
         return array;
-    }
-
-    public void release () {
-        clReleaseMemObject(this.id);
-        queue.release();
     }
 }

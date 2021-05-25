@@ -1,13 +1,14 @@
 package Testing;
 
-import Vector.VecCL;
+import Mathx.Rand;
+import Vector.Single.Vecf;
 
 public class OpenCL {
     public static void main (String... args) {
-        VecCL a = new VecCL(1, 2, 3);
-        VecCL b = new VecCL(4, 5, 6);
+        Vecf a = Rand.getVecf(5);
+        Vecf b = Rand.getVecf(5);
 
         System.out.println(a.add(b));
-        System.out.println(a.add(2f));
+        System.out.println(a.toCUDA().add(b.toCUDA()));
     }
 }

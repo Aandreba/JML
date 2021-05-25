@@ -1,11 +1,10 @@
 package Mathx;
 
-import Matrix.Mat;
-import Matrix.Matf;
-import Vector.Vec;
-import Vector.Vecf;
+import Matrix.Double.Mat;
+import Matrix.Single.Matf;
+import Vector.Double.Vec;
+import Vector.Single.Vecf;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 

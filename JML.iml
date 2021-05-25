@@ -10,5 +10,7 @@
     <orderEntry type="library" name="Win" level="project" />
     <orderEntry type="library" name="OSX" level="project" />
     <orderEntry type="library" name="Jocl-Blast" level="project" />
+    <orderEntry type="library" name="JCublas" level="project" />
+    <orderEntry type="library" name="JCublas Natives" level="project" />
   </component>
 </module>
