@@ -2,8 +2,11 @@ package Vector.Double;
 
 import GPGPU.OpenCL.Context;
 import Matrix.Double.Matd;
+import References.Double.Complex.Ref1Di;
 import References.Double.Ref1D;
 import Vector.Single.Vec;
+
+import java.util.Arrays;
 
 public class Vecd implements Ref1D {
     final protected double[] values;
@@ -229,6 +232,11 @@ public class Vecd implements Ref1D {
         return vector;
     }
 
+    @Override
+    public Vecid toComplex() {
+        return new Vecid(values);
+    }
+
     public VecCLd toCL(Context context) {
         return new VecCLd(context, this);
     }
@@ -262,5 +270,18 @@ public class Vecd implements Ref1D {
         }
 
         return "{ " + builder.substring(2) + " }";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Vecd doubles = (Vecd) o;
+        return Arrays.equals(values, doubles.values);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(values);
     }
 }

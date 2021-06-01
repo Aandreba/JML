@@ -2,6 +2,8 @@ package Complex;
 import Mathx.Mathf;
 import jcuda.cuComplex;
 
+import java.util.Objects;
+
 public class Comp {
     final public static Comp ZERO = new Comp();
     final public static Comp ONE = new Comp(1,0);
@@ -137,6 +139,19 @@ public class Comp {
         }
 
         return real + " - " + -imaginary + "i";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Comp comp = (Comp) o;
+        return Float.compare(comp.real, real) == 0 && Float.compare(comp.imaginary, imaginary) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(real, imaginary);
     }
 
     public String polarRadString() {

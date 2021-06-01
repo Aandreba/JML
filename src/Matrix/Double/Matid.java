@@ -2,9 +2,12 @@ package Matrix.Double;
 
 import GPGPU.OpenCL.Context;
 import Complex.Compd;
+import Matrix.Single.Mat;
 import Matrix.Single.Mati;
 import References.Double.Complex.Ref2Di;
 import Vector.Double.Vecid;
+
+import java.util.Arrays;
 
 public class Matid implements Ref2Di {
     final protected Vecid[] values;
@@ -86,7 +89,7 @@ public class Matid implements Ref2Di {
         int rows = finalRows(b);
         int cols = finalCols(b);
 
-        Matid matrix = new Matid(rows, 0);
+        Matid matrix = new Matid(rows, cols);
         for (int i=0;i<rows;i++) {
             for (int j=0;j<cols;j++) {
                 matrix.set(i, j, forEach.apply(get(i, j), b.get(i, j)));
@@ -325,6 +328,46 @@ public class Matid implements Ref2Di {
         return sum;
     }
 
+    public Matid pow (int x) {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate power of non-square matrix");
+        } else if (x < 0) {
+            throw new ArithmeticException("Tried to calculate negative power of matrix");
+        }
+
+        Matid result = identity(getRows());
+        for (int i=0;i<x;i++) {
+            result = result.mul(this);
+        }
+
+        return result;
+    }
+
+    public Matid exp () {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate exponential of non-square matrix");
+        }
+
+        int n = getRows();
+        int k = 1;
+        double factorial = 1;
+        Matid pow = identity(n);
+
+        Matid result = pow.clone();
+        Matid last = null;
+
+        while (!result.equals(last)) {
+            pow = pow.mul(this);
+            factorial *= k;
+
+            last = result.clone();
+            result = result.add(pow.scalDiv(factorial));
+            k++;
+        }
+
+        return result;
+    }
+
     public Matid T () {
         int rows = getCols();
         int cols = getRows();
@@ -382,5 +425,18 @@ public class Matid implements Ref2Di {
         }
 
         return "{ "+builder.substring(2)+" }";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Matid ref1Dis = (Matid) o;
+        return Arrays.equals(values, ref1Dis.values);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(values);
     }
 }

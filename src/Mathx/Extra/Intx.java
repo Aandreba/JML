@@ -8,4 +8,12 @@ public class Intx {
 
         System.out.println();
     }
+
+    public static boolean isOdd (int x) {
+        return (x & 1) == 1;
+    }
+
+    public static boolean isEven (int x) {
+        return !isOdd(x);
+    }
 }

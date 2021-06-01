@@ -5,6 +5,9 @@ import Mathx.Mathf;
 import Matrix.Single.Mat;
 import References.Single.Ref1Df;
 import Vector.Double.Vecd;
+import Vector.Double.Vecid;
+
+import java.util.Arrays;
 
 public class Vec implements Ref1Df {
     final protected float[] values;
@@ -230,6 +233,11 @@ public class Vec implements Ref1Df {
         return vector;
     }
 
+    @Override
+    public Veci toComplex() {
+        return new Veci(values);
+    }
+
     public VecCL toCL (Context context) {
         return new VecCL(context, this);
     }
@@ -267,5 +275,18 @@ public class Vec implements Ref1Df {
         }
 
         return "{ " + builder.substring(2) + " }";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Vec floats = (Vec) o;
+        return Arrays.equals(values, floats.values);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(values);
     }
 }

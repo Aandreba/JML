@@ -1,8 +1,14 @@
 package Matrix.Double;
 
 import GPGPU.OpenCL.Context;
+import Matrix.Single.Mat;
+import Matrix.Single.Mati;
 import References.Double.Ref2D;
 import Vector.Double.Vecd;
+import Vector.Double.Vecid;
+import Vector.Single.Veci;
+
+import java.util.Arrays;
 
 public class Matd implements Ref2D {
     final protected Vecd[] values;
@@ -84,7 +90,7 @@ public class Matd implements Ref2D {
         int rows = finalRows(b);
         int cols = finalCols(b);
 
-        Matd matrix = new Matd(rows, 0);
+        Matd matrix = new Matd(rows, cols);
         for (int i=0;i<rows;i++) {
             for (int j=0;j<cols;j++) {
                 matrix.set(i, j, forEach.apply(get(i, j), b.get(i, j)));
@@ -294,6 +300,46 @@ public class Matd implements Ref2D {
         return sum;
     }
 
+    public Matd pow (int x) {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate power of non-square matrix");
+        } else if (x < 0) {
+            throw new ArithmeticException("Tried to calculate negative power of matrix");
+        }
+
+        Matd result = identity(getRows());
+        for (int i=0;i<x;i++) {
+            result = result.mul(this);
+        }
+
+        return result;
+    }
+
+    public Matd exp () {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate exponential of non-square matrix");
+        }
+
+        int n = getRows();
+        int k = 1;
+        double factorial = 1;
+        Matd pow = identity(n);
+
+        Matd result = pow.clone();
+        Matd last = null;
+
+        while (!result.equals(last)) {
+            pow = pow.mul(this);
+            factorial *= k;
+
+            last = result.clone();
+            result = result.add(pow.scalDiv(factorial));
+            k++;
+        }
+
+        return result;
+    }
+
     public Matd T () {
         int rows = getCols();
         int cols = getRows();
@@ -303,6 +349,16 @@ public class Matd implements Ref2D {
 
     public Matrix.Single.Mat toFloat () {
         return Matrix.Single.Mat.forEach(getRows(), getCols(), (i, j) -> (float) get(i, j));
+    }
+
+    @Override
+    public Matid toComplex() {
+        Vecid[] complex = new Vecid[getRows()];
+        for (int i=0;i<getRows();i++) {
+            complex[i] = get(i).toComplex();
+        }
+
+        return new Matid(complex);
     }
 
     public MatCLd toCL (Context context) {
@@ -347,5 +403,18 @@ public class Matd implements Ref2D {
         }
 
         return "{ "+builder.substring(2)+" }";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Matd ref1DS = (Matd) o;
+        return Arrays.equals(values, ref1DS.values);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(values);
     }
 }

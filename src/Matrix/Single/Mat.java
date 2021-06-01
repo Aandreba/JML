@@ -1,9 +1,17 @@
 package Matrix.Single;
 
 import GPGPU.OpenCL.Context;
+import Mathx.Extra.Intx;
+import Mathx.Mathf;
 import Matrix.Double.Matd;
+import Matrix.Double.Matid;
+import References.Single.Complex.Ref2Dif;
 import References.Single.Ref2Df;
+import Vector.Double.Vecid;
 import Vector.Single.Vec;
+import Vector.Single.Veci;
+
+import java.util.Arrays;
 
 public class Mat implements Ref2Df {
     final protected Vec[] values;
@@ -225,8 +233,7 @@ public class Mat implements Ref2Df {
     }
 
     public Mat inverse() {
-        int rows = getRows();
-        if (rows != getCols()) {
+        if (!isSquare()) {
             throw new ArithmeticException("Tried to invert non-square matrix");
         }
 
@@ -234,20 +241,24 @@ public class Mat implements Ref2Df {
     }
 
     public Mat cofactor () {
-        int rows = getRows();
-        if (rows != getCols()) {
+        if (!isSquare()) {
             throw new ArithmeticException("Tried to calculate cofactor of non-square matrix");
         }
 
-        if (rows == 2) {
+        int n = getRows();
+        if (n == 1 && get(0,0) != 0) {
+            return new Mat(new Vec(1f));
+        } else if (n == 1) {
+            return new Mat(new Vec(0f));
+        } else if (n == 2) {
             return new Mat(new Vec(get(1, 1), -get(0, 1)), new Vec(-get(1, 0), get(0, 0)));
         }
 
-        int rowsm1 = rows - 1;
-        Mat matrix = new Mat(rows, rows);
+        int rowsm1 = n - 1;
+        Mat matrix = new Mat(n, n);
 
-        for (int i=0;i<rows;i++) {
-            for (int j=0;j<rows;j++) {
+        for (int i=0;i<n;i++) {
+            for (int j=0;j<n;j++) {
                 Mat det = new Mat(rowsm1, rowsm1);
 
                 for (int x=0;x<rowsm1;x++) {
@@ -273,6 +284,8 @@ public class Mat implements Ref2Df {
         int k = getRows();
         if (k != getCols()) {
             throw new ArithmeticException("Tried to calculate determinant of non-square matrix");
+        } else if (k == 1) {
+            return get(0,0);
         } else if (k == 2) {
             return get(0, 0) * get(1, 1) - get(1, 0) * get(0, 1);
         }
@@ -296,6 +309,80 @@ public class Mat implements Ref2Df {
         return sum;
     }
 
+    public Mat pow (int x) {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate power of non-square matrix");
+        } else if (x < 0) {
+            throw new ArithmeticException("Tried to calculate negative power of matrix");
+        }
+
+        Mat result = identity(getRows());
+        for (int i=0;i<x;i++) {
+            result = result.mul(this);
+        }
+
+        return result;
+    }
+
+    public Mat pow (float y) {
+        return log().scalMul(y).exp();
+    }
+
+    public Mat pow (Mat y) {
+        return y.mul(log()).exp();
+    }
+
+    public Mat exp () {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate exponential of non-square matrix");
+        }
+
+        int n = getRows();
+        int k = 1;
+        long factorial = 1;
+        Mat pow = identity(n);
+
+        Mat result = pow.clone();
+        Mat last = null;
+
+        while (!result.equals(last)) {
+            pow = pow.mul(this);
+            factorial *= k;
+
+            last = result.clone();
+            result = result.add(pow.scalDiv(factorial));
+            k++;
+        }
+
+        return result;
+    }
+
+    public Mat log () {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate exponential of non-square matrix");
+        }
+
+        int k = 1;
+        Mat pow = identity(getRows());
+
+        Mat result = pow.clone();
+        Mat last = null;
+
+        while (!result.equals(last)) {
+            pow = pow.mul(this);
+            last = result.clone();
+
+            if (Intx.isOdd(k)) {
+                result = result.add(pow.scalDiv(k));
+            } else {
+                result = result.subtr(pow.scalDiv(k));
+            }
+            k++;
+        }
+
+        return result;
+    }
+
     public Mat T () {
         int rows = getCols();
         int cols = getRows();
@@ -305,6 +392,16 @@ public class Mat implements Ref2Df {
 
     public Matd toDouble () {
         return Matd.forEach(getRows(), getCols(), (Matd.MatForEachIndex) this::get);
+    }
+
+    @Override
+    public Mati toComplex() {
+        Veci[] complex = new Veci[getRows()];
+        for (int i=0;i<getRows();i++) {
+            complex[i] = get(i).toComplex();
+        }
+
+        return new Mati(complex);
     }
 
     public MatCL toCL (Context context) {
@@ -353,5 +450,18 @@ public class Mat implements Ref2Df {
         }
 
         return "{ "+builder.substring(2)+" }";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Mat ref1Dfs = (Mat) o;
+        return Arrays.equals(values, ref1Dfs.values);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(values);
     }
 }

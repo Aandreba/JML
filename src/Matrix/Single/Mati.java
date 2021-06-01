@@ -6,6 +6,8 @@ import Matrix.Double.Matid;
 import References.Single.Complex.Ref2Dif;
 import Vector.Single.Veci;
 
+import java.util.Arrays;
+
 public class Mati implements Ref2Dif {
     final protected Veci[] values;
 
@@ -86,7 +88,7 @@ public class Mati implements Ref2Dif {
         int rows = finalRows(b);
         int cols = finalCols(b);
 
-        Mati matrix = new Mati(rows, 0);
+        Mati matrix = new Mati(rows, cols);
         for (int i=0;i<rows;i++) {
             for (int j=0;j<cols;j++) {
                 matrix.set(i, j, forEach.apply(get(i, j), b.get(i, j)));
@@ -325,6 +327,46 @@ public class Mati implements Ref2Dif {
         return sum;
     }
 
+    public Mati pow (int x) {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate power of non-square matrix");
+        } else if (x < 0) {
+            throw new ArithmeticException("Tried to calculate negative power of matrix");
+        }
+
+        Mati result = identity(getRows());
+        for (int i=0;i<x;i++) {
+            result = result.mul(this);
+        }
+
+        return result;
+    }
+
+    public Mati exp () {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate exponential of non-square matrix");
+        }
+
+        int n = getRows();
+        int k = 1;
+        long factorial = 1;
+        Mati pow = identity(n);
+
+        Mati result = pow.clone();
+        Mati last = null;
+
+        while (!result.equals(last)) {
+            pow = pow.mul(this);
+            factorial *= k;
+
+            last = result.clone();
+            result = result.add(pow.scalDiv(factorial));
+            k++;
+        }
+
+        return result;
+    }
+
     public Mati T () {
         int rows = getCols();
         int cols = getRows();
@@ -382,5 +424,18 @@ public class Mati implements Ref2Dif {
         }
 
         return "{ "+builder.substring(2)+" }";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Mati ref1Difs = (Mati) o;
+        return Arrays.equals(values, ref1Difs.values);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(values);
     }
 }

@@ -7,6 +7,8 @@ import Matrix.Single.Mati;
 import References.Single.Complex.Ref1Dif;
 import Vector.Double.Vecid;
 
+import java.util.Arrays;
+
 public class Veci implements Ref1Dif {
     final protected Comp[] values;
 
@@ -284,5 +286,18 @@ public class Veci implements Ref1Dif {
         }
 
         return "{ " + builder.substring(2) + " }";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Veci comps = (Veci) o;
+        return Arrays.equals(values, comps.values);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(values);
     }
 }

@@ -6,6 +6,8 @@ import Matrix.Double.Matid;
 import References.Double.Complex.Ref1Di;
 import Vector.Single.Veci;
 
+import java.util.Arrays;
+
 public class Vecid implements Ref1Di {
     final protected Compd[] values;
 
@@ -303,5 +305,18 @@ public class Vecid implements Ref1Di {
         }
 
         return "{ " + builder.substring(2) + " }";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Vecid compds = (Vecid) o;
+        return Arrays.equals(values, compds.values);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(values);
     }
 }
