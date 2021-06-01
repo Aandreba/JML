@@ -1,31 +1,30 @@
-package Matrix.Single;
+package Matrix.Double;
 
 import GPGPU.OpenCL.Context;
-import Matrix.Double.Mat;
-import References.Single.Ref2Df;
-import Vector.Single.Vecf;
+import References.Double.Ref2D;
+import Vector.Double.Vecd;
 
-public class Matf implements Ref2Df {
-    final protected Vecf[] values;
+public class Matd implements Ref2D {
+    final protected Vecd[] values;
 
-    public Matf (int rows, int cols) {
-        this.values = new Vecf[rows];
+    public Matd(int rows, int cols) {
+        this.values = new Vecd[rows];
         for (int i=0;i<rows;i++) {
-            this.values[i] = new Vecf(cols);
+            this.values[i] = new Vecd(cols);
         }
     }
 
-    public Matf (float[][] values) {
-        this.values = new Vecf[values.length];
-        this.values[0] = new Vecf(values[0]);
+    public Matd(double[][] values) {
+        this.values = new Vecd[values.length];
+        this.values[0] = new Vecd(values[0]);
 
         for (int i=1;i<values.length;i++) {
-            set(i, new Vecf(values[i]));
+            set(i, new Vecd(values[i]));
         }
     }
 
-    public Matf (Vecf... values) {
-        this.values = new Vecf[values.length];
+    public Matd(Vecd... values) {
+        this.values = new Vecd[values.length];
         this.values[0] = values[0];
 
         for (int i=1;i<values.length;i++) {
@@ -33,12 +32,12 @@ public class Matf implements Ref2Df {
         }
     }
 
-    public interface MatfForEachIndex {
-        float apply (int row, int col);
+    public interface MatForEachIndex {
+        double apply (int row, int col);
     }
 
-    public interface MatfForEachVecf {
-        Vecf apply (int row);
+    public interface MatForEachVec {
+        Vecd apply (int row);
     }
 
     public int getRows () {
@@ -49,20 +48,19 @@ public class Matf implements Ref2Df {
         return values[0].getSize();
     }
 
-    @Override
-    public float get (int row, int col) {
+    public double get (int row, int col) {
         return values[row].get(col);
     }
 
-    public Vecf get (int row) {
+    public Vecd get (int row) {
         return values[row];
     }
 
-    public void set (int row, int col, float value) {
+    public void set (int row, int col, double value) {
         values[row].set(col, value);
     }
 
-    public void set (int row, Vecf value) {
+    public void set (int row, Vecd value) {
         if (value.getSize() != getCols()) {
             throw new ArrayIndexOutOfBoundsException();
         }
@@ -74,19 +72,19 @@ public class Matf implements Ref2Df {
         return getRows() == getCols();
     }
 
-    private int finalRows (Matf b) {
+    private int finalRows (Matd b) {
         return Math.min(getRows(), b.getRows());
     }
 
-    private int finalCols (Matf b) {
+    private int finalCols (Matd b) {
         return Math.min(getCols(), b.getCols());
     }
 
-    public Matf forEach (Matf b, Vecf.VecfForEach forEach) {
+    public Matd forEach (Matd b, Vecd.VecForEach forEach) {
         int rows = finalRows(b);
         int cols = finalCols(b);
 
-        Matf matrix = new Matf(rows, cols);
+        Matd matrix = new Matd(rows, 0);
         for (int i=0;i<rows;i++) {
             for (int j=0;j<cols;j++) {
                 matrix.set(i, j, forEach.apply(get(i, j), b.get(i, j)));
@@ -96,11 +94,11 @@ public class Matf implements Ref2Df {
         return matrix;
     }
 
-    public Matf forEach (float b, Vecf.VecfForEach forEach) {
+    public Matd forEach (double b, Vecd.VecForEach forEach) {
         int rows = getRows();
         int cols = getCols();
 
-        Matf matrix = new Matf(rows, cols);
+        Matd matrix = new Matd(rows, cols);
         for (int i=0;i<rows;i++) {
             for (int j=0;j<cols;j++) {
                 matrix.set(i, j, forEach.apply(get(i, j), b));
@@ -110,11 +108,11 @@ public class Matf implements Ref2Df {
         return matrix;
     }
 
-    public static Matf forEach (int rows, int cols, MatfForEachVecf forEach) {
-        Matf matrix = new Matf(rows, cols);
+    public static Matd forEach (int rows, int cols, MatForEachVec forEach) {
+        Matd matrix = new Matd(rows, cols);
 
         for (int i=0;i<rows;i++) {
-            Vecf vector = forEach.apply(i);
+            Vecd vector = forEach.apply(i);
             if (vector.getSize() > cols) {
                 throw new IllegalArgumentException();
             }
@@ -125,8 +123,8 @@ public class Matf implements Ref2Df {
         return matrix;
     }
 
-    public static Matf forEach (int rows, int cols, MatfForEachIndex forEach) {
-        Matf matrix = new Matf(rows, cols);
+    public static Matd forEach (int rows, int cols, MatForEachIndex forEach) {
+        Matd matrix = new Matd(rows, cols);
 
         for (int i=0;i<rows;i++) {
             for (int j=0;j<cols;j++) {
@@ -137,45 +135,45 @@ public class Matf implements Ref2Df {
         return matrix;
     }
 
-    public Matf add (Matf b) {
-        return forEach(b, Float::sum);
+    public Matd add (Matd b) {
+        return forEach(b, Double::sum);
     }
 
-    public Matf add (Vecf b) {
+    public Matd add (Vecd b) {
         return forEach(getRows(), getCols(), (i,j) -> get(i, j) + b.get(j));
     }
 
-    public Matf add (float b) {
-        return forEach(b, Float::sum);
+    public Matd add (double b) {
+        return forEach(b, Double::sum);
     }
 
-    public Matf subtr (Matf b) {
+    public Matd subtr (Matd b) {
         return forEach(b, (x, y) -> x - y);
     }
 
-    public Matf subtr (Vecf b) {
+    public Matd subtr (Vecd b) {
         return forEach(getRows(), getCols(), (i,j) -> get(i, j) - b.get(j));
     }
 
-    public Matf subtr (float b) {
+    public Matd subtr (double b) {
         return forEach(b, (x, y) -> x - y);
     }
 
-    public Matf invSubtr (Vecf b) {
+    public Matd invSubtr (Vecd b) {
         return forEach(getRows(), getCols(), (i,j) -> b.get(j) - get(i, j));
     }
 
-    public Matf invSubtr (float b) {
+    public Matd invSubtr (double b) {
         return forEach(b, (x, y) -> y - x);
     }
 
-    public Matf mul (Matf b) {
+    public Matd mul (Matd b) {
         int rows = getRows();
         int cols = b.getCols();
         int dig = Math.min(getCols(), b.getRows());
 
         return forEach(rows, cols, (i, j) -> {
-            float sum = 0;
+            double sum = 0;
             for (int k=0;k<dig;k++) {
                 sum += get(i, k) * b.get(k, j);
             }
@@ -184,47 +182,47 @@ public class Matf implements Ref2Df {
         });
     }
 
-    public Vecf mul (Vecf b) {
+    public Vecd mul (Vecd b) {
         return mul(b.colMatrix()).T().get(0);
     }
 
-    public Matf div (Matf b) {
+    public Matd div (Matd b) {
         return mul(b.inverse());
     }
 
-    public Matf scalMul (Matf b) {
+    public Matd scalMul (Matd b) {
         return forEach(b, (x, y) -> x * y);
     }
 
-    public Matf scalMul (Vecf b) {
+    public Matd scalMul (Vecd b) {
         return forEach(getRows(), getCols(), (i,j) -> get(i, j) * b.get(j));
     }
 
-    public Matf scalMul (float b) {
+    public Matd scalMul (double b) {
         return forEach(b, (x, y) -> x * y);
     }
 
-    public Matf scalDiv (Matf b) {
+    public Matd scalDiv (Matd b) {
         return forEach(b, (x, y) -> x / y);
     }
 
-    public Matf scalDiv (Vecf b) {
+    public Matd scalDiv (Vecd b) {
         return forEach(getRows(), getCols(), (i,j) -> get(i, j) / b.get(j));
     }
 
-    public Matf scalDiv (float b) {
+    public Matd scalDiv (double b) {
         return forEach(b, (x, y) -> x / y);
     }
 
-    public Matf scalInvDiv (Vecf b) {
+    public Matd scalInvDiv (Vecd b) {
         return forEach(getRows(), getCols(), (i,j) -> b.get(j) / get(i, j));
     }
 
-    public Matf scalInvDiv (float b) {
+    public Matd scalInvDiv (double b) {
         return forEach(b, (x, y) -> y / x);
     }
 
-    public Matf inverse() {
+    public Matd inverse() {
         int rows = getRows();
         if (rows != getCols()) {
             throw new ArithmeticException("Tried to invert non-square matrix");
@@ -233,22 +231,22 @@ public class Matf implements Ref2Df {
         return adj().scalMul(1 / det());
     }
 
-    public Matf cofactor () {
+    public Matd cofactor () {
         int rows = getRows();
         if (rows != getCols()) {
             throw new ArithmeticException("Tried to calculate cofactor of non-square matrix");
         }
 
         if (rows == 2) {
-            return new Matf(new Vecf(get(1, 1), -get(0, 1)), new Vecf(-get(1, 0), get(0, 0)));
+            return new Matd(new Vecd(get(1, 1), -get(0, 1)), new Vecd(-get(1, 0), get(0, 0)));
         }
 
         int rowsm1 = rows - 1;
-        Matf matrix = new Matf(rows, rows);
+        Matd matrix = new Matd(rows, rows);
 
         for (int i=0;i<rows;i++) {
             for (int j=0;j<rows;j++) {
-                Matf det = new Matf(rowsm1, rowsm1);
+                Matd det = new Matd(rowsm1, rowsm1);
 
                 for (int x=0;x<rowsm1;x++) {
                     int X = x < i ? x : x + 1;
@@ -265,23 +263,23 @@ public class Matf implements Ref2Df {
         return matrix;
     }
 
-    public Matf adj () {
+    public Matd adj () {
         return cofactor().T();
     }
 
-    public float det () {
+    public double det () {
         int k = getRows();
         if (k != getCols()) {
-            return 0;
+            throw new ArithmeticException("Tried to calculate determinant of non-square matrix");
         } else if (k == 2) {
             return get(0, 0) * get(1, 1) - get(1, 0) * get(0, 1);
         }
 
         int km1 = k - 1;
-        float sum = 0;
+        double sum = 0;
 
         for (int q=0;q<k;q++) {
-            Matf matrix = new Matf(km1, km1);
+            Matd matrix = new Matd(km1, km1);
 
             for (int i=1;i<k;i++) {
                 for (int j=0;j<km1;j++) {
@@ -296,44 +294,44 @@ public class Matf implements Ref2Df {
         return sum;
     }
 
-    public Matf T () {
+    public Matd T () {
         int rows = getCols();
         int cols = getRows();
 
         return forEach(rows, cols, (i, j) -> get(j, i));
     }
 
-    public Mat toDouble () {
-        return Mat.forEach(getRows(), getCols(), (Mat.MatForEachIndex) this::get);
+    public Matrix.Single.Mat toFloat () {
+        return Matrix.Single.Mat.forEach(getRows(), getCols(), (i, j) -> (float) get(i, j));
     }
 
-    public MatCLf toCL (Context context) {
-        return new MatCLf(context, this);
+    public MatCLd toCL (Context context) {
+        return new MatCLd(context, this);
     }
 
-    public MatCLf toCL() {
+    public MatCLd toCL () {
         return toCL(Context.DEFAULT);
     }
 
-    public Vecf toVectorRow () {
-        return Vecf.fromRef(rowMajor());
+    public Vecd toVectorRow () {
+        return Vecd.fromRef(rowMajor());
     }
 
-    public Vecf toVectorCol () {
-        return Vecf.fromRef(colMajor());
+    public Vecd toVectorCol () {
+        return Vecd.fromRef(colMajor());
     }
 
-    public static Matf identity (int k) {
+    public static Matd identity (int k) {
         return forEach(k, k, (i, j) -> i == j ? 1 : 0);
     }
 
-    public static Matf fromRef (Ref2Df ref) {
-        return ref instanceof Matf ? (Matf) ref : forEach(ref.getRows(), ref.getCols(), (MatfForEachIndex) ref::get);
+    public static Matd fromRef (Ref2D ref) {
+        return ref instanceof Matd ? (Matd) ref : forEach(ref.getRows(), ref.getCols(), (MatForEachIndex) ref::get);
     }
 
     @Override
-    public Matf clone() {
-        Matf matrix = new Matf(getRows(), getCols());
+    public Matd clone() {
+        Matd matrix = new Matd(getRows(), getCols());
         for (int i=0;i<getRows();i++) {
             matrix.set(i, get(i).clone());
         }
@@ -345,7 +343,7 @@ public class Matf implements Ref2Df {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         for (int i=0;i<getRows();i++) {
-            builder.append(", ").append(get(i).toString());
+            builder.append(", ").append(get(i));
         }
 
         return "{ "+builder.substring(2)+" }";

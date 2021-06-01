@@ -1,7 +1,7 @@
 package References.Double.Complex;
 
-import Imaginary.Comp;
-import Imaginary.Compf;
+import Complex.Compd;
+import Complex.Comp;
 import References.Single.Complex.Ref2Dif;
 
 import java.util.Iterator;
@@ -10,8 +10,8 @@ public interface Ref2Di extends Iterable<Ref1Di> {
     int getRows();
     int getCols();
 
-    Comp get (int row, int col);
-    void set (int row, int col, Comp val);
+    Compd get (int row, int col);
+    void set (int row, int col, Compd val);
 
     default Ref1Di get (int row) {
         return new Ref1Di() {
@@ -21,12 +21,12 @@ public interface Ref2Di extends Iterable<Ref1Di> {
             }
 
             @Override
-            public Comp get(int pos) {
+            public Compd get(int pos) {
                 return Ref2Di.this.get(row, pos);
             }
 
             @Override
-            public void set(int pos, Comp val) {
+            public void set(int pos, Compd val) {
                 Ref2Di.this.set(row, pos, val);
             }
         };
@@ -63,19 +63,19 @@ public interface Ref2Di extends Iterable<Ref1Di> {
             }
 
             @Override
-            public Comp get (int row, int col) {
+            public Compd get (int row, int col) {
                 return Ref2Di.this.get(col, row);
             }
 
             @Override
-            public void set(int row, int col, Comp val) {
+            public void set(int row, int col, Compd val) {
                 Ref2Di.this.set(col, row, val);
             }
         };
     }
 
-    default Comp[][] toArray () {
-        Comp[][] array = new Comp[getRows()][getCols()];
+    default Compd[][] toArray () {
+        Compd[][] array = new Compd[getRows()][getCols()];
         for (int i=0;i<array.length;i++) {
             array[i] = get(i).toArray();
         }
@@ -83,7 +83,7 @@ public interface Ref2Di extends Iterable<Ref1Di> {
         return array;
     }
 
-    default Ref2Dif toFloat () { // TODO
+    default Ref2Dif toFloat () {
         return new Ref2Dif() {
             @Override
             public int getRows() {
@@ -96,18 +96,18 @@ public interface Ref2Di extends Iterable<Ref1Di> {
             }
 
             @Override
-            public Compf get(int row, int col) {
+            public Comp get(int row, int col) {
                 return Ref2Di.this.get(row, col).toFloat();
             }
 
             @Override
-            public void set(int row, int col, Compf val) {
+            public void set(int row, int col, Comp val) {
                 Ref2Di.this.set(row, col, val.toDouble());
             }
         };
     }
 
-    default Ref1Di rowMajor () { // TODO
+    default Ref1Di rowMajor () {
         return new Ref1Di() {
             @Override
             public int getSize() {
@@ -115,7 +115,7 @@ public interface Ref2Di extends Iterable<Ref1Di> {
             }
 
             @Override
-            public Comp get (int pos) {
+            public Compd get (int pos) {
                 int cols = getCols();
                 int row = pos / cols;
                 int col = pos % cols;
@@ -124,7 +124,7 @@ public interface Ref2Di extends Iterable<Ref1Di> {
             }
 
             @Override
-            public void set (int pos, Comp val) {
+            public void set (int pos, Compd val) {
                 int cols = getCols();
                 int row = pos / cols;
                 int col = pos % cols;
@@ -134,7 +134,7 @@ public interface Ref2Di extends Iterable<Ref1Di> {
         };
     }
 
-    default Ref1Di colMajor () { // TODO
+    default Ref1Di colMajor () {
         return new Ref1Di() {
             @Override
             public int getSize() {
@@ -142,7 +142,7 @@ public interface Ref2Di extends Iterable<Ref1Di> {
             }
 
             @Override
-            public Comp get (int pos) {
+            public Compd get (int pos) {
                 int rows = getRows();
                 int col = pos / rows;
                 int row = pos % rows;
@@ -151,7 +151,7 @@ public interface Ref2Di extends Iterable<Ref1Di> {
             }
 
             @Override
-            public void set (int pos, Comp val) {
+            public void set (int pos, Compd val) {
                 int rows = getRows();
                 int col = pos / rows;
                 int row = pos % rows;

@@ -1,15 +1,15 @@
 package References.Double.Complex;
 
-import Imaginary.Comp;
-import Imaginary.Compf;
+import Complex.Compd;
+import Complex.Comp;
 import References.Single.Complex.Ref1Dif;
 
 import java.util.Iterator;
 
-public interface Ref1Di extends Iterable<Comp> {
+public interface Ref1Di extends Iterable<Compd> {
     int getSize();
-    Comp get (int pos);
-    void set (int pos, Comp val);
+    Compd get (int pos);
+    void set (int pos, Compd val);
 
     default void set (Ref1Di values) {
         int len = Math.min(getSize(), values.getSize());
@@ -18,8 +18,8 @@ public interface Ref1Di extends Iterable<Comp> {
         }
     }
 
-    default Comp[] toArray () {
-        Comp[] array = new Comp[getSize()];
+    default Compd[] toArray () {
+        Compd[] array = new Compd[getSize()];
         for (int i=0;i<array.length;i++) {
             array[i] = get(i);
         }
@@ -35,12 +35,12 @@ public interface Ref1Di extends Iterable<Comp> {
             }
 
             @Override
-            public Compf get(int pos) {
+            public Comp get(int pos) {
                 return Ref1Di.this.get(pos).toFloat();
             }
 
             @Override
-            public void set(int pos, Compf val) {
+            public void set(int pos, Comp val) {
                 Ref1Di.this.set(pos, val.toDouble());
             }
         };
@@ -59,12 +59,12 @@ public interface Ref1Di extends Iterable<Comp> {
             }
 
             @Override
-            public Comp get (int row, int col) {
+            public Compd get (int row, int col) {
                 return Ref1Di.this.get((row * cols) + col);
             }
 
             @Override
-            public void set (int row, int col, Comp val) {
+            public void set (int row, int col, Compd val) {
                 Ref1Di.this.set((row * cols) + col, val);
             }
         };
@@ -83,20 +83,20 @@ public interface Ref1Di extends Iterable<Comp> {
             }
 
             @Override
-            public Comp get (int row, int col) {
+            public Compd get (int row, int col) {
                 return Ref1Di.this.get((col * rows) + row);
             }
 
             @Override
-            public void set (int row, int col, Comp val) {
+            public void set (int row, int col, Compd val) {
                 Ref1Di.this.set((col * rows) + row, val);
             }
         };
     }
 
     @Override
-    default Iterator<Comp> iterator() {
-        return new Iterator<Comp>() {
+    default Iterator<Compd> iterator() {
+        return new Iterator<Compd>() {
             int i = 0;
 
             @Override
@@ -105,7 +105,7 @@ public interface Ref1Di extends Iterable<Comp> {
             }
 
             @Override
-            public Comp next() {
+            public Compd next() {
                 return get(i++);
             }
         };

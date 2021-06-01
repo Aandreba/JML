@@ -1,7 +1,6 @@
 package References.Single;
 
-import Imaginary.Comp;
-import Imaginary.Compf;
+import Complex.Comp;
 import References.Double.Ref1D;
 import References.Single.Complex.Ref1Dif;
 
@@ -55,12 +54,12 @@ public interface Ref1Df extends Iterable<Float> {
             }
 
             @Override
-            public Compf get(int pos) {
-                return new Compf(Ref1Df.this.get(pos), 0);
+            public Comp get(int pos) {
+                return new Comp(Ref1Df.this.get(pos), 0);
             }
 
             @Override
-            public void set (int pos, Compf val) {
+            public void set (int pos, Comp val) {
                 Ref1Df.this.set(pos, val.real);
             }
         };

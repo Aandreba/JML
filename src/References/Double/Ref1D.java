@@ -1,6 +1,6 @@
 package References.Double;
 
-import Imaginary.Comp;
+import Complex.Compd;
 import References.Double.Complex.Ref1Di;
 import References.Single.Ref1Df;
 
@@ -54,12 +54,12 @@ public interface Ref1D extends Iterable<Double> {
             }
 
             @Override
-            public Comp get(int pos) {
-                return new Comp(Ref1D.this.get(pos), 0);
+            public Compd get(int pos) {
+                return new Compd(Ref1D.this.get(pos), 0);
             }
 
             @Override
-            public void set (int pos, Comp val) {
+            public void set (int pos, Compd val) {
                 Ref1D.this.set(pos, val.real);
             }
         };

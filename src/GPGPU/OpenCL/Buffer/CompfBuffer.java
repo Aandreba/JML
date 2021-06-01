@@ -3,27 +3,30 @@ package GPGPU.OpenCL.Buffer;
 import GPGPU.OpenCL.CommandQueue;
 import GPGPU.OpenCL.Context;
 import GPGPU.OpenCL.Query;
-import Imaginary.Comp;
-import References.Double.Complex.Ref1Di;
+import Complex.Comp;
+import References.Single.Complex.Ref1Dif;
 import org.jocl.Pointer;
 import org.jocl.Sizeof;
+import org.jocl.blast.CLBlast;
 import org.jocl.cl_event;
+
+import java.util.Arrays;
 
 import static org.jocl.CL.*;
 
-public class ComplexBuffer extends Buffer implements Ref1Di {
+public class CompfBuffer extends Buffer implements Ref1Dif {
     final public int size;
 
-    public ComplexBuffer (CommandQueue queue, int size) {
-        super(queue, Sizeof.cl_double2 * size);
+    public CompfBuffer(CommandQueue queue, int size) {
+        super(queue, Sizeof.cl_float2 * size);
         this.size = size;
     }
 
-    public ComplexBuffer (Context context, int size) {
+    public CompfBuffer(Context context, int size) {
         this(new CommandQueue(context), size);
     }
 
-    public ComplexBuffer (Context context, Comp... values) {
+    public CompfBuffer(Context context, Comp... values) {
         this(context, values.length);
         set(values);
     }
@@ -39,19 +42,19 @@ public class ComplexBuffer extends Buffer implements Ref1Di {
             throw new IllegalArgumentException();
         }
 
-        double[] array = new double[2];
-        clEnqueueReadBuffer(queue.id, this.id, CL_TRUE, Sizeof.cl_double2 * pos, Sizeof.cl_double2, Pointer.to(array), 0, null, null);
+        float[] array = new float[2];
+        clEnqueueReadBuffer(queue.id, this.id, CL_TRUE, Sizeof.cl_float2 * pos, Sizeof.cl_float2, Pointer.to(array), 0, null, null);
 
         return new Comp(array[0], array[1]);
     }
 
     public void set (int offset, Comp... vals) {
-        if (vals.length != size) {
+        if (offset < 0 || offset + vals.length >= size) {
             throw new IllegalArgumentException();
         }
 
         cl_event event = new cl_event();
-        clEnqueueWriteBuffer(queue.id, this.id, CL_TRUE, Sizeof.cl_double2 * offset, Sizeof.cl_double2 * vals.length, Pointer.to(getDoubles(vals)), 0, null, event);
+        clEnqueueWriteBuffer(queue.id, this.id, CL_TRUE, Sizeof.cl_float2 * offset, Sizeof.cl_float2 * vals.length, Pointer.to(getFloats(vals)), 0, null, event);
         Query.awaitEvents(event);
     }
 
@@ -61,7 +64,7 @@ public class ComplexBuffer extends Buffer implements Ref1Di {
         }
 
         cl_event event = new cl_event();
-        clEnqueueWriteBuffer(queue.id, this.id, CL_TRUE, 0, byteSize, Pointer.to(getDoubles(vals)), 0, null, event);
+        clEnqueueWriteBuffer(queue.id, this.id, CL_TRUE, 0, byteSize, Pointer.to(getFloats(vals)), 0, null, event);
         Query.awaitEvents(event);
     }
 
@@ -72,18 +75,18 @@ public class ComplexBuffer extends Buffer implements Ref1Di {
         }
 
         cl_event event = new cl_event();
-        clEnqueueWriteBuffer(queue.id, this.id, CL_TRUE, Sizeof.cl_double2 * pos, Sizeof.cl_double2, Pointer.to(getDoubles(val)), 0, null, event);
+        clEnqueueWriteBuffer(queue.id, this.id, CL_TRUE, Sizeof.cl_float2 * pos, Sizeof.cl_float2, Pointer.to(getFloats(val)), 0, null, event);
         Query.awaitEvents(event);
     }
 
     @Override
-    public void set (Ref1Di values) {
+    public void set (Ref1Dif values) {
         set(values.toArray());
     }
 
     @Override
     public Comp[] toArray() {
-        double[] array = new double[2 * size];
+        float[] array = new float[2 * size];
 
         cl_event event = new cl_event();
         clEnqueueReadBuffer(queue.id, this.id, CL_TRUE, 0, byteSize, Pointer.to(array), 0, null, event);
@@ -98,8 +101,24 @@ public class ComplexBuffer extends Buffer implements Ref1Di {
         return values;
     }
 
-    public static double[] getDoubles (Comp... vals) {
-        double[] values = new double[vals.length * 2];
+    @Override
+    public String toString() {
+        return Arrays.toString(toArray());
+    }
+
+    @Override
+    public CompfBuffer clone() {
+        CompfBuffer vector = new CompfBuffer(getContext(), size);
+
+        cl_event event = new cl_event();
+        CLBlast.CLBlastCcopy(size, this.getId(), 0, 1, vector.getId(), 0, 1, getQueue().id, event);
+
+        Query.awaitEvents(event);
+        return vector;
+    }
+
+    public static float[] getFloats (Comp... vals) {
+        float[] values = new float[vals.length * 2];
         for (int i=0;i<vals.length;i++) {
             int j = 2 * i;
             values[j] = vals[i].real;

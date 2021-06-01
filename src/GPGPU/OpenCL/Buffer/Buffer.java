@@ -6,7 +6,6 @@ import GPGPU.OpenCL.Query;
 import org.jocl.Pointer;
 import org.jocl.cl_event;
 import org.jocl.cl_mem;
-
 import static org.jocl.CL.*;
 
 public class Buffer {
@@ -51,8 +50,21 @@ public class Buffer {
         setQueue(new CommandQueue(context));
     }
 
-    public void release () {
+    public void release (boolean releaseQueue) {
         clReleaseMemObject(this.id);
-        queue.release();
+        if (releaseQueue) {
+            queue.release();
+        }
+    }
+
+    @Override
+    public Buffer clone() {
+        Buffer buffer = new Buffer(getContext(), byteSize);
+
+        cl_event event = new cl_event();
+        clEnqueueCopyBuffer(queue.id, getId(), buffer.getId(), 0, 0, byteSize, 0, null, event);
+
+        Query.awaitEvents(event);
+        return buffer;
     }
 }

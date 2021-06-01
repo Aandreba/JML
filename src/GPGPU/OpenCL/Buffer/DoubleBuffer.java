@@ -6,7 +6,10 @@ import GPGPU.OpenCL.Query;
 import References.Double.Ref1D;
 import org.jocl.Pointer;
 import org.jocl.Sizeof;
+import org.jocl.blast.CLBlast;
 import org.jocl.cl_event;
+
+import java.util.Arrays;
 
 import static org.jocl.CL.*;
 
@@ -39,18 +42,27 @@ public class DoubleBuffer extends Buffer implements Ref1D {
         }
 
         double[] array = new double[1];
-        clEnqueueReadBuffer(queue.id, this.id, CL_TRUE, Sizeof.cl_double * pos, Sizeof.cl_double, Pointer.to(array), 0, null, null);
+        cl_event event = new cl_event();
+        clEnqueueReadBuffer(queue.id, getId(), true, Sizeof.cl_double * pos, Sizeof.cl_double, Pointer.to(array), 0, null, event);
 
+        Query.awaitEvents(event);
         return array[0];
     }
 
     public void set (int offset, double... vals) {
-        if (vals.length != size) {
+        if (offset < 0 || offset + vals.length >= size) {
             throw new IllegalArgumentException();
         }
 
         cl_event event = new cl_event();
         clEnqueueWriteBuffer(queue.id, this.id, CL_TRUE, Sizeof.cl_double * offset, Sizeof.cl_double * vals.length, Pointer.to(vals), 0, null, event);
+        Query.awaitEvents(event);
+    }
+
+    public void set (int len, int offsetX, int incX, DoubleBuffer y, int offsetY, int incY) {
+        cl_event event = new cl_event();
+        CLBlast.CLBlastDcopy(len, y.id, offsetY, incY, getId(), offsetX, incX, queue.id, event);
+
         Query.awaitEvents(event);
     }
 
@@ -89,5 +101,21 @@ public class DoubleBuffer extends Buffer implements Ref1D {
 
         Query.awaitEvents(event);
         return array;
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.toString(toArray());
+    }
+
+    @Override
+    public DoubleBuffer clone() {
+        DoubleBuffer vector = new DoubleBuffer(getContext(), size);
+
+        cl_event event = new cl_event();
+        CLBlast.CLBlastDcopy(size, this.getId(), 0, 1, vector.getId(), 0, 1, getQueue().id, event);
+
+        Query.awaitEvents(event);
+        return vector;
     }
 }

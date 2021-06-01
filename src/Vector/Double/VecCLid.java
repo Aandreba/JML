@@ -1,47 +1,48 @@
 package Vector.Double;
 
-import GPGPU.OpenCL.Buffer.ComplexBuffer;
+import GPGPU.OpenCL.Buffer.CompBuffer;
+import GPGPU.OpenCL.Buffer.DoubleBuffer;
 import GPGPU.OpenCL.CommandQueue;
 import GPGPU.OpenCL.Context;
 import GPGPU.OpenCL.Query;
-import Imaginary.Comp;
-import Imaginary.Compf;
-import Matrix.Double.MatCLi;
+import Complex.Compd;
+import Complex.Comp;
+import Matrix.Double.MatCLid;
 import References.Double.Complex.Ref1Di;
-import Vector.Single.VecCLif;
+import Vector.Single.VecCLi;
 import org.jocl.blast.CLBlast;
 import org.jocl.cl_event;
 
 import java.util.Arrays;
 
-public class VecCLi extends ComplexBuffer {
-    public VecCLi (Context context, int size) {
+public class VecCLid extends CompBuffer {
+    public VecCLid(Context context, int size) {
         super(context, size);
     }
 
-    public VecCLi (Context context, Ref1Di values) {
+    public VecCLid(Context context, Ref1Di values) {
         this(context, values.getSize());
         set(values.toArray());
     }
 
-    public VecCLi (Context context, Comp... values) {
+    public VecCLid(Context context, Compd... values) {
         this(context, values.length);
         set(values);
     }
 
-    public VecCLi (int size) {
+    public VecCLid(int size) {
         super(Context.DEFAULT, size);
     }
 
-    public VecCLi (Ref1Di values) {
+    public VecCLid(Ref1Di values) {
         this(Context.DEFAULT, values);
     }
 
-    public VecCLi (Comp... values) {
+    public VecCLid(Compd... values) {
         this(Context.DEFAULT, values);
     }
 
-    private void checkCompatibility (VecCLi b) {
+    private void checkCompatibility (VecCLid b) {
         if (size != b.size || !getContext().equals(b.getContext())) {
             throw new IllegalArgumentException();
         }
@@ -50,12 +51,12 @@ public class VecCLi extends ComplexBuffer {
     /**
      * Performs the operation y = alpha * x + y
      */
-    public VecCLi add (Comp alpha, VecCLi y) {
+    public VecCLid add (Compd alpha, VecCLid y) {
         checkCompatibility(y);
-        VecCLi result = y.clone();
+        VecCLid result = y.clone();
 
         cl_event event = new cl_event();
-        CLBlast.CLBlastZaxpy(size, ComplexBuffer.getDoubles(alpha), this.getId(), 0, 1, result.getId(), 0, 1, getQueue().id, event);
+        CLBlast.CLBlastZaxpy(size, CompBuffer.getDoubles(alpha), this.getId(), 0, 1, result.getId(), 0, 1, getQueue().id, event);
 
         Query.awaitEvents(event);
         return result;
@@ -64,9 +65,9 @@ public class VecCLi extends ComplexBuffer {
     /**
      * Performs the operation y = alpha * x + y
      */
-    public VecCLi add (double alpha, VecCLi y) {
+    public VecCLid add (double alpha, VecCLid y) {
         checkCompatibility(y);
-        VecCLi result = y.clone();
+        VecCLid result = y.clone();
 
         cl_event event = new cl_event();
         CLBlast.CLBlastZaxpy(size, new double[]{ alpha, 0 }, this.getId(), 0, 1, result.getId(), 0, 1, getQueue().id, event);
@@ -79,20 +80,20 @@ public class VecCLi extends ComplexBuffer {
      * Performs the operation y = x + y
      * @param y Vector
      */
-    public VecCLi add (VecCLi y) {
+    public VecCLid add (VecCLid y) {
         return add(1, y);
     }
 
     /**
      * Performs the operation y = x + alpha
      */
-    public VecCLi add (Comp alpha) {
-        Comp[] vals = new Comp[size];
+    public VecCLid add (Compd alpha) {
+        Compd[] vals = new Compd[size];
         Arrays.fill(vals, alpha);
 
-        VecCLi vector = new VecCLi(getContext(), vals);
-        VecCLi result = add(vector);
-        vector.release();
+        VecCLid vector = new VecCLid(getContext(), vals);
+        VecCLid result = add(vector);
+        vector.release(true);
 
         return result;
     }
@@ -101,13 +102,13 @@ public class VecCLi extends ComplexBuffer {
      * Performs the operation y = x + alpha, in which x is a vector and alpha is a scalar.
      * @param alpha Scalar
      */
-    public VecCLi add (double alpha) {
-        Comp[] vals = new Comp[size];
-        Arrays.fill(vals, new Comp(alpha, 0));
+    public VecCLid add (double alpha) {
+        Compd[] vals = new Compd[size];
+        Arrays.fill(vals, new Compd(alpha, 0));
 
-        VecCLi vector = new VecCLi(getContext(), vals);
-        VecCLi result = add(vector);
-        vector.release();
+        VecCLid vector = new VecCLid(getContext(), vals);
+        VecCLid result = add(vector);
+        vector.release(true);
 
         return result;
     }
@@ -115,72 +116,86 @@ public class VecCLi extends ComplexBuffer {
     /**
      * Performs the operation x = x - beta * y
      */
-    public VecCLi subtr (Comp beta, VecCLi y) {
+    public VecCLid subtr (Compd beta, VecCLid y) {
         return y.add(beta.mul(-1), this);
     }
 
     /**
      * Performs the operation x = x - beta * y
      */
-    public VecCLi subtr (double beta, VecCLi y) {
+    public VecCLid subtr (double beta, VecCLid y) {
         return y.add(-beta, this);
     }
 
     /**
      * Performs the operation x = x - y
      */
-    public VecCLi subtr (VecCLi y) {
+    public VecCLid subtr (VecCLid y) {
         return subtr(1, y);
     }
 
     /**
      * Performs the operation y = x - alpha
      */
-    public VecCLi subtr (Comp alpha) {
+    public VecCLid subtr (Compd alpha) {
         return add(alpha.mul(-1));
     }
 
     /**
      * Performs the operation y = x - alpha
      */
-    public VecCLi subtr (double alpha) {
+    public VecCLid subtr (double alpha) {
         return add(-alpha);
+    }
+
+    /**
+     * Performs the operation y = alpha - x
+     */
+    public VecCLid invSubtr (Compd alpha) {
+        return mul(-1).add(alpha);
+    }
+
+    /**
+     * Performs the operation y = alpha - x
+     */
+    public VecCLid invSubtr (double alpha) {
+        return mul(-1).add(alpha);
     }
 
     /**
      * Performs the operation y = alpha * x * y
      */
-    public VecCLi mul (Comp alpha, VecCLi y) {
+    public VecCLid mul (Compd alpha, VecCLid y) {
         checkCompatibility(y);
-        MatCLi identity = identityLike();
-        VecCLi result = identity.mul(alpha, y);
+        MatCLid identity = identityLike();
+        VecCLid result = identity.mul(alpha, y);
 
-        identity.release();
+        identity.release(true);
         return result;
     }
 
     /**
      * Performs the operation y = alpha * x * y
      */
-    public VecCLi mul (double alpha, VecCLi y) {
-        return mul(new Comp(alpha, 0), y);
+    public VecCLid mul (double alpha, VecCLid y) {
+        return mul(new Compd(alpha, 0), y);
     }
 
     /**
      * Performs the operation y = x * y
      */
-    public VecCLi mul (VecCLi y) {
+    public VecCLid mul (VecCLid y) {
         return mul(1, y);
     }
 
     /**
      * Multiplies n elements of vector x by a scalar constant alpha.
      */
-    public VecCLi mul (Comp alpha) {
-        VecCLi result = clone();
+    public VecCLid mul (Compd alpha) {
+        VecCLid result = clone();
 
         cl_event event = new cl_event();
-        CLBlast.CLBlastZscal(size, ComplexBuffer.getDoubles(alpha), result.getId(), 0, 1, getQueue().id, event);
+        CLBlast.CLBlastZscal(size, CompBuffer.getDoubles(alpha), result.getId(), 0, 1, getQueue().id, event);
 
         Query.awaitEvents(event);
         return result;
@@ -189,31 +204,31 @@ public class VecCLi extends ComplexBuffer {
     /**
      * Multiplies n elements of vector x by a scalar constant alpha.
      */
-    public VecCLi mul (double alpha) {
-        return mul(new Comp(alpha, 0));
+    public VecCLid mul (double alpha) {
+        return mul(new Compd(alpha, 0));
     }
 
     /**
      * Divides n elements of vector x by a scalar constant alpha.
      */
-    public VecCLi div (Comp alpha) {
+    public VecCLid div (Compd alpha) {
         return mul(alpha.inverse());
     }
 
     /**
      * Divides n elements of vector x by a scalar constant alpha.
      */
-    public VecCLi div (double alpha) {
+    public VecCLid div (double alpha) {
         return mul(1 / alpha);
     }
 
     /**
      * Multiplies n elements of the vectors x and y element-wise and accumulates the results.
      */
-    public Comp dot (VecCLi y) {
+    public Compd dot (VecCLid y) {
         checkCompatibility(y);
         CommandQueue queue = getQueue();
-        ComplexBuffer buffer = new ComplexBuffer(queue, 1);
+        CompBuffer buffer = new CompBuffer(queue, 1);
 
         cl_event event = new cl_event();
         CLBlast.CLBlastZdotu(size, buffer.getId(), 0, this.getId(), 0, 1, y.getId(), 0, 1, queue.id, event);
@@ -225,9 +240,9 @@ public class VecCLi extends ComplexBuffer {
     /**
      * Accumulates the square of n elements in the x vector and takes the square root
      */
-    public Comp magnitude () {
+    public double magnitude () {
         CommandQueue queue = getQueue();
-        ComplexBuffer buffer = new ComplexBuffer(queue, 1);
+        DoubleBuffer buffer = new DoubleBuffer(queue, 1);
 
         cl_event event = new cl_event();
         CLBlast.CLBlastDznrm2(size, buffer.getId(), 0, this.getId(), 0, 1, queue.id, event);
@@ -236,23 +251,42 @@ public class VecCLi extends ComplexBuffer {
         return buffer.get(0);
     }
 
-    public Comp magnitude2 () {
-        return dot(this);
+    /**
+     * Calculates vector's magnitude to the second power
+     */
+    public double magnitude2 () {
+        double mag = magnitude();
+        return mag * mag;
     }
 
     /**
      * Normalized vector
      * @return Normalized vector
      */
-    public VecCLi norm () {
+    public VecCLid unit () {
         return div(magnitude());
+    }
+
+    public Compd sum () {
+        CommandQueue queue = getQueue();
+        CompBuffer buffer = new CompBuffer(queue, 1);
+
+        cl_event event = new cl_event();
+        CLBlast.CLBlastDzsum(size, buffer.getId(), 0, getId(), 0, 1, queue.id, event);
+
+        Query.awaitEvents(event);
+        return buffer.get(0);
+    }
+
+    public Compd mean () {
+        return sum().div(size);
     }
 
     /**
      * Represents vector values in form of an identity matrix
      */
-    public MatCLi identityLike () {
-        MatCLi matrix = new MatCLi(size, size);
+    public MatCLid identityLike () {
+        MatCLid matrix = new MatCLid(getContext(), size, size);
 
         cl_event event = new cl_event();
         CLBlast.CLBlastZcopy(size, getId(), 0, 1, matrix.getId(), 0, size + 1, getQueue().id, event);
@@ -262,23 +296,31 @@ public class VecCLi extends ComplexBuffer {
     }
 
     @Override
-    public VecCLif toFloat() {
-        Comp[] values = toArray();
-        Compf[] casted = new Compf[values.length];
+    public VecCLi toFloat() {
+        Compd[] values = toArray();
+        Comp[] casted = new Comp[values.length];
         for (int i=0;i<casted.length;i++) {
             casted[i] = values[i].toFloat();
         }
 
-        return new VecCLif(getContext(), casted);
+        return new VecCLi(getContext(), casted);
     }
 
-    public Veci toCPU () {
-        return new Veci(toArray());
+    public Vecid toCPU () {
+        return new Vecid(toArray());
+    }
+
+    public MatCLid rowMatrix () {
+        return new MatCLid(this.clone(), size);
+    }
+
+    public MatCLid colMatrix () {
+        return new MatCLid(this.clone(), 1);
     }
 
     @Override
     public String toString() {
-        Comp[] vals = toArray();
+        Compd[] vals = toArray();
         StringBuilder builder = new StringBuilder();
 
         for (int i=0;i<getSize();i++) {
@@ -289,8 +331,8 @@ public class VecCLi extends ComplexBuffer {
     }
 
     @Override
-    public VecCLi clone() {
-        VecCLi vector = new VecCLi(getContext(), size);
+    public VecCLid clone() {
+        VecCLid vector = new VecCLid(getContext(), size);
 
         cl_event event = new cl_event();
         CLBlast.CLBlastZcopy(size, this.getId(), 0, 1, vector.getId(), 0, 1, getQueue().id, event);

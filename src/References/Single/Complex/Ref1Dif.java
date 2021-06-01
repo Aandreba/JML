@@ -1,15 +1,15 @@
 package References.Single.Complex;
 
-import Imaginary.Comp;
-import Imaginary.Compf;
+import Complex.Compd;
+import Complex.Comp;
 import References.Double.Complex.Ref1Di;
 
 import java.util.Iterator;
 
-public interface Ref1Dif extends Iterable<Compf> {
+public interface Ref1Dif extends Iterable<Comp> {
     int getSize();
-    Compf get (int pos);
-    void set (int pos, Compf val);
+    Comp get (int pos);
+    void set (int pos, Comp val);
 
     default void set (Ref1Dif values) {
         int len = Math.min(getSize(), values.getSize());
@@ -18,8 +18,8 @@ public interface Ref1Dif extends Iterable<Compf> {
         }
     }
 
-    default Compf[] toArray () {
-        Compf[] array = new Compf[getSize()];
+    default Comp[] toArray () {
+        Comp[] array = new Comp[getSize()];
         for (int i=0;i<array.length;i++) {
             array[i] = get(i);
         }
@@ -35,18 +35,18 @@ public interface Ref1Dif extends Iterable<Compf> {
             }
 
             @Override
-            public Comp get(int pos) {
+            public Compd get(int pos) {
                 return Ref1Dif.this.get(pos).toDouble();
             }
 
             @Override
-            public void set(int pos, Comp val) {
+            public void set(int pos, Compd val) {
                 Ref1Dif.this.set(pos, val.toFloat());
             }
         };
     }
 
-    default Ref2Dif rowMajor (int cols) { // TODO
+    default Ref2Dif rowMajor (int cols) {
         return new Ref2Dif() {
             @Override
             public int getRows() {
@@ -59,18 +59,18 @@ public interface Ref1Dif extends Iterable<Compf> {
             }
 
             @Override
-            public Compf get (int row, int col) {
+            public Comp get (int row, int col) {
                 return Ref1Dif.this.get((row * cols) + col);
             }
 
             @Override
-            public void set (int row, int col, Compf val) {
+            public void set (int row, int col, Comp val) {
                 Ref1Dif.this.set((row * cols) + col, val);
             }
         };
     }
 
-    default Ref2Dif colMajor (int rows) { // TODO
+    default Ref2Dif colMajor (int rows) {
         return new Ref2Dif () {
             @Override
             public int getRows() {
@@ -83,20 +83,20 @@ public interface Ref1Dif extends Iterable<Compf> {
             }
 
             @Override
-            public Compf get (int row, int col) {
+            public Comp get (int row, int col) {
                 return Ref1Dif.this.get((col * rows) + row);
             }
 
             @Override
-            public void set (int row, int col, Compf val) {
+            public void set (int row, int col, Comp val) {
                 Ref1Dif.this.set((col * rows) + row, val);
             }
         };
     }
 
     @Override
-    default Iterator<Compf> iterator() {
-        return new Iterator<Compf>() {
+    default Iterator<Comp> iterator() {
+        return new Iterator<Comp>() {
             int i = 0;
 
             @Override
@@ -105,7 +105,7 @@ public interface Ref1Dif extends Iterable<Compf> {
             }
 
             @Override
-            public Compf next() {
+            public Comp next() {
                 return get(i++);
             }
         };

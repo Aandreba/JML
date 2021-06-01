@@ -1,9 +1,15 @@
 package Mathx;
 
-import Matrix.Double.Mat;
-import Matrix.Single.Matf;
-import Vector.Double.Vec;
-import Vector.Single.Vecf;
+import Complex.Compd;
+import Complex.Comp;
+import Matrix.Double.Matd;
+import Matrix.Double.Matid;
+import Matrix.Single.Mat;
+import Matrix.Single.Mati;
+import Vector.Double.Vecd;
+import Vector.Double.Vecid;
+import Vector.Single.Vec;
+import Vector.Single.Veci;
 
 import java.util.List;
 import java.util.Random;
@@ -81,6 +87,22 @@ final public class Rand {
         return Double.longBitsToDouble(random.nextLong());
     }
 
+    public static Compd getCompd() {
+        return Compd.fromPolar(random.nextDouble(), getDouble(0, Mathd.PI2));
+    }
+
+    public static Compd getCompd(Compd from, Compd to) {
+        return to.subtr(from).mul(getCompd()).add(from);
+    }
+
+    public static Comp getComp() {
+        return Comp.fromPolar(random.nextFloat(), getFloat(0, Mathf.PI2));
+    }
+
+    public static Comp getComp(Comp from, Comp to) {
+        return to.subtr(from).mul(getComp()).add(from);
+    }
+
     public static double getGaussian () {
         return random.nextGaussian();
     }
@@ -112,8 +134,8 @@ final public class Rand {
         return std * getFloatGaussian() + mean;
     }
 
-    public static Vec getVec (int size) {
-        Vec vector = new Vec(size);
+    public static Vecd getVecd (int size) {
+        Vecd vector = new Vecd(size);
         for (int i=0;i<size;i++) {
             vector.set(i, random.nextDouble());
         }
@@ -121,8 +143,8 @@ final public class Rand {
         return vector;
     }
 
-    public static Vec getVec (int size, double from, double to) {
-        Vec vector = new Vec(size);
+    public static Vecd getVecd (int size, double from, double to) {
+        Vecd vector = new Vecd(size);
         for (int i=0;i<size;i++) {
             vector.set(i, getDouble(from, to));
         }
@@ -130,8 +152,8 @@ final public class Rand {
         return vector;
     }
 
-    public static Vecf getVecf (int size) {
-        Vecf vector = new Vecf(size);
+    public static Vec getVec (int size) {
+        Vec vector = new Vec(size);
         for (int i=0;i<size;i++) {
             vector.set(i, random.nextFloat());
         }
@@ -139,8 +161,8 @@ final public class Rand {
         return vector;
     }
 
-    public static Vecf getVecf (int size, float from, float to) {
-        Vecf vector = new Vecf(size);
+    public static Vec getVec (int size, float from, float to) {
+        Vec vector = new Vec(size);
         for (int i=0;i<size;i++) {
             vector.set(i, getFloat(from, to));
         }
@@ -148,23 +170,75 @@ final public class Rand {
         return vector;
     }
 
-    public static Mat getMat (int rows, int cols) {
-        return Mat.forEach(rows, cols, (i,j) -> Rand.getDouble());
+    public static Vecid getVecid(int size) {
+        Vecid vector = new Vecid(size);
+        for (int i=0;i<size;i++) {
+            vector.set(i, getCompd());
+        }
+
+        return vector;
     }
 
-    public static Mat getMat (int rows, int cols, double from, double to) {
-        return Mat.forEach(rows, cols, (i,j) -> Rand.getDouble(from, to));
+    public static Vecid getVecid(int size, Compd from, Compd to) {
+        Vecid vector = new Vecid(size);
+        for (int i=0;i<size;i++) {
+            vector.set(i, getCompd(from, to));
+        }
+
+        return vector;
     }
 
-    public static Matf getMatf (int rows, int cols) {
-        return Matf.forEach(rows, cols, (i,j) -> Rand.getFloat());
+    public static Veci getVeci (int size) {
+        Veci vector = new Veci(size);
+        for (int i=0;i<size;i++) {
+            vector.set(i, getComp());
+        }
+
+        return vector;
     }
 
-    public static Matf getMatf (int rows, int cols, float from, float to) {
-        return Matf.forEach(rows, cols, (i,j) -> Rand.getFloat(from, to));
+    public static Veci getVeci (int size, Comp from, Comp to) {
+        Veci vector = new Veci(size);
+        for (int i=0;i<size;i++) {
+            vector.set(i, getComp(from, to));
+        }
+
+        return vector;
     }
 
-    public static int choiceIndex(Vecf weights) {
+    public static Matd getMatd(int rows, int cols) {
+        return Matd.forEach(rows, cols, (i, j) -> Rand.getDouble());
+    }
+
+    public static Matd getMatd(int rows, int cols, double from, double to) {
+        return Matd.forEach(rows, cols, (i, j) -> Rand.getDouble(from, to));
+    }
+
+    public static Mat getMat(int rows, int cols) {
+        return Mat.forEach(rows, cols, (i, j) -> Rand.getFloat());
+    }
+
+    public static Mat getMat(int rows, int cols, float from, float to) {
+        return Mat.forEach(rows, cols, (i, j) -> Rand.getFloat(from, to));
+    }
+
+    public static Mati getMati (int rows, int cols) {
+        return Mati.forEach(rows, cols, (i, j) -> Rand.getComp());
+    }
+
+    public static Mati getMati (int rows, int cols, Comp from, Comp to) {
+        return Mati.forEach(rows, cols, (i, j) -> Rand.getComp(from, to));
+    }
+
+    public static Matid getMatid (int rows, int cols) {
+        return Matid.forEach(rows, cols, (i, j) -> Rand.getCompd());
+    }
+
+    public static Matid getMatid (int rows, int cols, Compd from, Compd to) {
+        return Matid.forEach(rows, cols, (i, j) -> Rand.getCompd(from, to));
+    }
+
+    public static int choiceIndex(Vec weights) {
         weights = weights.div(weights.sum());
 
         float x = Rand.getFloat();
@@ -181,10 +255,10 @@ final public class Rand {
     }
 
     public static int choiceIndex (float... weights) {
-        return choiceIndex(new Vecf(weights));
+        return choiceIndex(new Vec(weights));
     }
 
-    public static <T> T choice (T[] values, Vecf weights) {
+    public static <T> T choice (T[] values, Vec weights) {
         return values[choiceIndex(weights)];
     }
 
@@ -192,7 +266,7 @@ final public class Rand {
         return values[choiceIndex(weights)];
     }
 
-    public static <T> T choice (List<T> values, Vecf weights) {
+    public static <T> T choice (List<T> values, Vec weights) {
         return values.get(choiceIndex(weights));
     }
 

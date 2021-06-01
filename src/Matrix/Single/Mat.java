@@ -1,21 +1,21 @@
-package Matrix.Double;
+package Matrix.Single;
 
 import GPGPU.OpenCL.Context;
-import Matrix.Single.Matf;
-import References.Double.Ref2D;
-import Vector.Double.Vec;
+import Matrix.Double.Matd;
+import References.Single.Ref2Df;
+import Vector.Single.Vec;
 
-public class Mat implements Ref2D {
+public class Mat implements Ref2Df {
     final protected Vec[] values;
 
-    public Mat (int rows, int cols) {
+    public Mat(int rows, int cols) {
         this.values = new Vec[rows];
         for (int i=0;i<rows;i++) {
             this.values[i] = new Vec(cols);
         }
     }
 
-    public Mat (double[][] values) {
+    public Mat(float[][] values) {
         this.values = new Vec[values.length];
         this.values[0] = new Vec(values[0]);
 
@@ -24,7 +24,7 @@ public class Mat implements Ref2D {
         }
     }
 
-    public Mat (Vec... values) {
+    public Mat(Vec... values) {
         this.values = new Vec[values.length];
         this.values[0] = values[0];
 
@@ -33,11 +33,11 @@ public class Mat implements Ref2D {
         }
     }
 
-    public interface MatForEachIndex {
-        double apply (int row, int col);
+    public interface MatfForEachIndex {
+        float apply (int row, int col);
     }
 
-    public interface MatForEachVec {
+    public interface MatfForEachVecf {
         Vec apply (int row);
     }
 
@@ -49,7 +49,8 @@ public class Mat implements Ref2D {
         return values[0].getSize();
     }
 
-    public double get (int row, int col) {
+    @Override
+    public float get (int row, int col) {
         return values[row].get(col);
     }
 
@@ -57,7 +58,7 @@ public class Mat implements Ref2D {
         return values[row];
     }
 
-    public void set (int row, int col, double value) {
+    public void set (int row, int col, float value) {
         values[row].set(col, value);
     }
 
@@ -81,11 +82,11 @@ public class Mat implements Ref2D {
         return Math.min(getCols(), b.getCols());
     }
 
-    public Mat forEach (Mat b, Vec.VecForEach forEach) {
+    public Mat forEach (Mat b, Vec.VecfForEach forEach) {
         int rows = finalRows(b);
         int cols = finalCols(b);
 
-        Mat matrix = new Mat(rows, 0);
+        Mat matrix = new Mat(rows, cols);
         for (int i=0;i<rows;i++) {
             for (int j=0;j<cols;j++) {
                 matrix.set(i, j, forEach.apply(get(i, j), b.get(i, j)));
@@ -95,7 +96,7 @@ public class Mat implements Ref2D {
         return matrix;
     }
 
-    public Mat forEach (double b, Vec.VecForEach forEach) {
+    public Mat forEach (float b, Vec.VecfForEach forEach) {
         int rows = getRows();
         int cols = getCols();
 
@@ -109,7 +110,7 @@ public class Mat implements Ref2D {
         return matrix;
     }
 
-    public static Mat forEach (int rows, int cols, MatForEachVec forEach) {
+    public static Mat forEach (int rows, int cols, MatfForEachVecf forEach) {
         Mat matrix = new Mat(rows, cols);
 
         for (int i=0;i<rows;i++) {
@@ -124,7 +125,7 @@ public class Mat implements Ref2D {
         return matrix;
     }
 
-    public static Mat forEach (int rows, int cols, MatForEachIndex forEach) {
+    public static Mat forEach (int rows, int cols, MatfForEachIndex forEach) {
         Mat matrix = new Mat(rows, cols);
 
         for (int i=0;i<rows;i++) {
@@ -137,15 +138,15 @@ public class Mat implements Ref2D {
     }
 
     public Mat add (Mat b) {
-        return forEach(b, Double::sum);
+        return forEach(b, Float::sum);
     }
 
     public Mat add (Vec b) {
         return forEach(getRows(), getCols(), (i,j) -> get(i, j) + b.get(j));
     }
 
-    public Mat add (double b) {
-        return forEach(b, Double::sum);
+    public Mat add (float b) {
+        return forEach(b, Float::sum);
     }
 
     public Mat subtr (Mat b) {
@@ -156,7 +157,7 @@ public class Mat implements Ref2D {
         return forEach(getRows(), getCols(), (i,j) -> get(i, j) - b.get(j));
     }
 
-    public Mat subtr (double b) {
+    public Mat subtr (float b) {
         return forEach(b, (x, y) -> x - y);
     }
 
@@ -164,7 +165,7 @@ public class Mat implements Ref2D {
         return forEach(getRows(), getCols(), (i,j) -> b.get(j) - get(i, j));
     }
 
-    public Mat invSubtr (double b) {
+    public Mat invSubtr (float b) {
         return forEach(b, (x, y) -> y - x);
     }
 
@@ -174,7 +175,7 @@ public class Mat implements Ref2D {
         int dig = Math.min(getCols(), b.getRows());
 
         return forEach(rows, cols, (i, j) -> {
-            double sum = 0;
+            float sum = 0;
             for (int k=0;k<dig;k++) {
                 sum += get(i, k) * b.get(k, j);
             }
@@ -199,7 +200,7 @@ public class Mat implements Ref2D {
         return forEach(getRows(), getCols(), (i,j) -> get(i, j) * b.get(j));
     }
 
-    public Mat scalMul (double b) {
+    public Mat scalMul (float b) {
         return forEach(b, (x, y) -> x * y);
     }
 
@@ -211,7 +212,7 @@ public class Mat implements Ref2D {
         return forEach(getRows(), getCols(), (i,j) -> get(i, j) / b.get(j));
     }
 
-    public Mat scalDiv (double b) {
+    public Mat scalDiv (float b) {
         return forEach(b, (x, y) -> x / y);
     }
 
@@ -219,7 +220,7 @@ public class Mat implements Ref2D {
         return forEach(getRows(), getCols(), (i,j) -> b.get(j) / get(i, j));
     }
 
-    public Mat scalInvDiv (double b) {
+    public Mat scalInvDiv (float b) {
         return forEach(b, (x, y) -> y / x);
     }
 
@@ -268,16 +269,16 @@ public class Mat implements Ref2D {
         return cofactor().T();
     }
 
-    public double det () {
+    public float det () {
         int k = getRows();
         if (k != getCols()) {
-            return 0;
+            throw new ArithmeticException("Tried to calculate determinant of non-square matrix");
         } else if (k == 2) {
             return get(0, 0) * get(1, 1) - get(1, 0) * get(0, 1);
         }
 
         int km1 = k - 1;
-        double sum = 0;
+        float sum = 0;
 
         for (int q=0;q<k;q++) {
             Mat matrix = new Mat(km1, km1);
@@ -302,16 +303,20 @@ public class Mat implements Ref2D {
         return forEach(rows, cols, (i, j) -> get(j, i));
     }
 
-    public Matf toFloat () {
-        return Matf.forEach(getRows(), getCols(), (i, j) -> (float) get(i, j));
+    public Matd toDouble () {
+        return Matd.forEach(getRows(), getCols(), (Matd.MatForEachIndex) this::get);
     }
 
     public MatCL toCL (Context context) {
         return new MatCL(context, this);
     }
 
-    public MatCL toCL () {
+    public MatCL toCL() {
         return toCL(Context.DEFAULT);
+    }
+
+    public MatCUDA toCUDA () {
+        return new MatCUDA(this);
     }
 
     public Vec toVectorRow () {
@@ -326,8 +331,8 @@ public class Mat implements Ref2D {
         return forEach(k, k, (i, j) -> i == j ? 1 : 0);
     }
 
-    public static Mat fromRef (Ref2D ref) {
-        return ref instanceof Mat ? (Mat) ref : forEach(ref.getRows(), ref.getCols(), (MatForEachIndex) ref::get);
+    public static Mat fromRef (Ref2Df ref) {
+        return ref instanceof Mat ? (Mat) ref : forEach(ref.getRows(), ref.getCols(), (MatfForEachIndex) ref::get);
     }
 
     @Override
@@ -344,7 +349,7 @@ public class Mat implements Ref2D {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         for (int i=0;i<getRows();i++) {
-            builder.append(", ").append(get(i));
+            builder.append(", ").append(get(i).toString());
         }
 
         return "{ "+builder.substring(2)+" }";

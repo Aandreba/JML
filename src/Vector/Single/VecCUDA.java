@@ -1,36 +1,38 @@
 package Vector.Single;
 
 import GPGPU.CUDA.CUDA;
+import Matrix.Single.MatCUDA;
 import References.Single.Ref1Df;
 import jcuda.Pointer;
 import jcuda.Sizeof;
 import jcuda.jcublas.JCublas;
+
 import java.util.Arrays;
 
-public class VecCUDAf implements Ref1Df {
+public class VecCUDA implements Ref1Df {
     static {
         CUDA.init();
     }
 
-    final int size;
-    final Pointer id;
+    final public int size;
+    final public Pointer id;
 
-    public VecCUDAf (int size) {
+    public VecCUDA(int size) {
         this.size = size;
         this.id = new Pointer();
         JCublas.cublasAlloc(size, Sizeof.FLOAT, id);
     }
 
-    public VecCUDAf (float... values) {
+    public VecCUDA(float... values) {
         this(values.length);
         set(values);
     }
 
-    public VecCUDAf (Vecf values) {
+    public VecCUDA(Vec values) {
         this(values.toArray());
     }
 
-    private void checkCompatibility (VecCUDAf b) {
+    private void checkCompatibility (VecCUDA b) {
         if (size != b.size) {
             throw new IllegalArgumentException();
         }
@@ -39,10 +41,10 @@ public class VecCUDAf implements Ref1Df {
     /**
      * Performs the operation y = alpha * x + y
      */
-    public VecCUDAf add (float alpha, VecCUDAf y) {
+    public VecCUDA add (float alpha, VecCUDA y) {
         checkCompatibility(y);
 
-        VecCUDAf result = y.clone();
+        VecCUDA result = y.clone();
         JCublas.cublasSaxpy(size, alpha, this.id, 1, result.id, 1);
         return result;
     }
@@ -50,19 +52,19 @@ public class VecCUDAf implements Ref1Df {
     /**
      * Performs the operation y = x + y
      */
-    public VecCUDAf add (VecCUDAf y) {
+    public VecCUDA add (VecCUDA y) {
         return add(1, y);
     }
 
     /**
      * Performs the operation y = x + alpha
      */
-    public VecCUDAf add (float alpha) {
+    public VecCUDA add (float alpha) {
         float[] vals = new float[size];
         Arrays.fill(vals, alpha);
 
-        VecCUDAf vector = new VecCUDAf(vals);
-        VecCUDAf result = add(vector);
+        VecCUDA vector = new VecCUDA(vals);
+        VecCUDA result = add(vector);
         vector.release();
 
         return result;
@@ -71,29 +73,51 @@ public class VecCUDAf implements Ref1Df {
     /**
      * Performs the operation x = x - beta * y
      */
-    public VecCUDAf subtr (float beta, VecCUDAf y) {
+    public VecCUDA subtr (float beta, VecCUDA y) {
         return y.add(-beta, this);
     }
 
     /**
      * Performs the operation x = x - y
      */
-    public VecCUDAf subtr (VecCUDAf y) {
+    public VecCUDA subtr (VecCUDA y) {
         return subtr(1, y);
     }
 
     /**
      * Performs the operation y = x - alpha
      */
-    public VecCUDAf subtr (float alpha) {
+    public VecCUDA subtr (float alpha) {
         return add(-alpha);
+    }
+
+    /**
+     * Performs the operation y = alpha - x
+     */
+    public VecCUDA invSubtr (float alpha) {
+        return mul(-1).add(alpha);
+    }
+
+    /**
+     * Performs the operation y = alpha * x * y
+     */
+    public VecCUDA mul (float alpha, VecCUDA b) {
+        checkCompatibility(b);
+        return identityLike().mul(alpha, b);
+    }
+
+    /**
+     * Performs the operation y = x * y
+     */
+    public VecCUDA mul (VecCUDA b) {
+        return mul(1, b);
     }
 
     /**
      * Multiplies n elements of vector x by a scalar constant alpha.
      */
-    public VecCUDAf mul (float alpha) {
-        VecCUDAf result = clone();
+    public VecCUDA mul (float alpha) {
+        VecCUDA result = clone();
         JCublas.cublasSscal(size, alpha, result.id, 1);
 
         return result;
@@ -102,14 +126,14 @@ public class VecCUDAf implements Ref1Df {
     /**
      * Divides n elements of vector x by a scalar constant alpha.
      */
-    public VecCUDAf div (float alpha) {
+    public VecCUDA div (float alpha) {
         return mul(1 / alpha);
     }
 
     /**
      * Multiplies n elements of the vectors x and y element-wise and accumulates the results.
      */
-    public float dot (VecCUDAf y) {
+    public float dot (VecCUDA y) {
         return JCublas.cublasSdot(size, id, 1, y.id, 1);
     }
 
@@ -128,8 +152,18 @@ public class VecCUDAf implements Ref1Df {
      * Normalized vector
      * @return Normalized vector
      */
-    public VecCUDAf norm () {
+    public VecCUDA unit() {
         return div(magnitude());
+    }
+
+    /**
+     * Represents vector values in form of an identity matrix
+     */
+    public MatCUDA identityLike () {
+        MatCUDA matrix = new MatCUDA(size, size);
+        JCublas.cublasScopy(size, id, 1, matrix.id, size + 1);
+
+        return matrix;
     }
 
     public void set (float... values) {
@@ -177,6 +211,18 @@ public class VecCUDAf implements Ref1Df {
         return array;
     }
 
+    public Vec toCPU () {
+        return new Vec(toArray());
+    }
+
+    public MatCUDA rowMatrix () {
+        return new MatCUDA(this, 1);
+    }
+
+    public MatCUDA colMatrix () {
+        return new MatCUDA(this, size);
+    }
+
     @Override
     public String toString() {
         float[] vals = toArray();
@@ -190,8 +236,8 @@ public class VecCUDAf implements Ref1Df {
     }
 
     @Override
-    public VecCUDAf clone() {
-        VecCUDAf clone = new VecCUDAf();
+    public VecCUDA clone() {
+        VecCUDA clone = new VecCUDA();
         JCublas.cublasScopy(size, id, 1, clone.id, 1);
 
         return clone;

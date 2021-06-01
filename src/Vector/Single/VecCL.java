@@ -1,42 +1,40 @@
-package Vector.Double;
+package Vector.Single;
 
-import GPGPU.OpenCL.Buffer.DoubleBuffer;
 import GPGPU.OpenCL.Buffer.FloatBuffer;
 import GPGPU.OpenCL.CommandQueue;
 import GPGPU.OpenCL.Context;
 import GPGPU.OpenCL.Query;
-import Matrix.Double.MatCL;
-import References.Double.Ref1D;
-import Vector.Single.VecCLf;
+import Matrix.Single.MatCL;
+import References.Single.Ref1Df;
+import Vector.Double.VecCLd;
+import org.jocl.*;
 import org.jocl.blast.CLBlast;
-import org.jocl.cl_event;
-
 import java.util.Arrays;
 
-public class VecCL extends DoubleBuffer {
-    public VecCL (Context context, int size) {
+public class VecCL extends FloatBuffer {
+    public VecCL(Context context, int size) {
         super(context, size);
     }
 
-    public VecCL (Context context, Ref1D values) {
+    public VecCL(Context context, Ref1Df values) {
         this(context, values.getSize());
         set(values.toArray());
     }
 
-    public VecCL (Context context, double... values) {
+    public VecCL(Context context, float... values) {
         this(context, values.length);
         set(values);
     }
 
-    public VecCL (int size) {
+    public VecCL(int size) {
         super(Context.DEFAULT, size);
     }
 
-    public VecCL (Ref1D values) {
+    public VecCL(Ref1Df values) {
         this(Context.DEFAULT, values);
     }
 
-    public VecCL (double... values) {
+    public VecCL(float... values) {
         this(Context.DEFAULT, values);
     }
 
@@ -48,39 +46,35 @@ public class VecCL extends DoubleBuffer {
 
     /**
      * Performs the operation y = alpha * x + y
-     * @param alpha Scalar multiplier
-     * @param y Vector
      */
-    public VecCL add (double alpha, VecCL y) {
+    public VecCL add (float alpha, VecCL y) {
         checkCompatibility(y);
         VecCL result = y.clone();
 
         cl_event event = new cl_event();
-        CLBlast.CLBlastDaxpy(size, alpha, this.getId(), 0, 1, result.getId(), 0, 1, getQueue().id, event);
+        CLBlast.CLBlastSaxpy(size, alpha, this.getId(), 0, 1, result.getId(), 0, 1, getQueue().id, event);
 
         Query.awaitEvents(event);
         return result;
     }
 
     /**
-     * Performs the operation y = x + y, in which x and y are vectors.
-     * @param y Vector
+     * Performs the operation y = x + y
      */
     public VecCL add (VecCL y) {
         return add(1, y);
     }
 
     /**
-     * Performs the operation y = x + alpha, in which x is a vector and alpha is a scalar.
-     * @param alpha Scalar
+     * Performs the operation y = x + alpha
      */
-    public VecCL add (double alpha) {
-        double[] vals = new double[size];
+    public VecCL add (float alpha) {
+        float[] vals = new float[size];
         Arrays.fill(vals, alpha);
 
         VecCL vector = new VecCL(getContext(), vals);
         VecCL result = add(vector);
-        vector.release();
+        vector.release(true);
 
         return result;
     }
@@ -88,7 +82,7 @@ public class VecCL extends DoubleBuffer {
     /**
      * Performs the operation x = x - beta * y
      */
-    public VecCL subtr (double beta, VecCL y) {
+    public VecCL subtr (float beta, VecCL y) {
         return y.add(-beta, this);
     }
 
@@ -102,19 +96,26 @@ public class VecCL extends DoubleBuffer {
     /**
      * Performs the operation y = x - alpha
      */
-    public VecCL subtr (double alpha) {
+    public VecCL subtr (float alpha) {
         return add(-alpha);
+    }
+
+    /**
+     * Performs the operation y = alpha - x
+     */
+    public VecCL invSubtr (float alpha) {
+        return mul(-1).add(alpha);
     }
 
     /**
      * Performs the operation y = alpha * x * y
      */
-    public VecCL mul (double alpha, VecCL y) { // TODO
+    public VecCL mul (float alpha, VecCL y) {
         checkCompatibility(y);
         MatCL identity = identityLike();
         VecCL result = identity.mul(alpha, y);
 
-        identity.release();
+        identity.release(true);
         return result;
     }
 
@@ -126,38 +127,42 @@ public class VecCL extends DoubleBuffer {
     }
 
     /**
-     * Multiplies n elements of vector x by a scalar constant alpha.
-     * @param alpha Scalar
+     * Performs the operation y = alpha * x
      */
-    public VecCL mul (double alpha) {
+    public VecCL mul (float alpha) {
         VecCL result = clone();
 
         cl_event event = new cl_event();
-        CLBlast.CLBlastDscal(size, alpha, result.getId(), 0, 1, getQueue().id, event);
+        CLBlast.CLBlastSscal(size, alpha, result.getId(), 0, 1, getQueue().id, event);
 
         Query.awaitEvents(event);
         return result;
     }
 
     /**
-     * Divides n elements of vector x by a scalar constant alpha.
-     * @param alpha Scalar
+     * Performs the operation y = x / alpha
      */
-    public VecCL div (double alpha) {
+    public VecCL div (float alpha) {
+        return mul(1 / alpha);
+    }
+
+    /**
+     * Performs the operation y = alpha / x
+     */
+    public VecCL invDiv (float alpha) { // TODO
         return mul(1 / alpha);
     }
 
     /**
      * Multiplies n elements of the vectors x and y element-wise and accumulates the results.
-     * @param y Vector
      */
-    public double dot (VecCL y) {
+    public float dot (VecCL y) {
         checkCompatibility(y);
         CommandQueue queue = getQueue();
         FloatBuffer buffer = new FloatBuffer(queue, 1);
 
         cl_event event = new cl_event();
-        CLBlast.CLBlastDdot(size, buffer.getId(), 0, this.getId(), 0, 1, y.getId(), 0, 1, queue.id, event);
+        CLBlast.CLBlastSdot(size, buffer.getId(), 0, this.getId(), 0, 1, y.getId(), 0, 1, queue.id, event);
 
         Query.awaitEvents(event);
         return buffer.get(0);
@@ -166,18 +171,18 @@ public class VecCL extends DoubleBuffer {
     /**
      * Accumulates the square of n elements in the x vector and takes the square root
      */
-    public double magnitude() {
+    public float magnitude () {
         CommandQueue queue = getQueue();
-        DoubleBuffer buffer = new DoubleBuffer(queue, 1);
+        FloatBuffer buffer = new FloatBuffer(queue, 1);
 
         cl_event event = new cl_event();
-        CLBlast.CLBlastDnrm2(size, buffer.getId(), 0, this.getId(), 0, 1, queue.id, event);
+        CLBlast.CLBlastSnrm2(size, buffer.getId(), 0, this.getId(), 0, 1, queue.id, event);
 
         Query.awaitEvents(event);
         return buffer.get(0);
     }
 
-    public double magnitude2 () {
+    public float magnitude2 () {
         return dot(this);
     }
 
@@ -185,41 +190,64 @@ public class VecCL extends DoubleBuffer {
      * Normalized vector
      * @return Normalized vector
      */
-    public VecCL norm () {
+    public VecCL unit () {
         return div(magnitude());
+    }
+
+    public float sum () {
+        CommandQueue queue = getQueue();
+        FloatBuffer buffer = new FloatBuffer(queue, 1);
+
+        cl_event event = new cl_event();
+        CLBlast.CLBlastSsum(size, buffer.getId(), 0, getId(), 0, 1, queue.id, event);
+
+        Query.awaitEvents(event);
+        return buffer.get(0);
+    }
+
+    public float mean () {
+        return sum() / size;
     }
 
     /**
      * Represents vector values in form of an identity matrix
      */
     public MatCL identityLike () {
-        MatCL matrix = new MatCL(size, size);
+        MatCL matrix = new MatCL(getContext(), size, size);
 
         cl_event event = new cl_event();
-        CLBlast.CLBlastDcopy(size, getId(), 0, 1, matrix.getId(), 0, size + 1, getQueue().id, event);
+        CLBlast.CLBlastScopy(size, getId(), 0, 1, matrix.getId(), 0, size + 1, getQueue().id, event);
 
         Query.awaitEvents(event);
         return matrix;
     }
 
     @Override
-    public VecCLf toFloat() {
-        double[] values = toArray();
-        float[] casted = new float[values.length];
+    public VecCLd toDouble() {
+        float[] values = toArray();
+        double[] casted = new double[values.length];
         for (int i=0;i<casted.length;i++) {
-            casted[i] = (float) values[i];
+            casted[i] = values[i];
         }
 
-        return new VecCLf(getContext(), casted);
+        return new VecCLd(getContext(), casted);
     }
 
     public Vec toCPU () {
         return new Vec(toArray());
     }
 
+    public MatCL rowMatrix () {
+        return new MatCL(this.clone(), size);
+    }
+
+    public MatCL colMatrix () {
+        return new MatCL(this.clone(), 1);
+    }
+
     @Override
     public String toString() {
-        double[] vals = toArray();
+        float[] vals = toArray();
         StringBuilder builder = new StringBuilder();
 
         for (int i=0;i<getSize();i++) {
@@ -234,7 +262,7 @@ public class VecCL extends DoubleBuffer {
         VecCL vector = new VecCL(getContext(), size);
 
         cl_event event = new cl_event();
-        CLBlast.CLBlastDcopy(size, this.getId(), 0, 1, vector.getId(), 0, 1, getQueue().id, event);
+        CLBlast.CLBlastScopy(size, this.getId(), 0, 1, vector.getId(), 0, 1, getQueue().id, event);
 
         Query.awaitEvents(event);
         return vector;

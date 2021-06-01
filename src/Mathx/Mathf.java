@@ -1,6 +1,9 @@
 package Mathx;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.function.Function;
 
 final public class Mathf {
     final public static float PI = (float) StrictMath.PI;
@@ -75,4 +78,37 @@ final public class Mathf {
     public static float nextUp (float x) { return Math.nextUp(x); }
     public static float nextDown (float x) { return Math.nextDown(x); }
     public static float scalb (float f, int scaleFactor) { return Math.scalb(f, scaleFactor); }
+
+    public static class Plot2D {
+        Function<Float,Float> function;
+        Color color;
+
+        public Plot2D (Function<Float, Float> function, Color color) {
+            this.function = function;
+            this.color = color;
+        }
+    }
+
+    public static BufferedImage plot2D (float from, float to, int width, int height, Plot2D... plots) {
+        float ft = from - to;
+        float ht = height * to;
+        float step = -ft / width;
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        for (Plot2D plot: plots) {
+            for (int i = 0; i < width; i++) {
+                float x = from + (i * step);
+                float y = plot.function.apply(x);
+
+                int h = round((height * y - ht) / ft);
+                if (h < 0 || h >= height) {
+                    continue;
+                }
+
+                image.setRGB(i, h, plot.color.getRGB());
+            }
+        }
+
+        return image;
+    }
 }

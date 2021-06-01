@@ -1,12 +1,12 @@
-package Matrix.Double;
+package Matrix.Single;
 
 import GPGPU.OpenCL.Context;
-import Imaginary.Comp;
-import Matrix.Single.Matif;
-import References.Double.Complex.Ref2Di;
-import Vector.Double.Veci;
+import Complex.Comp;
+import Matrix.Double.Matid;
+import References.Single.Complex.Ref2Dif;
+import Vector.Single.Veci;
 
-public class Mati implements Ref2Di {
+public class Mati implements Ref2Dif {
     final protected Veci[] values;
 
     public Mati(int rows, int cols) {
@@ -34,11 +34,11 @@ public class Mati implements Ref2Di {
         }
     }
 
-    public interface MatiForEachIndex {
+    public interface MatifForEachIndex {
         Comp apply (int row, int col);
     }
 
-    public interface MatiForEachVeci {
+    public interface MatifForEachVecif {
         Veci apply (int row);
     }
 
@@ -82,7 +82,7 @@ public class Mati implements Ref2Di {
         return Math.min(getCols(), b.getCols());
     }
 
-    public Mati forEach (Mati b, Veci.VeciForEach forEach) {
+    public Mati forEach (Mati b, Veci.VecifForEach forEach) {
         int rows = finalRows(b);
         int cols = finalCols(b);
 
@@ -96,7 +96,7 @@ public class Mati implements Ref2Di {
         return matrix;
     }
 
-    public Mati forEach (Comp b, Veci.VeciForEach forEach) {
+    public Mati forEach (Comp b, Veci.VecifForEach forEach) {
         int rows = getRows();
         int cols = getCols();
 
@@ -110,26 +110,26 @@ public class Mati implements Ref2Di {
         return matrix;
     }
 
-    public Mati forEach (double b, Veci.VeciForEach forEach) {
+    public Mati forEach (float b, Veci.VecifForEach forEach) {
         return forEach(new Comp(b, 0), forEach);
     }
 
-    public static Mati forEach (int rows, int cols, MatiForEachVeci forEach) {
+    public static Mati forEach (int rows, int cols, MatifForEachVecif forEach) {
         Mati matrix = new Mati(rows, cols);
 
         for (int i=0;i<rows;i++) {
-            Veci Vecitor = forEach.apply(i);
-            if (Vecitor.getSize() > cols) {
+            Veci Veciftor = forEach.apply(i);
+            if (Veciftor.getSize() > cols) {
                 throw new IllegalArgumentException();
             }
 
-            matrix.set(i, Vecitor);
+            matrix.set(i, Veciftor);
         }
 
         return matrix;
     }
 
-    public static Mati forEach (int rows, int cols, MatiForEachIndex forEach) {
+    public static Mati forEach (int rows, int cols, MatifForEachIndex forEach) {
         Mati matrix = new Mati(rows, cols);
 
         for (int i=0;i<rows;i++) {
@@ -153,7 +153,7 @@ public class Mati implements Ref2Di {
         return forEach(b, Comp::add);
     }
 
-    public Mati add (double b) {
+    public Mati add (float b) {
         return forEach(b, Comp::add);
     }
 
@@ -169,7 +169,7 @@ public class Mati implements Ref2Di {
         return forEach(b, Comp::subtr);
     }
 
-    public Mati subtr (double b) {
+    public Mati subtr (float b) {
         return forEach(b, Comp::subtr);
     }
 
@@ -181,7 +181,7 @@ public class Mati implements Ref2Di {
         return forEach(getRows(), getCols(), (i,j) -> b.subtr(get(i, j)));
     }
 
-    public Mati invSubtr (double b) {
+    public Mati invSubtr (float b) {
         return forEach(getRows(), getCols(), (i,j) -> get(i, j).invSubtr(b));
     }
 
@@ -220,7 +220,7 @@ public class Mati implements Ref2Di {
         return forEach(b, Comp::mul);
     }
 
-    public Mati scalMul (double b) {
+    public Mati scalMul (float b) {
         return forEach(b, Comp::mul);
     }
 
@@ -236,7 +236,7 @@ public class Mati implements Ref2Di {
         return forEach(b, Comp::div);
     }
 
-    public Mati scalDiv (double b) {
+    public Mati scalDiv (float b) {
         return forEach(b, Comp::div);
     }
 
@@ -248,7 +248,7 @@ public class Mati implements Ref2Di {
         return forEach(b, (x, y) -> y.div(x));
     }
 
-    public Mati scalInvDiv (double b) {
+    public Mati scalInvDiv (float b) {
         return forEach(b, (x, y) -> y.div(x));
     }
 
@@ -300,7 +300,7 @@ public class Mati implements Ref2Di {
     public Comp det () {
         int k = getRows();
         if (k != getCols()) {
-            return new Comp();
+            throw new ArithmeticException("Tried to calculate determinant of non-square matrix");
         } else if (k == 2) {
             return get(0, 0).mul(get(1, 1)).subtr(get(1, 0).mul(get(0, 1)));
         }
@@ -332,8 +332,8 @@ public class Mati implements Ref2Di {
         return forEach(rows, cols, (i, j) -> get(j, i));
     }
 
-    public Matif toFloat () {
-        return Matif.forEach(getRows(), getCols(), (i, j) -> get(i, j).toFloat());
+    public Matid toDouble () {
+        return Matid.forEach(getRows(), getCols(), (i, j) -> get(i, j).toDouble());
     }
 
     public MatCLi toCL(Context context) {
@@ -342,6 +342,10 @@ public class Mati implements Ref2Di {
 
     public MatCLi toCL() {
         return toCL(Context.DEFAULT);
+    }
+
+    public MatCUDAi toCUDA() {
+        return new MatCUDAi(this);
     }
 
     public Veci toVectorRow () {
@@ -356,8 +360,8 @@ public class Mati implements Ref2Di {
         return forEach(k, k, (i, j) -> i == j ? new Comp(1,0) : new Comp());
     }
 
-    public static Mati fromRef (Ref2Di ref) {
-        return ref instanceof Mati ? (Mati) ref : forEach(ref.getRows(), ref.getCols(), (MatiForEachIndex) ref::get);
+    public static Mati fromRef (Ref2Dif ref) {
+        return ref instanceof Mati ? (Mati) ref : forEach(ref.getRows(), ref.getCols(), (MatifForEachIndex) ref::get);
     }
 
     @Override

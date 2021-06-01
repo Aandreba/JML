@@ -5,6 +5,10 @@ import GPGPU.OpenCL.Context;
 import GPGPU.OpenCL.Query;
 import References.Single.Ref1Df;
 import org.jocl.*;
+import org.jocl.blast.CLBlast;
+
+import java.util.Arrays;
+
 import static org.jocl.CL.*;
 
 public class FloatBuffer extends Buffer implements Ref1Df {
@@ -41,8 +45,15 @@ public class FloatBuffer extends Buffer implements Ref1Df {
         return array[0];
     }
 
+    public void set (int len, int offsetX, int incX, FloatBuffer y, int offsetY, int incY) {
+        cl_event event = new cl_event();
+        CLBlast.CLBlastScopy(len, y.id, offsetY, incY, getId(), offsetX, incX, queue.id, event);
+
+        Query.awaitEvents(event);
+    }
+
     public void set (int offset, float... vals) {
-        if (vals.length != size) {
+        if (offset < 0 || offset + vals.length >= size) {
             throw new IllegalArgumentException();
         }
 
@@ -86,5 +97,21 @@ public class FloatBuffer extends Buffer implements Ref1Df {
 
         Query.awaitEvents(event);
         return array;
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.toString(toArray());
+    }
+
+    @Override
+    public FloatBuffer clone() {
+        FloatBuffer vector = new FloatBuffer(getContext(), size);
+
+        cl_event event = new cl_event();
+        CLBlast.CLBlastScopy(size, this.getId(), 0, 1, vector.getId(), 0, 1, getQueue().id, event);
+
+        Query.awaitEvents(event);
+        return vector;
     }
 }

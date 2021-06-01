@@ -1,32 +1,32 @@
-package Matrix.Single;
+package Matrix.Double;
 
 import GPGPU.OpenCL.Context;
-import Imaginary.Compf;
-import Matrix.Double.Mati;
-import References.Single.Complex.Ref2Dif;
-import Vector.Single.Vecif;
+import Complex.Compd;
+import Matrix.Single.Mati;
+import References.Double.Complex.Ref2Di;
+import Vector.Double.Vecid;
 
-public class Matif implements Ref2Dif {
-    final protected Vecif[] values;
+public class Matid implements Ref2Di {
+    final protected Vecid[] values;
 
-    public Matif(int rows, int cols) {
-        this.values = new Vecif[rows];
+    public Matid(int rows, int cols) {
+        this.values = new Vecid[rows];
         for (int i=0;i<rows;i++) {
-            this.values[i] = new Vecif(cols);
+            this.values[i] = new Vecid(cols);
         }
     }
 
-    public Matif(Compf[][] values) {
-        this.values = new Vecif[values.length];
-        this.values[0] = new Vecif(values[0]);
+    public Matid(Compd[][] values) {
+        this.values = new Vecid[values.length];
+        this.values[0] = new Vecid(values[0]);
 
         for (int i=1;i<values.length;i++) {
-            set(i, new Vecif(values[i]));
+            set(i, new Vecid(values[i]));
         }
     }
 
-    public Matif(Vecif... values) {
-        this.values = new Vecif[values.length];
+    public Matid(Vecid... values) {
+        this.values = new Vecid[values.length];
         this.values[0] = values[0];
 
         for (int i=1;i<values.length;i++) {
@@ -34,12 +34,12 @@ public class Matif implements Ref2Dif {
         }
     }
 
-    public interface MatifForEachIndex {
-        Compf apply (int row, int col);
+    public interface MatiForEachIndex {
+        Compd apply (int row, int col);
     }
 
-    public interface MatifForEachVecif {
-        Vecif apply (int row);
+    public interface MatiForEachVeci {
+        Vecid apply (int row);
     }
 
     public int getRows () {
@@ -50,19 +50,19 @@ public class Matif implements Ref2Dif {
         return values[0].getSize();
     }
 
-    public Compf get (int row, int col) {
+    public Compd get (int row, int col) {
         return values[row].get(col);
     }
 
-    public Vecif get (int row) {
+    public Vecid get (int row) {
         return values[row];
     }
 
-    public void set (int row, int col, Compf value) {
+    public void set (int row, int col, Compd value) {
         values[row].set(col, value);
     }
 
-    public void set (int row, Vecif value) {
+    public void set (int row, Vecid value) {
         if (value.getSize() != getCols()) {
             throw new ArrayIndexOutOfBoundsException();
         }
@@ -74,19 +74,19 @@ public class Matif implements Ref2Dif {
         return getRows() == getCols();
     }
 
-    private int finalRows (Matif b) {
+    private int finalRows (Matid b) {
         return Math.min(getRows(), b.getRows());
     }
 
-    private int finalCols (Matif b) {
+    private int finalCols (Matid b) {
         return Math.min(getCols(), b.getCols());
     }
 
-    public Matif forEach (Matif b, Vecif.VecifForEach forEach) {
+    public Matid forEach (Matid b, Vecid.VeciForEach forEach) {
         int rows = finalRows(b);
         int cols = finalCols(b);
 
-        Matif matrix = new Matif(rows, 0);
+        Matid matrix = new Matid(rows, 0);
         for (int i=0;i<rows;i++) {
             for (int j=0;j<cols;j++) {
                 matrix.set(i, j, forEach.apply(get(i, j), b.get(i, j)));
@@ -96,11 +96,11 @@ public class Matif implements Ref2Dif {
         return matrix;
     }
 
-    public Matif forEach (Compf b, Vecif.VecifForEach forEach) {
+    public Matid forEach (Compd b, Vecid.VeciForEach forEach) {
         int rows = getRows();
         int cols = getCols();
 
-        Matif matrix = new Matif(rows, cols);
+        Matid matrix = new Matid(rows, cols);
         for (int i=0;i<rows;i++) {
             for (int j=0;j<cols;j++) {
                 matrix.set(i, j, forEach.apply(get(i, j), b));
@@ -110,27 +110,27 @@ public class Matif implements Ref2Dif {
         return matrix;
     }
 
-    public Matif forEach (float b, Vecif.VecifForEach forEach) {
-        return forEach(new Compf(b, 0), forEach);
+    public Matid forEach (double b, Vecid.VeciForEach forEach) {
+        return forEach(new Compd(b, 0), forEach);
     }
 
-    public static Matif forEach (int rows, int cols, MatifForEachVecif forEach) {
-        Matif matrix = new Matif(rows, cols);
+    public static Matid forEach (int rows, int cols, MatiForEachVeci forEach) {
+        Matid matrix = new Matid(rows, cols);
 
         for (int i=0;i<rows;i++) {
-            Vecif Veciftor = forEach.apply(i);
-            if (Veciftor.getSize() > cols) {
+            Vecid Vecitor = forEach.apply(i);
+            if (Vecitor.getSize() > cols) {
                 throw new IllegalArgumentException();
             }
 
-            matrix.set(i, Veciftor);
+            matrix.set(i, Vecitor);
         }
 
         return matrix;
     }
 
-    public static Matif forEach (int rows, int cols, MatifForEachIndex forEach) {
-        Matif matrix = new Matif(rows, cols);
+    public static Matid forEach (int rows, int cols, MatiForEachIndex forEach) {
+        Matid matrix = new Matid(rows, cols);
 
         for (int i=0;i<rows;i++) {
             for (int j=0;j<cols;j++) {
@@ -141,57 +141,57 @@ public class Matif implements Ref2Dif {
         return matrix;
     }
 
-    public Matif add (Matif b) {
-        return forEach(b, Compf::add);
+    public Matid add (Matid b) {
+        return forEach(b, Compd::add);
     }
 
-    public Matif add (Vecif b) {
+    public Matid add (Vecid b) {
         return forEach(getRows(), getCols(), (i,j) -> get(i, j).add(b.get(j)));
     }
 
-    public Matif add (Compf b) {
-        return forEach(b, Compf::add);
+    public Matid add (Compd b) {
+        return forEach(b, Compd::add);
     }
 
-    public Matif add (float b) {
-        return forEach(b, Compf::add);
+    public Matid add (double b) {
+        return forEach(b, Compd::add);
     }
 
-    public Matif subtr (Matif b) {
-        return forEach(b, Compf::subtr);
+    public Matid subtr (Matid b) {
+        return forEach(b, Compd::subtr);
     }
 
-    public Matif subtr (Vecif b) {
+    public Matid subtr (Vecid b) {
         return forEach(getRows(), getCols(), (i,j) -> get(i, j).subtr(b.get(j)));
     }
 
-    public Matif subtr (Compf b) {
-        return forEach(b, Compf::subtr);
+    public Matid subtr (Compd b) {
+        return forEach(b, Compd::subtr);
     }
 
-    public Matif subtr (float b) {
-        return forEach(b, Compf::subtr);
+    public Matid subtr (double b) {
+        return forEach(b, Compd::subtr);
     }
 
-    public Matif invSubtr (Vecif b) {
+    public Matid invSubtr (Vecid b) {
         return forEach(getRows(), getCols(), (i,j) -> b.get(j).subtr(get(i, j)));
     }
 
-    public Matif invSubtr (Compf b) {
+    public Matid invSubtr (Compd b) {
         return forEach(getRows(), getCols(), (i,j) -> b.subtr(get(i, j)));
     }
 
-    public Matif invSubtr (float b) {
+    public Matid invSubtr (double b) {
         return forEach(getRows(), getCols(), (i,j) -> get(i, j).invSubtr(b));
     }
 
-    public Matif mul (Matif b) {
+    public Matid mul (Matid b) {
         int rows = getRows();
         int cols = b.getCols();
         int dig = Math.min(getCols(), b.getRows());
 
         return forEach(rows, cols, (i, j) -> {
-            Compf sum = new Compf();
+            Compd sum = new Compd();
             for (int k=0;k<dig;k++) {
                 sum = sum.add(get(i, k).mul(b.get(k, j)));
             }
@@ -200,59 +200,59 @@ public class Matif implements Ref2Dif {
         });
     }
 
-    public Vecif mul (Vecif b) {
+    public Vecid mul (Vecid b) {
         return mul(b.colMatrix()).T().get(0);
     }
 
-    public Matif div (Matif b) {
+    public Matid div (Matid b) {
         return mul(b.inverse());
     }
 
-    public Matif scalMul (Matif b) {
-        return forEach(b, Compf::mul);
+    public Matid scalMul (Matid b) {
+        return forEach(b, Compd::mul);
     }
 
-    public Matif scalMul (Vecif b) {
+    public Matid scalMul (Vecid b) {
         return forEach(getRows(), getCols(), (i,j) -> get(i, j).mul(b.get(j)));
     }
 
-    public Matif scalMul (Compf b) {
-        return forEach(b, Compf::mul);
+    public Matid scalMul (Compd b) {
+        return forEach(b, Compd::mul);
     }
 
-    public Matif scalMul (float b) {
-        return forEach(b, Compf::mul);
+    public Matid scalMul (double b) {
+        return forEach(b, Compd::mul);
     }
 
-    public Matif scalDiv (Matif b) {
-        return forEach(b, Compf::div);
+    public Matid scalDiv (Matid b) {
+        return forEach(b, Compd::div);
     }
 
-    public Matif scalDiv (Vecif b) {
+    public Matid scalDiv (Vecid b) {
         return forEach(getRows(), getCols(), (i,j) -> get(i, j).div(b.get(j)));
     }
 
-    public Matif scalDiv (Compf b) {
-        return forEach(b, Compf::div);
+    public Matid scalDiv (Compd b) {
+        return forEach(b, Compd::div);
     }
 
-    public Matif scalDiv (float b) {
-        return forEach(b, Compf::div);
+    public Matid scalDiv (double b) {
+        return forEach(b, Compd::div);
     }
 
-    public Matif scalInvDiv (Vecif b) {
+    public Matid scalInvDiv (Vecid b) {
         return forEach(getRows(), getCols(), (i,j) -> b.get(j).div(get(i,j)));
     }
 
-    public Matif scalInvDiv (Compf b) {
+    public Matid scalInvDiv (Compd b) {
         return forEach(b, (x, y) -> y.div(x));
     }
 
-    public Matif scalInvDiv (float b) {
+    public Matid scalInvDiv (double b) {
         return forEach(b, (x, y) -> y.div(x));
     }
 
-    public Matif inverse() {
+    public Matid inverse() {
         int rows = getRows();
         if (rows != getCols()) {
             throw new ArithmeticException("Tried to invert non-square matrix");
@@ -261,22 +261,22 @@ public class Matif implements Ref2Dif {
         return adj().scalMul(det().inverse());
     }
 
-    public Matif cofactor () {
+    public Matid cofactor () {
         int rows = getRows();
         if (rows != getCols()) {
             throw new ArithmeticException("Tried to calculate cofactor of non-square matrix");
         }
 
         if (rows == 2) {
-            return new Matif(new Vecif(get(1, 1), get(0, 1).mul(-1)), new Vecif(get(1, 0).mul(-1), get(0, 0)));
+            return new Matid(new Vecid(get(1, 1), get(0, 1).mul(-1)), new Vecid(get(1, 0).mul(-1), get(0, 0)));
         }
 
         int rowsm1 = rows - 1;
-        Matif matrix = new Matif(rows, rows);
+        Matid matrix = new Matid(rows, rows);
 
         for (int i=0;i<rows;i++) {
             for (int j=0;j<rows;j++) {
-                Matif det = new Matif(rowsm1, rowsm1);
+                Matid det = new Matid(rowsm1, rowsm1);
 
                 for (int x=0;x<rowsm1;x++) {
                     int X = x < i ? x : x + 1;
@@ -293,23 +293,23 @@ public class Matif implements Ref2Dif {
         return matrix;
     }
 
-    public Matif adj () {
+    public Matid adj () {
         return cofactor().T();
     }
 
-    public Compf det () {
+    public Compd det () {
         int k = getRows();
         if (k != getCols()) {
-            return new Compf();
+            throw new ArithmeticException("Tried to calculate determinant of non-square matrix");
         } else if (k == 2) {
             return get(0, 0).mul(get(1, 1)).subtr(get(1, 0).mul(get(0, 1)));
         }
 
         int km1 = k - 1;
-        Compf sum = new Compf();
+        Compd sum = new Compd();
 
         for (int q=0;q<k;q++) {
-            Matif matrix = new Matif(km1, km1);
+            Matid matrix = new Matid(km1, km1);
 
             for (int i=1;i<k;i++) {
                 for (int j=0;j<km1;j++) {
@@ -318,51 +318,55 @@ public class Matif implements Ref2Dif {
                 }
             }
 
-            Compf n = ((q & 0x1) == 1) ? get(0, q).mul(-1) : get(0, q);
+            Compd n = ((q & 0x1) == 1) ? get(0, q).mul(-1) : get(0, q);
             sum = sum.add(n.mul(matrix.det()));
         }
 
         return sum;
     }
 
-    public Matif T () {
+    public Matid T () {
         int rows = getCols();
         int cols = getRows();
 
         return forEach(rows, cols, (i, j) -> get(j, i));
     }
 
-    public Mati toDouble () {
-        return Mati.forEach(getRows(), getCols(), (i, j) -> get(i, j).toDouble());
+    public Mati toFloat () {
+        return Mati.forEach(getRows(), getCols(), (i, j) -> get(i, j).toFloat());
     }
 
-    public MatCLif toCL(Context context) {
-        return new MatCLif(context, this);
+    public MatCUDAid toCUDA () {
+        return new MatCUDAid(this);
     }
 
-    public MatCLif toCL() {
+    public MatCLid toCL(Context context) {
+        return new MatCLid(context, this);
+    }
+
+    public MatCLid toCL() {
         return toCL(Context.DEFAULT);
     }
 
-    public Vecif toVectorRow () {
-        return Vecif.fromRef(rowMajor());
+    public Vecid toVectorRow () {
+        return Vecid.fromRef(rowMajor());
     }
 
-    public Vecif toVectorCol () {
-        return Vecif.fromRef(colMajor());
+    public Vecid toVectorCol () {
+        return Vecid.fromRef(colMajor());
     }
 
-    public static Matif identity (int k) {
-        return forEach(k, k, (i, j) -> i == j ? new Compf(1,0) : new Compf());
+    public static Matid identity (int k) {
+        return forEach(k, k, (i, j) -> i == j ? new Compd(1,0) : new Compd());
     }
 
-    public static Matif fromRef (Ref2Dif ref) {
-        return ref instanceof Matif ? (Matif) ref : forEach(ref.getRows(), ref.getCols(), (MatifForEachIndex) ref::get);
+    public static Matid fromRef (Ref2Di ref) {
+        return ref instanceof Matid ? (Matid) ref : forEach(ref.getRows(), ref.getCols(), (MatiForEachIndex) ref::get);
     }
 
     @Override
-    public Matif clone() {
-        Matif matrix = new Matif(getRows(), getCols());
+    public Matid clone() {
+        Matid matrix = new Matid(getRows(), getCols());
         for (int i=0;i<getRows();i++) {
             matrix.set(i, get(i).clone());
         }

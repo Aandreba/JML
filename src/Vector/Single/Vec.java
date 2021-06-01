@@ -2,22 +2,22 @@ package Vector.Single;
 
 import GPGPU.OpenCL.Context;
 import Mathx.Mathf;
-import Matrix.Single.Matf;
+import Matrix.Single.Mat;
 import References.Single.Ref1Df;
-import Vector.Double.Vec;
+import Vector.Double.Vecd;
 
-public class Vecf implements Ref1Df {
+public class Vec implements Ref1Df {
     final protected float[] values;
 
-    public Vecf(int size) {
+    public Vec(int size) {
         this.values = new float[size];
     }
 
-    public Vecf(float... values) {
+    public Vec(float... values) {
         this.values = values;
     }
 
-    public Vecf(Vecf initialValues, float... finalValues) {
+    public Vec(Vec initialValues, float... finalValues) {
         int vecSize = initialValues.getSize();
         this.values = new float[vecSize + finalValues.length];
 
@@ -30,7 +30,7 @@ public class Vecf implements Ref1Df {
         }
     }
 
-    public Vecf(float[] initialValues, Vecf finalValues) {
+    public Vec(float[] initialValues, Vec finalValues) {
         int vecSize = finalValues.getSize();
         this.values = new float[initialValues.length + vecSize];
 
@@ -67,13 +67,13 @@ public class Vecf implements Ref1Df {
         this.values[pos] = value;
     }
 
-    private int finalLen (Vecf b) {
+    private int finalLen (Vec b) {
         return Math.min(getSize(), b.getSize());
     }
 
-    public Vecf forEach (Vecf b, VecfForEach forEach) {
+    public Vec forEach (Vec b, VecfForEach forEach) {
         int size = finalLen(b);
-        Vecf vector = new Vecf(size);
+        Vec vector = new Vec(size);
 
         for (int i=0;i<size;i++) {
             vector.set(i, forEach.apply(get(i), b.get(i)));
@@ -82,9 +82,9 @@ public class Vecf implements Ref1Df {
         return vector;
     }
 
-    public Vecf forEach (float b, VecfForEach forEach) {
+    public Vec forEach (float b, VecfForEach forEach) {
         int size = getSize();
-        Vecf vector = new Vecf(size);
+        Vec vector = new Vec(size);
 
         for (int i=0;i<size;i++) {
             vector.set(i, forEach.apply(get(i), b));
@@ -93,9 +93,9 @@ public class Vecf implements Ref1Df {
         return vector;
     }
 
-    public Vecf forEach (VecfForEachValue forEach) {
+    public Vec forEach (VecfForEachValue forEach) {
         int size = getSize();
-        Vecf vector = new Vecf(size);
+        Vec vector = new Vec(size);
 
         for (int i=0;i<size;i++) {
             vector.set(i, forEach.apply(get(i)));
@@ -104,8 +104,8 @@ public class Vecf implements Ref1Df {
         return vector;
     }
 
-    public static Vecf forEach (int size, VecfForEachIndex forEach) {
-        Vecf vector = new Vecf(size);
+    public static Vec forEach (int size, VecfForEachIndex forEach) {
+        Vec vector = new Vec(size);
         for (int i=0;i<size;i++) {
             vector.set(i, forEach.apply(i));
         }
@@ -113,43 +113,43 @@ public class Vecf implements Ref1Df {
         return vector;
     }
 
-    public Vecf add (Vecf b) {
+    public Vec add (Vec b) {
         return forEach(b, Float::sum);
     }
 
-    public Vecf add (float b) {
+    public Vec add (float b) {
         return forEach(b, Float::sum);
     }
 
-    public Vecf subtr (Vecf b) {
+    public Vec subtr (Vec b) {
         return forEach(b, (x, y) -> x - y);
     }
 
-    public Vecf subtr (float b) {
+    public Vec subtr (float b) {
         return forEach(b, (x, y) -> x - y);
     }
 
-    public Vecf invSubtr (float b) {
+    public Vec invSubtr (float b) {
         return forEach(b, (x, y) -> y - x);
     }
 
-    public Vecf mul (Vecf b) {
+    public Vec mul (Vec b) {
         return forEach(b, (x, y) -> x * y);
     }
 
-    public Vecf mul (float b) {
+    public Vec mul (float b) {
         return forEach(b, (x, y) -> x * y);
     }
 
-    public Vecf div (Vecf b) {
+    public Vec div (Vec b) {
         return forEach(b, (x, y) -> x / y);
     }
 
-    public Vecf div (float b) {
+    public Vec div (float b) {
         return forEach(b, (x, y) -> x / y);
     }
 
-    public Vecf invDiv(float b) {
+    public Vec invDiv(float b) {
         return forEach(b, (x, y) -> y / x);
     }
 
@@ -166,11 +166,11 @@ public class Vecf implements Ref1Df {
         return Mathf.sqrt(magnitude2());
     }
 
-    public Vecf unit () {
+    public Vec unit () {
         return div(magnitude());
     }
 
-    public float dot (Vecf b) {
+    public float dot (Vec b) {
         int len = finalLen(b);
         float sum = 0;
 
@@ -181,12 +181,12 @@ public class Vecf implements Ref1Df {
         return sum;
     }
 
-    public Vecf cross (Vecf b) {
+    public Vec cross (Vec b) {
         if (finalLen(b) < 3) {
             throw new ArithmeticException("Tried to do cross product with vectors of size smaller than 3");
         }
 
-        Vecf vector = new Vecf(3);
+        Vec vector = new Vec(3);
         vector.values[0] = get(1) * b.get(2) - get(2) * b.get(1);
         vector.values[1] = get(2) * b.get(0) - get(0) * b.get(2);
         vector.values[2] = get(0) * b.get(1) - get(1) * b.get(0);
@@ -207,8 +207,8 @@ public class Vecf implements Ref1Df {
         return sum() / getSize();
     }
 
-    public Vecf sub (int... pos) {
-        Vecf vector = new Vecf(pos.length);
+    public Vec sub (int... pos) {
+        Vec vector = new Vec(pos.length);
         for (int i=0;i<pos.length;i++) {
             vector.set(i, get(pos[i]));
         }
@@ -221,8 +221,8 @@ public class Vecf implements Ref1Df {
         return values.clone();
     }
 
-    public Vec toDouble () {
-        Vec vector = new Vec(getSize());
+    public Vecd toDouble () {
+        Vecd vector = new Vecd(getSize());
         for (int i=0;i<getSize();i++) {
             vector.set(i, get(i));
         }
@@ -230,33 +230,33 @@ public class Vecf implements Ref1Df {
         return vector;
     }
 
-    public VecCLf toCL (Context context) {
-        return new VecCLf(context, this);
+    public VecCL toCL (Context context) {
+        return new VecCL(context, this);
     }
 
-    public VecCLf toCL() {
+    public VecCL toCL() {
         return toCL(Context.DEFAULT);
     }
 
-    public VecCUDAf toCUDA () {
-        return new VecCUDAf(this);
+    public VecCUDA toCUDA () {
+        return new VecCUDA(this);
     }
 
-    public Matf rowMatrix () {
-        return new Matf(this);
+    public Mat rowMatrix () {
+        return new Mat(this);
     }
 
-    public Matf colMatrix () {
+    public Mat colMatrix () {
         return rowMatrix().T();
     }
 
-    public static Vecf fromRef (Ref1Df ref) {
-        return ref instanceof Vecf ? (Vecf) ref : forEach(ref.getSize(), ref::get);
+    public static Vec fromRef (Ref1Df ref) {
+        return ref instanceof Vec ? (Vec) ref : forEach(ref.getSize(), ref::get);
     }
 
     @Override
-    public Vecf clone() {
-        return new Vecf(values.clone());
+    public Vec clone() {
+        return new Vec(values.clone());
     }
 
     @Override

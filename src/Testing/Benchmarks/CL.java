@@ -1,8 +1,8 @@
 package Testing.Benchmarks;
 
 import Mathx.Rand;
-import Matrix.Double.Mat;
-import Matrix.Single.MatCLf;
+import Matrix.Double.Matd;
+import Matrix.Single.MatCL;
 
 public class CL {
     public static void main (String... args) {
@@ -14,16 +14,16 @@ public class CL {
         System.out.println("Insert epochs");
         epochs = Benchmark.getInt(x -> x > 0);
 
-        Mat[] cpu1 = new Mat[epochs];
-        Mat[] cpu2 = new Mat[epochs];
-        MatCLf[] gpu1 = new MatCLf[epochs];
-        MatCLf[] gpu2 = new MatCLf[epochs];
+        Matd[] cpu1 = new Matd[epochs];
+        Matd[] cpu2 = new Matd[epochs];
+        MatCL[] gpu1 = new MatCL[epochs];
+        MatCL[] gpu2 = new MatCL[epochs];
 
         for (int i=0;i<epochs;i++) {
-            cpu1[i] = Rand.getMat(size, size, -100, 100);
+            cpu1[i] = Rand.getMatd(size, size, -100, 100);
             gpu1[i] = cpu1[i].toFloat().toCL();
 
-            cpu2[i] = Rand.getMat(size, size, -100, 100);
+            cpu2[i] = Rand.getMatd(size, size, -100, 100);
             gpu2[i] = cpu2[i].toFloat().toCL();
         }
 
