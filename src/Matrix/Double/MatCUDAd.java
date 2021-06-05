@@ -2,15 +2,15 @@ package Matrix.Double;
 
 import GPGPU.CUDA.CUDA;
 import Matrix.Single.MatCUDA;
-import References.Double.Ref1D;
-import References.Double.Ref2D;
+import References.Double.Ref1Dd;
+import References.Double.Ref2Dd;
 import Vector.Double.Vecd;
 import Vector.Double.VecCUDAd;
 import jcuda.Pointer;
 import jcuda.Sizeof;
 import jcuda.jcublas.JCublas;
 
-public class MatCUDAd implements Ref2D {
+public class MatCUDAd implements Ref2Dd {
     static {
         CUDA.init();
     }
@@ -26,7 +26,7 @@ public class MatCUDAd implements Ref2D {
         JCublas.cublasAlloc(size, Sizeof.DOUBLE, id);
     }
 
-    public MatCUDAd(Ref2D values) {
+    public MatCUDAd(Ref2Dd values) {
         this(values.getRows(), values.getCols());
         set(values.colMajor().toArray());
     }
@@ -198,7 +198,7 @@ public class MatCUDAd implements Ref2D {
     }
 
     @Override
-    public void set(int row, Ref1D values) {
+    public void set(int row, Ref1Dd values) {
         double[] array = new double[size];
         JCublas.cublasGetMatrix(rows, cols, Sizeof.DOUBLE, id, rows, Pointer.to(array), rows);
 

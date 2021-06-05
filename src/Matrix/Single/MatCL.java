@@ -1,12 +1,11 @@
 package Matrix.Single;
 
-import GPGPU.OpenCL.Buffer.DoubleBuffer;
 import GPGPU.OpenCL.Buffer.FloatBuffer;
 import GPGPU.OpenCL.CommandQueue;
 import GPGPU.OpenCL.Context;
 import GPGPU.OpenCL.Query;
 import Matrix.Double.MatCLd;
-import References.Single.Ref2Df;
+import References.Single.Ref2D;
 import Vector.Double.VecCLd;
 import Vector.Single.VecCL;
 import Vector.Single.Vec;
@@ -16,7 +15,7 @@ import org.jocl.blast.CLBlast;
 import org.jocl.blast.CLBlastLayout;
 import org.jocl.blast.CLBlastTranspose;
 
-public class MatCL implements Ref2Df {
+public class MatCL implements Ref2D {
     final VecCL vector;
     final int rows, cols;
 
@@ -26,7 +25,7 @@ public class MatCL implements Ref2Df {
         this.cols = cols;
     }
 
-    public MatCL(Context context, Ref2Df values) {
+    public MatCL(Context context, Ref2D values) {
         this(context, values.getRows(), values.getCols());
         this.vector.set(values.rowMajor().toArray());
     }
@@ -49,7 +48,7 @@ public class MatCL implements Ref2Df {
         this(Context.DEFAULT, rows, cols);
     }
 
-    public MatCL(Ref2Df values) {
+    public MatCL(Ref2D values) {
         this(Context.DEFAULT, values);
     }
 

@@ -3,12 +3,11 @@ package Matrix.Single;
 import GPGPU.OpenCL.Context;
 import Complex.Comp;
 import Matrix.Double.Matid;
-import References.Single.Complex.Ref2Dif;
+import References.Single.Complex.Ref2Di;
 import Vector.Single.Veci;
-
 import java.util.Arrays;
 
-public class Mati implements Ref2Dif {
+public class Mati implements Ref2Di {
     final protected Veci[] values;
 
     public Mati(int rows, int cols) {
@@ -263,6 +262,20 @@ public class Mati implements Ref2Dif {
         return adj().scalMul(det().inverse());
     }
 
+    public Mati newtonInverse(Mati guess) {
+        Mati y = guess;
+        Mati last = null;
+
+        int n = 0;
+        while (!y.equals(last) && n < 100) {
+            last = y;
+            y = y.scalMul(2).subtr(y.mul(this).mul(y));
+            n++;
+        }
+
+        return y;
+    }
+
     public Mati cofactor () {
         int rows = getRows();
         if (rows != getCols()) {
@@ -327,21 +340,6 @@ public class Mati implements Ref2Dif {
         return sum;
     }
 
-    public Mati pow (int x) {
-        if (!isSquare()) {
-            throw new ArithmeticException("Tried to calculate power of non-square matrix");
-        } else if (x < 0) {
-            throw new ArithmeticException("Tried to calculate negative power of matrix");
-        }
-
-        Mati result = identity(getRows());
-        for (int i=0;i<x;i++) {
-            result = result.mul(this);
-        }
-
-        return result;
-    }
-
     public Mati exp () {
         if (!isSquare()) {
             throw new ArithmeticException("Tried to calculate exponential of non-square matrix");
@@ -365,6 +363,52 @@ public class Mati implements Ref2Dif {
         }
 
         return result;
+    }
+
+    public Mati pow (int x) {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate power of non-square matrix");
+        } else if (x < 0) {
+            throw new ArithmeticException("Tried to calculate negative power of matrix");
+        }
+
+        Mati result = identity(getRows());
+        for (int i=0;i<x;i++) {
+            result = result.mul(this);
+        }
+
+        return result;
+    }
+
+    public Mati sqrt () {
+        Mati y = this;
+        Mati z = identity(getRows());
+
+        Mati zInverse = null;
+        Mati yInverse = null;
+        int n = 1;
+
+        while (n <= 1000) {
+            if (n <= 10) {
+                zInverse = z.inverse();
+                yInverse = y.inverse();
+            } else {
+                zInverse = z.newtonInverse(zInverse);
+                yInverse = y.newtonInverse(yInverse);
+            }
+
+            Mati newY = y.add(zInverse).scalDiv(2);
+            if (newY.equals(y)) {
+                return y;
+            }
+
+            Mati newZ = z.add(yInverse).scalDiv(2);
+            y = newY;
+            z = newZ;
+            n++;
+        }
+
+        throw new ArithmeticException("No square root found");
     }
 
     public Mati T () {
@@ -402,7 +446,7 @@ public class Mati implements Ref2Dif {
         return forEach(k, k, (i, j) -> i == j ? new Comp(1,0) : new Comp());
     }
 
-    public static Mati fromRef (Ref2Dif ref) {
+    public static Mati fromRef (Ref2Di ref) {
         return ref instanceof Mati ? (Mati) ref : forEach(ref.getRows(), ref.getCols(), (MatifForEachIndex) ref::get);
     }
 

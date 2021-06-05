@@ -8,7 +8,7 @@ import GPGPU.OpenCL.Query;
 import Complex.Compd;
 import Complex.Comp;
 import Matrix.Double.MatCLid;
-import References.Double.Complex.Ref1Di;
+import References.Double.Complex.Ref1Did;
 import Vector.Single.VecCLi;
 import org.jocl.blast.CLBlast;
 import org.jocl.cl_event;
@@ -20,7 +20,7 @@ public class VecCLid extends CompBuffer {
         super(context, size);
     }
 
-    public VecCLid(Context context, Ref1Di values) {
+    public VecCLid(Context context, Ref1Did values) {
         this(context, values.getSize());
         set(values.toArray());
     }
@@ -34,7 +34,7 @@ public class VecCLid extends CompBuffer {
         super(Context.DEFAULT, size);
     }
 
-    public VecCLid(Ref1Di values) {
+    public VecCLid(Ref1Did values) {
         this(Context.DEFAULT, values);
     }
 

@@ -3,14 +3,14 @@ package Vector.Single;
 import Complex.Comp;
 import GPGPU.CUDA.CUDA;
 import Matrix.Single.MatCUDAi;
-import References.Single.Complex.Ref1Dif;
+import References.Single.Complex.Ref1Di;
 import jcuda.Pointer;
 import jcuda.Sizeof;
 import jcuda.jcublas.JCublas;
 
 import java.util.Arrays;
 
-public class VecCUDAi implements Ref1Dif {
+public class VecCUDAi implements Ref1Di {
     final public static int ELEMSIZE = 2 * Sizeof.FLOAT;
     static {
         CUDA.init();

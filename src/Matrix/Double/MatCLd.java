@@ -5,8 +5,8 @@ import GPGPU.OpenCL.CommandQueue;
 import GPGPU.OpenCL.Context;
 import GPGPU.OpenCL.Query;
 import Matrix.Single.MatCL;
-import References.Double.Ref1D;
-import References.Double.Ref2D;
+import References.Double.Ref1Dd;
+import References.Double.Ref2Dd;
 import Vector.Double.Vecd;
 import Vector.Double.VecCLd;
 import Vector.Single.VecCL;
@@ -17,9 +17,7 @@ import org.jocl.blast.CLBlastTranspose;
 import org.jocl.cl_event;
 import org.jocl.cl_mem;
 
-import java.util.Arrays;
-
-public class MatCLd implements Ref2D {
+public class MatCLd implements Ref2Dd {
     final VecCLd vector;
     final int rows, cols;
 
@@ -29,7 +27,7 @@ public class MatCLd implements Ref2D {
         this.cols = cols;
     }
 
-    public MatCLd(Context context, Ref2D values) {
+    public MatCLd(Context context, Ref2Dd values) {
         this(context, values.getRows(), values.getCols());
         this.vector.set(values.rowMajor().toArray());
     }
@@ -52,7 +50,7 @@ public class MatCLd implements Ref2D {
         this(Context.DEFAULT, rows, cols);
     }
 
-    public MatCLd(Ref2D values) {
+    public MatCLd(Ref2Dd values) {
         this(Context.DEFAULT, values);
     }
 
@@ -292,7 +290,7 @@ public class MatCLd implements Ref2D {
         this.vector.set(row * cols, vals);
     }
 
-    public void set (int row, Ref1D vals) {
+    public void set (int row, Ref1Dd vals) {
         if (cols != vals.getSize()) {
             throw new IllegalArgumentException();
         }

@@ -6,7 +6,7 @@ import GPGPU.OpenCL.CommandQueue;
 import GPGPU.OpenCL.Context;
 import GPGPU.OpenCL.Query;
 import Matrix.Double.MatCLd;
-import References.Double.Ref1D;
+import References.Double.Ref1Dd;
 import Vector.Single.VecCL;
 import org.jocl.blast.CLBlast;
 import org.jocl.cl_event;
@@ -18,7 +18,7 @@ public class VecCLd extends DoubleBuffer {
         super(context, size);
     }
 
-    public VecCLd(Context context, Ref1D values) {
+    public VecCLd(Context context, Ref1Dd values) {
         this(context, values.getSize());
         set(values.toArray());
     }
@@ -32,7 +32,7 @@ public class VecCLd extends DoubleBuffer {
         super(Context.DEFAULT, size);
     }
 
-    public VecCLd(Ref1D values) {
+    public VecCLd(Ref1Dd values) {
         this(Context.DEFAULT, values);
     }
 

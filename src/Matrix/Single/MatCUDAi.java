@@ -3,14 +3,14 @@ package Matrix.Single;
 import Complex.Comp;
 import GPGPU.CUDA.CUDA;
 import Matrix.Double.MatCUDAid;
-import References.Single.Complex.Ref1Dif;
-import References.Single.Complex.Ref2Dif;
+import References.Single.Complex.Ref1Di;
+import References.Single.Complex.Ref2Di;
 import Vector.Single.VecCUDAi;
 import Vector.Single.Veci;
 import jcuda.Pointer;
 import jcuda.jcublas.JCublas;
 
-public class MatCUDAi implements Ref2Dif {
+public class MatCUDAi implements Ref2Di {
     static {
         CUDA.init();
     }
@@ -26,7 +26,7 @@ public class MatCUDAi implements Ref2Dif {
         JCublas.cublasAlloc(size, VecCUDAi.ELEMSIZE, id);
     }
 
-    public MatCUDAi(Ref2Dif values) {
+    public MatCUDAi(Ref2Di values) {
         this(values.getRows(), values.getCols());
         set(values.colMajor().toArray());
     }
@@ -205,7 +205,7 @@ public class MatCUDAi implements Ref2Dif {
     }
 
     @Override
-    public void set (int row, Ref1Dif values) {
+    public void set (int row, Ref1Di values) {
         float[] array = toFloatArray();
         for (int i=0;i<cols;i++) {
             int j = (i * rows) + row;

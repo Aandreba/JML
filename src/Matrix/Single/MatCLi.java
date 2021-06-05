@@ -7,8 +7,8 @@ import GPGPU.OpenCL.Query;
 import Complex.Compd;
 import Complex.Comp;
 import Matrix.Double.MatCLid;
-import References.Single.Complex.Ref1Dif;
-import References.Single.Complex.Ref2Dif;
+import References.Single.Complex.Ref1Di;
+import References.Single.Complex.Ref2Di;
 import Vector.Double.VecCLid;
 import Vector.Single.VecCLi;
 import Vector.Single.Veci;
@@ -19,7 +19,7 @@ import org.jocl.blast.CLBlastTranspose;
 import org.jocl.cl_event;
 import org.jocl.cl_mem;
 
-public class MatCLi implements Ref2Dif {
+public class MatCLi implements Ref2Di {
     final VecCLi vector;
     final int rows, cols;
 
@@ -29,7 +29,7 @@ public class MatCLi implements Ref2Dif {
         this.cols = cols;
     }
 
-    public MatCLi(Context context, Ref2Dif values) {
+    public MatCLi(Context context, Ref2Di values) {
         this(context, values.getRows(), values.getCols());
         this.vector.set(values.rowMajor().toArray());
     }
@@ -52,7 +52,7 @@ public class MatCLi implements Ref2Dif {
         this(Context.DEFAULT, rows, cols);
     }
 
-    public MatCLi(Ref2Dif values) {
+    public MatCLi(Ref2Di values) {
         this(Context.DEFAULT, values);
     }
 
@@ -253,7 +253,7 @@ public class MatCLi implements Ref2Dif {
         this.vector.set(row * cols, vals);
     }
 
-    public void set (int row, Ref1Dif vals) {
+    public void set (int row, Ref1Di vals) {
         if (cols != vals.getSize()) {
             throw new IllegalArgumentException();
         }

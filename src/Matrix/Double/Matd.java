@@ -1,16 +1,13 @@
 package Matrix.Double;
 
 import GPGPU.OpenCL.Context;
-import Matrix.Single.Mat;
-import Matrix.Single.Mati;
-import References.Double.Ref2D;
+import References.Double.Ref2Dd;
 import Vector.Double.Vecd;
 import Vector.Double.Vecid;
-import Vector.Single.Veci;
 
 import java.util.Arrays;
 
-public class Matd implements Ref2D {
+public class Matd implements Ref2Dd {
     final protected Vecd[] values;
 
     public Matd(int rows, int cols) {
@@ -381,7 +378,7 @@ public class Matd implements Ref2D {
         return forEach(k, k, (i, j) -> i == j ? 1 : 0);
     }
 
-    public static Matd fromRef (Ref2D ref) {
+    public static Matd fromRef (Ref2Dd ref) {
         return ref instanceof Matd ? (Matd) ref : forEach(ref.getRows(), ref.getCols(), (MatForEachIndex) ref::get);
     }
 

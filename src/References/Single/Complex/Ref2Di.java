@@ -2,19 +2,19 @@ package References.Single.Complex;
 
 import Complex.Compd;
 import Complex.Comp;
-import References.Double.Complex.Ref2Di;
+import References.Double.Complex.Ref2Did;
 
 import java.util.Iterator;
 
-public interface Ref2Dif extends Iterable<Ref1Dif> {
+public interface Ref2Di extends Iterable<Ref1Di> {
     int getRows();
     int getCols();
 
     Comp get (int row, int col);
     void set (int row, int col, Comp val);
 
-    default Ref1Dif get (int row) {
-        return new Ref1Dif() {
+    default Ref1Di get (int row) {
+        return new Ref1Di() {
             @Override
             public int getSize() {
                 return getCols();
@@ -22,24 +22,24 @@ public interface Ref2Dif extends Iterable<Ref1Dif> {
 
             @Override
             public Comp get(int pos) {
-                return Ref2Dif.this.get(row, pos);
+                return Ref2Di.this.get(row, pos);
             }
 
             @Override
             public void set(int pos, Comp val) {
-                Ref2Dif.this.set(row, pos, val);
+                Ref2Di.this.set(row, pos, val);
             }
         };
     }
 
-    default void set (int row, Ref1Dif values) {
+    default void set (int row, Ref1Di values) {
         int len = Math.min(getCols(), values.getSize());
         for (int i=0;i<len;i++) {
             this.set(row, i, values.get(i));
         }
     }
 
-    default void set (Ref2Dif values) {
+    default void set (Ref2Di values) {
         int rows = Math.min(getRows(), values.getRows());
         int cols = Math.min(getCols(), values.getCols());
 
@@ -50,26 +50,26 @@ public interface Ref2Dif extends Iterable<Ref1Dif> {
         }
     }
 
-    default Ref2Dif T () {
-        return new Ref2Dif() {
+    default Ref2Di T () {
+        return new Ref2Di() {
             @Override
             public int getRows() {
-                return Ref2Dif.this.getCols();
+                return Ref2Di.this.getCols();
             }
 
             @Override
             public int getCols() {
-                return Ref2Dif.this.getRows();
+                return Ref2Di.this.getRows();
             }
 
             @Override
             public Comp get (int row, int col) {
-                return Ref2Dif.this.get(col, row);
+                return Ref2Di.this.get(col, row);
             }
 
             @Override
             public void set(int row, int col, Comp val) {
-                Ref2Dif.this.set(col, row, val);
+                Ref2Di.this.set(col, row, val);
             }
         };
     }
@@ -83,32 +83,32 @@ public interface Ref2Dif extends Iterable<Ref1Dif> {
         return array;
     }
 
-    default Ref2Di toDouble () {
-        return new Ref2Di() {
+    default Ref2Did toDouble () {
+        return new Ref2Did() {
             @Override
             public int getRows() {
-                return Ref2Dif.this.getRows();
+                return Ref2Di.this.getRows();
             }
 
             @Override
             public int getCols() {
-                return Ref2Dif.this.getCols();
+                return Ref2Di.this.getCols();
             }
 
             @Override
             public Compd get(int row, int col) {
-                return Ref2Dif.this.get(row, col).toDouble();
+                return Ref2Di.this.get(row, col).toDouble();
             }
 
             @Override
             public void set(int row, int col, Compd val) {
-                Ref2Dif.this.set(row, col, val.toFloat());
+                Ref2Di.this.set(row, col, val.toFloat());
             }
         };
     }
 
-    default Ref1Dif rowMajor () {
-        return new Ref1Dif() {
+    default Ref1Di rowMajor () {
+        return new Ref1Di() {
             @Override
             public int getSize() {
                 return getRows() * getCols();
@@ -120,7 +120,7 @@ public interface Ref2Dif extends Iterable<Ref1Dif> {
                 int row = pos / cols;
                 int col = pos % cols;
 
-                return Ref2Dif.this.get(row, col);
+                return Ref2Di.this.get(row, col);
             }
 
             @Override
@@ -129,13 +129,13 @@ public interface Ref2Dif extends Iterable<Ref1Dif> {
                 int row = pos / cols;
                 int col = pos % cols;
 
-                Ref2Dif.this.set(row, col, val);
+                Ref2Di.this.set(row, col, val);
             }
         };
     }
 
-    default Ref1Dif colMajor () {
-        return new Ref1Dif() {
+    default Ref1Di colMajor () {
+        return new Ref1Di() {
             @Override
             public int getSize() {
                 return getRows() * getCols();
@@ -147,7 +147,7 @@ public interface Ref2Dif extends Iterable<Ref1Dif> {
                 int col = pos / rows;
                 int row = pos % rows;
 
-                return Ref2Dif.this.get(row, col);
+                return Ref2Di.this.get(row, col);
             }
 
             @Override
@@ -156,14 +156,14 @@ public interface Ref2Dif extends Iterable<Ref1Dif> {
                 int col = pos / rows;
                 int row = pos % rows;
 
-                Ref2Dif.this.set(row, col, val);
+                Ref2Di.this.set(row, col, val);
             }
         };
     }
 
     @Override
-    default Iterator<Ref1Dif> iterator() {
-        return new Iterator<Ref1Dif>() {
+    default Iterator<Ref1Di> iterator() {
+        return new Iterator<Ref1Di>() {
             int i = 0;
 
             @Override
@@ -172,7 +172,7 @@ public interface Ref2Dif extends Iterable<Ref1Dif> {
             }
 
             @Override
-            public Ref1Dif next() {
+            public Ref1Di next() {
                 return get(i++);
             }
         };

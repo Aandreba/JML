@@ -3,12 +3,12 @@ package Vector.Double;
 import GPGPU.OpenCL.Context;
 import Complex.Compd;
 import Matrix.Double.Matid;
-import References.Double.Complex.Ref1Di;
+import References.Double.Complex.Ref1Did;
 import Vector.Single.Veci;
 
 import java.util.Arrays;
 
-public class Vecid implements Ref1Di {
+public class Vecid implements Ref1Did {
     final protected Compd[] values;
 
     public Vecid(int size) {
@@ -288,7 +288,7 @@ public class Vecid implements Ref1Di {
         return rowMatrix().T();
     }
 
-    public static Vecid fromRef (Ref1Di ref) {
+    public static Vecid fromRef (Ref1Did ref) {
         return ref instanceof Vecid ? (Vecid) ref : forEach(ref.getSize(), ref::get);
     }
 

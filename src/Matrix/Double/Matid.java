@@ -2,14 +2,13 @@ package Matrix.Double;
 
 import GPGPU.OpenCL.Context;
 import Complex.Compd;
-import Matrix.Single.Mat;
 import Matrix.Single.Mati;
-import References.Double.Complex.Ref2Di;
+import References.Double.Complex.Ref2Did;
 import Vector.Double.Vecid;
 
 import java.util.Arrays;
 
-public class Matid implements Ref2Di {
+public class Matid implements Ref2Did {
     final protected Vecid[] values;
 
     public Matid(int rows, int cols) {
@@ -403,7 +402,7 @@ public class Matid implements Ref2Di {
         return forEach(k, k, (i, j) -> i == j ? new Compd(1,0) : new Compd());
     }
 
-    public static Matid fromRef (Ref2Di ref) {
+    public static Matid fromRef (Ref2Did ref) {
         return ref instanceof Matid ? (Matid) ref : forEach(ref.getRows(), ref.getCols(), (MatiForEachIndex) ref::get);
     }
 

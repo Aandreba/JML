@@ -2,14 +2,14 @@ package Vector.Double;
 
 import GPGPU.CUDA.CUDA;
 import Matrix.Double.MatCUDAd;
-import References.Double.Ref1D;
+import References.Double.Ref1Dd;
 import jcuda.Pointer;
 import jcuda.Sizeof;
 import jcuda.jcublas.JCublas;
 
 import java.util.Arrays;
 
-public class VecCUDAd implements Ref1D {
+public class VecCUDAd implements Ref1Dd {
     static {
         CUDA.init();
     }

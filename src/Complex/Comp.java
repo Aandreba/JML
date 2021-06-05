@@ -130,10 +130,14 @@ public class Comp {
 
     @Override
     public String toString() {
-        if (real == 0) {
+        if (Float.isNaN(real) || Float.isNaN(imaginary)) {
+            return "NaN";
+        } else if (Float.isInfinite(real) || Float.isInfinite(imaginary)) {
+            return "Infinity";
+        } else if (real == 0) {
             return imaginary+"i";
         } else if (imaginary == 0) {
-            return Double.toString(real);
+            return Float.toString(real);
         } else if (imaginary >= 0) {
             return real + " + " + imaginary + "i";
         }

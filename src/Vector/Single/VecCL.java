@@ -5,7 +5,7 @@ import GPGPU.OpenCL.CommandQueue;
 import GPGPU.OpenCL.Context;
 import GPGPU.OpenCL.Query;
 import Matrix.Single.MatCL;
-import References.Single.Ref1Df;
+import References.Single.Ref1D;
 import Vector.Double.VecCLd;
 import org.jocl.*;
 import org.jocl.blast.CLBlast;
@@ -16,7 +16,7 @@ public class VecCL extends FloatBuffer {
         super(context, size);
     }
 
-    public VecCL(Context context, Ref1Df values) {
+    public VecCL(Context context, Ref1D values) {
         this(context, values.getSize());
         set(values.toArray());
     }
@@ -30,7 +30,7 @@ public class VecCL extends FloatBuffer {
         super(Context.DEFAULT, size);
     }
 
-    public VecCL(Ref1Df values) {
+    public VecCL(Ref1D values) {
         this(Context.DEFAULT, values);
     }
 

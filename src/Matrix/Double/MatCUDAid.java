@@ -3,8 +3,8 @@ package Matrix.Double;
 import Complex.Compd;
 import GPGPU.CUDA.CUDA;
 import Matrix.Single.MatCUDAi;
-import References.Double.Complex.Ref1Di;
-import References.Double.Complex.Ref2Di;
+import References.Double.Complex.Ref1Did;
+import References.Double.Complex.Ref2Did;
 import Vector.Double.VecCUDAid;
 import Vector.Double.Vecid;
 import jcuda.Pointer;
@@ -12,7 +12,7 @@ import jcuda.cuComplex;
 import jcuda.cuDoubleComplex;
 import jcuda.jcublas.JCublas;
 
-public class MatCUDAid implements Ref2Di {
+public class MatCUDAid implements Ref2Did {
     static {
         CUDA.init();
     }
@@ -28,7 +28,7 @@ public class MatCUDAid implements Ref2Di {
         JCublas.cublasAlloc(size, VecCUDAid.ELEMSIZE, id);
     }
 
-    public MatCUDAid(Ref2Di values) {
+    public MatCUDAid(Ref2Did values) {
         this(values.getRows(), values.getCols());
         set(values.colMajor().toArray());
     }
@@ -207,7 +207,7 @@ public class MatCUDAid implements Ref2Di {
     }
 
     @Override
-    public void set (int row, Ref1Di values) {
+    public void set (int row, Ref1Did values) {
         double[] array = toDoubleArray();
         for (int i=0;i<cols;i++) {
             int j = (i * rows) + row;

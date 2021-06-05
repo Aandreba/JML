@@ -3,13 +3,12 @@ package Vector.Single;
 import GPGPU.OpenCL.Context;
 import Mathx.Mathf;
 import Matrix.Single.Mat;
-import References.Single.Ref1Df;
+import References.Single.Ref1D;
 import Vector.Double.Vecd;
-import Vector.Double.Vecid;
 
 import java.util.Arrays;
 
-public class Vec implements Ref1Df {
+public class Vec implements Ref1D {
     final protected float[] values;
 
     public Vec(int size) {
@@ -258,7 +257,7 @@ public class Vec implements Ref1Df {
         return rowMatrix().T();
     }
 
-    public static Vec fromRef (Ref1Df ref) {
+    public static Vec fromRef (Ref1D ref) {
         return ref instanceof Vec ? (Vec) ref : forEach(ref.getSize(), ref::get);
     }
 

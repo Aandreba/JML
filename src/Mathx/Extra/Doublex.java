@@ -1,5 +1,7 @@
 package Mathx.Extra;
 
+import Mathx.Mathf;
+
 public class Doublex {
     public static void printBits (double value) {
         long bits = Double.doubleToLongBits(value);
@@ -8,5 +10,11 @@ public class Doublex {
         }
 
         System.out.println();
+    }
+
+    public static boolean isInteger (double x) {
+        int exponent = Math.getExponent(x);
+        long mantissaBits = Double.doubleToLongBits(x) & 0xfffffffffffffL;
+        return (mantissaBits << (exponent + 12)) == 0;
     }
 }

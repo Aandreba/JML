@@ -1,8 +1,8 @@
-package References.Double;
+package References.Single;
 
-import Complex.Compd;
-import References.Double.Complex.Ref2Di;
-import References.Single.Ref2Df;
+import Complex.Comp;
+import References.Double.Ref2Dd;
+import References.Single.Complex.Ref2Di;
 
 import java.util.Iterator;
 
@@ -10,8 +10,8 @@ public interface Ref2D extends Iterable<Ref1D> {
     int getRows();
     int getCols();
 
-    double get (int row, int col);
-    void set (int row, int col, double val);
+    float get (int row, int col);
+    void set (int row, int col, float val);
 
     default Ref1D get (int row) {
         return new Ref1D() {
@@ -21,12 +21,12 @@ public interface Ref2D extends Iterable<Ref1D> {
             }
 
             @Override
-            public double get(int pos) {
+            public float get(int pos) {
                 return Ref2D.this.get(row, pos);
             }
 
             @Override
-            public void set(int pos, double val) {
+            public void set(int pos, float val) {
                 Ref2D.this.set(row, pos, val);
             }
         };
@@ -63,19 +63,19 @@ public interface Ref2D extends Iterable<Ref1D> {
             }
 
             @Override
-            public double get (int row, int col) {
+            public float get (int row, int col) {
                 return Ref2D.this.get(col, row);
             }
 
             @Override
-            public void set(int row, int col, double val) {
+            public void set(int row, int col, float val) {
                 Ref2D.this.set(col, row, val);
             }
         };
     }
 
-    default double[][] toArray () {
-        double[][] array = new double[getRows()][getCols()];
+    default float[][] toArray () {
+        float[][] array = new float[getRows()][getCols()];
         for (int i=0;i<array.length;i++) {
             array[i] = get(i).toArray();
         }
@@ -83,8 +83,8 @@ public interface Ref2D extends Iterable<Ref1D> {
         return array;
     }
 
-    default Ref2Df toFloat () {
-        return new Ref2Df() {
+    default Ref2Dd toDouble () {
+        return new Ref2Dd() {
             @Override
             public int getRows() {
                 return Ref2D.this.getRows();
@@ -92,17 +92,17 @@ public interface Ref2D extends Iterable<Ref1D> {
 
             @Override
             public int getCols() {
-                return Ref2D.this.getCols();
+                return Ref2D.this.getRows();
             }
 
             @Override
-            public float get(int row, int col) {
-                return (float) Ref2D.this.get(row, col);
+            public double get(int row, int col) {
+                return Ref2D.this.get(row, col);
             }
 
             @Override
-            public void set(int row, int col, float val) {
-                Ref2D.this.set(row, col, val);
+            public void set (int row, int col, double val) {
+                Ref2D.this.set(row, col, (float) val);
             }
         };
     }
@@ -120,12 +120,12 @@ public interface Ref2D extends Iterable<Ref1D> {
             }
 
             @Override
-            public Compd get (int row, int col) {
-                return new Compd(Ref2D.this.get(row, col), 0);
+            public Comp get (int row, int col) {
+                return new Comp(Ref2D.this.get(row, col), 0);
             }
 
             @Override
-            public void set(int row, int col, Compd val) {
+            public void set(int row, int col, Comp val) {
                 Ref2D.this.set(row, col, val.real);
             }
         };
@@ -139,7 +139,7 @@ public interface Ref2D extends Iterable<Ref1D> {
             }
 
             @Override
-            public double get (int pos) {
+            public float get (int pos) {
                 int cols = getCols();
                 int row = pos / cols;
                 int col = pos % cols;
@@ -148,7 +148,7 @@ public interface Ref2D extends Iterable<Ref1D> {
             }
 
             @Override
-            public void set (int pos, double val) {
+            public void set (int pos, float val) {
                 int cols = getCols();
                 int row = pos / cols;
                 int col = pos % cols;
@@ -166,7 +166,7 @@ public interface Ref2D extends Iterable<Ref1D> {
             }
 
             @Override
-            public double get (int pos) {
+            public float get(int pos) {
                 int rows = getRows();
                 int col = pos / rows;
                 int row = pos % rows;
@@ -175,7 +175,7 @@ public interface Ref2D extends Iterable<Ref1D> {
             }
 
             @Override
-            public void set (int pos, double val) {
+            public void set(int pos, float val) {
                 int rows = getRows();
                 int col = pos / rows;
                 int row = pos % rows;

@@ -4,7 +4,7 @@ import GPGPU.OpenCL.CommandQueue;
 import GPGPU.OpenCL.Context;
 import GPGPU.OpenCL.Query;
 import Complex.Compd;
-import References.Double.Complex.Ref1Di;
+import References.Double.Complex.Ref1Did;
 import org.jocl.Pointer;
 import org.jocl.Sizeof;
 import org.jocl.blast.CLBlast;
@@ -14,7 +14,7 @@ import java.util.Arrays;
 
 import static org.jocl.CL.*;
 
-public class CompBuffer extends Buffer implements Ref1Di {
+public class CompBuffer extends Buffer implements Ref1Did {
     final public int size;
 
     public CompBuffer(CommandQueue queue, int size) {
@@ -80,7 +80,7 @@ public class CompBuffer extends Buffer implements Ref1Di {
     }
 
     @Override
-    public void set (Ref1Di values) {
+    public void set (Ref1Did values) {
         set(values.toArray());
     }
 

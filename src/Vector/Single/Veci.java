@@ -4,12 +4,12 @@ import GPGPU.OpenCL.Context;
 import Complex.Comp;
 import Mathx.Mathf;
 import Matrix.Single.Mati;
-import References.Single.Complex.Ref1Dif;
+import References.Single.Complex.Ref1Di;
 import Vector.Double.Vecid;
 
 import java.util.Arrays;
 
-public class Veci implements Ref1Dif {
+public class Veci implements Ref1Di {
     final protected Comp[] values;
 
     public Veci(int size) {
@@ -269,7 +269,7 @@ public class Veci implements Ref1Dif {
         return rowMatrix().T();
     }
 
-    public static Veci fromRef (Ref1Dif ref) {
+    public static Veci fromRef (Ref1Di ref) {
         return ref instanceof Veci ? (Veci) ref : forEach(ref.getSize(), ref::get);
     }
 

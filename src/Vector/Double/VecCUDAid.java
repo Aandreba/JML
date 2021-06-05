@@ -3,13 +3,13 @@ package Vector.Double;
 import Complex.Compd;
 import GPGPU.CUDA.CUDA;
 import Matrix.Double.MatCUDAid;
-import References.Double.Complex.Ref1Di;
+import References.Double.Complex.Ref1Did;
 import jcuda.Pointer;
 import jcuda.Sizeof;
 import jcuda.jcublas.JCublas;
 import java.util.Arrays;
 
-public class VecCUDAid implements Ref1Di {
+public class VecCUDAid implements Ref1Did {
     final public static int ELEMSIZE = 2 * Sizeof.DOUBLE;
     static {
         CUDA.init();

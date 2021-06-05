@@ -1,19 +1,16 @@
 package Matrix.Single;
 
 import GPGPU.OpenCL.Context;
+import Mathx.Extra.Floatx;
 import Mathx.Extra.Intx;
-import Mathx.Mathf;
 import Matrix.Double.Matd;
-import Matrix.Double.Matid;
-import References.Single.Complex.Ref2Dif;
-import References.Single.Ref2Df;
-import Vector.Double.Vecid;
+import References.Single.Ref2D;
 import Vector.Single.Vec;
 import Vector.Single.Veci;
 
 import java.util.Arrays;
 
-public class Mat implements Ref2Df {
+public class Mat implements Ref2D {
     final protected Vec[] values;
 
     public Mat(int rows, int cols) {
@@ -240,6 +237,20 @@ public class Mat implements Ref2Df {
         return adj().scalMul(1 / det());
     }
 
+    public Mat newtonInverse(Mat guess) {
+        Mat y = guess;
+        Mat last = null;
+
+        int n = 0;
+        while (!y.equals(last) && n < 100) {
+            last = y;
+            y = y.scalMul(2).subtr(y.mul(this).mul(y));
+            n++;
+        }
+
+        return y;
+    }
+
     public Mat cofactor () {
         if (!isSquare()) {
             throw new ArithmeticException("Tried to calculate cofactor of non-square matrix");
@@ -309,29 +320,6 @@ public class Mat implements Ref2Df {
         return sum;
     }
 
-    public Mat pow (int x) {
-        if (!isSquare()) {
-            throw new ArithmeticException("Tried to calculate power of non-square matrix");
-        } else if (x < 0) {
-            throw new ArithmeticException("Tried to calculate negative power of matrix");
-        }
-
-        Mat result = identity(getRows());
-        for (int i=0;i<x;i++) {
-            result = result.mul(this);
-        }
-
-        return result;
-    }
-
-    public Mat pow (float y) {
-        return log().scalMul(y).exp();
-    }
-
-    public Mat pow (Mat y) {
-        return y.mul(log()).exp();
-    }
-
     public Mat exp () {
         if (!isSquare()) {
             throw new ArithmeticException("Tried to calculate exponential of non-square matrix");
@@ -357,30 +345,103 @@ public class Mat implements Ref2Df {
         return result;
     }
 
-    public Mat log () {
+    public Mat log1p() {
         if (!isSquare()) {
-            throw new ArithmeticException("Tried to calculate exponential of non-square matrix");
+            throw new ArithmeticException("Tried to calculate logarithm of non-square matrix");
         }
 
-        int k = 1;
-        Mat pow = identity(getRows());
-
-        Mat result = pow.clone();
+        Mat y = this;
         Mat last = null;
+        Mat pow = this;
 
-        while (!result.equals(last)) {
+        int n = 2;
+        while (!y.equals(last)) {
             pow = pow.mul(this);
-            last = result.clone();
+            Mat x = pow.scalDiv(n);
 
-            if (Intx.isOdd(k)) {
-                result = result.add(pow.scalDiv(k));
+            last = y;
+            if (Intx.isOdd(n)) {
+                y = y.add(x);
             } else {
-                result = result.subtr(pow.scalDiv(k));
+                y = y.subtr(x);
             }
-            k++;
+
+            n++;
+        }
+
+        return y;
+    }
+
+    public Mat log () {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate logarithm of non-square matrix");
+        }
+
+        return subtr(identity(getRows())).log1p();
+    }
+
+    public Mat pow (int b) {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate power of non-square matrix");
+        } else if (b < 0) {
+            throw new ArithmeticException("Tried to calculate negative power of matrix");
+        }
+
+        Mat result = identity(getRows());
+        for (int i=0;i<b;i++) {
+            result = result.mul(this);
         }
 
         return result;
+    }
+
+    public Mat sqrt () {
+        Mat y = this;
+        Mat z = identity(getRows());
+
+        Mat zInverse = null;
+        Mat yInverse = null;
+        int n = 1;
+
+        while (n <= 1000) {
+            if (n <= 10) {
+                zInverse = z.inverse();
+                yInverse = y.inverse();
+            } else {
+                zInverse = z.newtonInverse(zInverse);
+                yInverse = y.newtonInverse(yInverse);
+            }
+
+            Mat newY = y.add(zInverse).scalDiv(2);
+            if (newY.equals(y)) {
+                return y;
+            }
+
+            Mat newZ = z.add(yInverse).scalDiv(2);
+            y = newY;
+            z = newZ;
+            n++;
+        }
+
+        throw new ArithmeticException("No square root found");
+    }
+
+    public Mat invSqrt () {
+        Mat y = this;
+        Mat z = identity(getRows());
+        Mat last = null;
+
+        while (!z.equals(last)) {
+            last = z;
+
+            Mat newY = y.add(z.inverse()).scalMul(0.5f);
+            Mat newZ = z.add(y.inverse()).scalMul(0.5f);
+
+            y = newY;
+            z = newZ;
+        }
+
+        return z;
     }
 
     public Mat T () {
@@ -428,7 +489,7 @@ public class Mat implements Ref2Df {
         return forEach(k, k, (i, j) -> i == j ? 1 : 0);
     }
 
-    public static Mat fromRef (Ref2Df ref) {
+    public static Mat fromRef (Ref2D ref) {
         return ref instanceof Mat ? (Mat) ref : forEach(ref.getRows(), ref.getCols(), (MatfForEachIndex) ref::get);
     }
 

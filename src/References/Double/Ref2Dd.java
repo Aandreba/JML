@@ -1,45 +1,45 @@
-package References.Single;
+package References.Double;
 
-import Complex.Comp;
-import References.Double.Ref2D;
-import References.Single.Complex.Ref2Dif;
+import Complex.Compd;
+import References.Double.Complex.Ref2Did;
+import References.Single.Ref2D;
 
 import java.util.Iterator;
 
-public interface Ref2Df extends Iterable<Ref1Df> {
+public interface Ref2Dd extends Iterable<Ref1Dd> {
     int getRows();
     int getCols();
 
-    float get (int row, int col);
-    void set (int row, int col, float val);
+    double get (int row, int col);
+    void set (int row, int col, double val);
 
-    default Ref1Df get (int row) {
-        return new Ref1Df() {
+    default Ref1Dd get (int row) {
+        return new Ref1Dd() {
             @Override
             public int getSize() {
                 return getCols();
             }
 
             @Override
-            public float get(int pos) {
-                return Ref2Df.this.get(row, pos);
+            public double get(int pos) {
+                return Ref2Dd.this.get(row, pos);
             }
 
             @Override
-            public void set(int pos, float val) {
-                Ref2Df.this.set(row, pos, val);
+            public void set(int pos, double val) {
+                Ref2Dd.this.set(row, pos, val);
             }
         };
     }
 
-    default void set (int row, Ref1Df values) {
+    default void set (int row, Ref1Dd values) {
         int len = Math.min(getCols(), values.getSize());
         for (int i=0;i<len;i++) {
             this.set(row, i, values.get(i));
         }
     }
 
-    default void set (Ref2Df values) {
+    default void set (Ref2Dd values) {
         int rows = Math.min(getRows(), values.getRows());
         int cols = Math.min(getCols(), values.getCols());
 
@@ -50,32 +50,32 @@ public interface Ref2Df extends Iterable<Ref1Df> {
         }
     }
 
-    default Ref2Df T () {
-        return new Ref2Df() {
+    default Ref2Dd T () {
+        return new Ref2Dd() {
             @Override
             public int getRows() {
-                return Ref2Df.this.getCols();
+                return Ref2Dd.this.getCols();
             }
 
             @Override
             public int getCols() {
-                return Ref2Df.this.getRows();
+                return Ref2Dd.this.getRows();
             }
 
             @Override
-            public float get (int row, int col) {
-                return Ref2Df.this.get(col, row);
+            public double get (int row, int col) {
+                return Ref2Dd.this.get(col, row);
             }
 
             @Override
-            public void set(int row, int col, float val) {
-                Ref2Df.this.set(col, row, val);
+            public void set(int row, int col, double val) {
+                Ref2Dd.this.set(col, row, val);
             }
         };
     }
 
-    default float[][] toArray () {
-        float[][] array = new float[getRows()][getCols()];
+    default double[][] toArray () {
+        double[][] array = new double[getRows()][getCols()];
         for (int i=0;i<array.length;i++) {
             array[i] = get(i).toArray();
         }
@@ -83,111 +83,111 @@ public interface Ref2Df extends Iterable<Ref1Df> {
         return array;
     }
 
-    default Ref2D toDouble () {
+    default Ref2D toFloat () {
         return new Ref2D() {
             @Override
             public int getRows() {
-                return Ref2Df.this.getRows();
+                return Ref2Dd.this.getRows();
             }
 
             @Override
             public int getCols() {
-                return Ref2Df.this.getRows();
+                return Ref2Dd.this.getCols();
             }
 
             @Override
-            public double get(int row, int col) {
-                return Ref2Df.this.get(row, col);
+            public float get(int row, int col) {
+                return (float) Ref2Dd.this.get(row, col);
             }
 
             @Override
-            public void set (int row, int col, double val) {
-                Ref2Df.this.set(row, col, (float) val);
+            public void set(int row, int col, float val) {
+                Ref2Dd.this.set(row, col, val);
             }
         };
     }
 
-    default Ref2Dif toComplex () {
-        return new Ref2Dif() {
+    default Ref2Did toComplex () {
+        return new Ref2Did() {
             @Override
             public int getRows() {
-                return Ref2Df.this.getRows();
+                return Ref2Dd.this.getRows();
             }
 
             @Override
             public int getCols() {
-                return Ref2Df.this.getCols();
+                return Ref2Dd.this.getCols();
             }
 
             @Override
-            public Comp get (int row, int col) {
-                return new Comp(Ref2Df.this.get(row, col), 0);
+            public Compd get (int row, int col) {
+                return new Compd(Ref2Dd.this.get(row, col), 0);
             }
 
             @Override
-            public void set(int row, int col, Comp val) {
-                Ref2Df.this.set(row, col, val.real);
+            public void set(int row, int col, Compd val) {
+                Ref2Dd.this.set(row, col, val.real);
             }
         };
     }
 
-    default Ref1Df rowMajor () {
-        return new Ref1Df() {
+    default Ref1Dd rowMajor () {
+        return new Ref1Dd() {
             @Override
             public int getSize() {
                 return getRows() * getCols();
             }
 
             @Override
-            public float get (int pos) {
+            public double get (int pos) {
                 int cols = getCols();
                 int row = pos / cols;
                 int col = pos % cols;
 
-                return Ref2Df.this.get(row, col);
+                return Ref2Dd.this.get(row, col);
             }
 
             @Override
-            public void set (int pos, float val) {
+            public void set (int pos, double val) {
                 int cols = getCols();
                 int row = pos / cols;
                 int col = pos % cols;
 
-                Ref2Df.this.set(row, col, val);
+                Ref2Dd.this.set(row, col, val);
             }
         };
     }
 
-    default Ref1Df colMajor () {
-        return new Ref1Df() {
+    default Ref1Dd colMajor () {
+        return new Ref1Dd() {
             @Override
             public int getSize() {
                 return getRows() * getCols();
             }
 
             @Override
-            public float get(int pos) {
+            public double get (int pos) {
                 int rows = getRows();
                 int col = pos / rows;
                 int row = pos % rows;
 
-                return Ref2Df.this.get(row, col);
+                return Ref2Dd.this.get(row, col);
             }
 
             @Override
-            public void set(int pos, float val) {
+            public void set (int pos, double val) {
                 int rows = getRows();
                 int col = pos / rows;
                 int row = pos % rows;
 
-                Ref2Df.this.set(row, col, val);
+                Ref2Dd.this.set(row, col, val);
             }
         };
     }
 
     @Override
-    default Iterator<Ref1Df> iterator() {
-        return new Iterator<Ref1Df>() {
+    default Iterator<Ref1Dd> iterator() {
+        return new Iterator<Ref1Dd>() {
             int i = 0;
 
             @Override
@@ -196,7 +196,7 @@ public interface Ref2Df extends Iterable<Ref1Df> {
             }
 
             @Override
-            public Ref1Df next() {
+            public Ref1Dd next() {
                 return get(i++);
             }
         };

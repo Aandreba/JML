@@ -2,13 +2,12 @@ package Vector.Double;
 
 import GPGPU.OpenCL.Context;
 import Matrix.Double.Matd;
-import References.Double.Complex.Ref1Di;
-import References.Double.Ref1D;
+import References.Double.Ref1Dd;
 import Vector.Single.Vec;
 
 import java.util.Arrays;
 
-public class Vecd implements Ref1D {
+public class Vecd implements Ref1Dd {
     final protected double[] values;
 
     public Vecd(int size) {
@@ -253,7 +252,7 @@ public class Vecd implements Ref1D {
         return rowMatrix().T();
     }
 
-    public static Vecd fromRef (Ref1D ref) {
+    public static Vecd fromRef (Ref1Dd ref) {
         return ref instanceof Vecd ? (Vecd) ref : forEach(ref.getSize(), ref::get);
     }
 

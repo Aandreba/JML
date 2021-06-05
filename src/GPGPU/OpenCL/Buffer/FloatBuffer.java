@@ -3,7 +3,7 @@ package GPGPU.OpenCL.Buffer;
 import GPGPU.OpenCL.CommandQueue;
 import GPGPU.OpenCL.Context;
 import GPGPU.OpenCL.Query;
-import References.Single.Ref1Df;
+import References.Single.Ref1D;
 import org.jocl.*;
 import org.jocl.blast.CLBlast;
 
@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 import static org.jocl.CL.*;
 
-public class FloatBuffer extends Buffer implements Ref1Df {
+public class FloatBuffer extends Buffer implements Ref1D {
     final public int size;
 
     public FloatBuffer (CommandQueue queue, int size) {
@@ -84,7 +84,7 @@ public class FloatBuffer extends Buffer implements Ref1Df {
     }
 
     @Override
-    public void set (Ref1Df values) {
+    public void set (Ref1D values) {
         set(values.toArray());
     }
 

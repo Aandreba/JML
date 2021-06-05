@@ -79,6 +79,51 @@ final public class Mathf {
     public static float nextDown (float x) { return Math.nextDown(x); }
     public static float scalb (float f, int scaleFactor) { return Math.scalb(f, scaleFactor); }
 
+    public static float factorial (int x) {
+        if (x < 0) {
+            return factorial((float) x);
+        }
+
+        float y = 1;
+        for (int i=1;i<=x;i++) {
+            y *= i;
+        }
+
+        return y;
+    }
+
+    public static float factorial (float x) {
+        float y = 1;
+        float last = 0;
+
+        long k = 1;
+        while (y != last) {
+            last = y;
+            y *= Mathf.pow((k + 1f) / k, x) * k/(x + k);
+            k++;
+        }
+
+        return y;
+    }
+
+    public static float stirling (float x) {
+        if (x < 0) {
+            throw new ArithmeticException("Can't calculate stirling factorial of negative number");
+        } else if (x == 0) {
+            return 1;
+        }
+
+        return Mathf.sqrt(PI2 * x) * Mathf.pow(x / E, x);
+    }
+
+    public static float binomial (float n, float k) {
+        return factorial(n) / (factorial(k) * factorial(n - k));
+    }
+
+    public static float stirlingBinomial (float n, float k) {
+        return stirling(n) / (stirling(k) * stirling(n - k));
+    }
+
     public static class Plot2D {
         Function<Float,Float> function;
         Color color;
@@ -89,9 +134,11 @@ final public class Mathf {
         }
     }
 
-    public static BufferedImage plot2D (float from, float to, int width, int height, Plot2D... plots) {
+    public static BufferedImage plot2D (float from, float to, float fromY, float toY, int width, int height, Plot2D... plots) {
         float ft = from - to;
-        float ht = height * to;
+        float ftY = fromY - toY;
+        float htY = height * toY;
+
         float step = -ft / width;
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
@@ -100,7 +147,7 @@ final public class Mathf {
                 float x = from + (i * step);
                 float y = plot.function.apply(x);
 
-                int h = round((height * y - ht) / ft);
+                int h = round((height * y - htY) / ftY);
                 if (h < 0 || h >= height) {
                     continue;
                 }
