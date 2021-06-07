@@ -14,6 +14,9 @@ public class Veci implements Ref1Di {
 
     public Veci(int size) {
         this.values = new Comp[size];
+        for (int i=0;i<size;i++) {
+            this.values[i] = Comp.ZERO.clone();
+        }
     }
 
     public Veci(Comp... values) {
@@ -231,10 +234,19 @@ public class Veci implements Ref1Di {
         return sum().div(getSize());
     }
 
-    public Veci sub (int... pos) { // Subvector
+    public Veci sub (int... pos) {
         Veci vector = new Veci(pos.length);
         for (int i=0;i<pos.length;i++) {
             vector.set(i, get(pos[i]));
+        }
+
+        return vector;
+    }
+
+    public Veci sub (int from, int length) {
+        Veci vector = new Veci(length);
+        for (int i=0;i<length;i++) {
+            vector.set(i, get(from + i));
         }
 
         return vector;

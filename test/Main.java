@@ -1,15 +1,17 @@
+import Mathx.Mathf;
 import Mathx.Rand;
+import Matrix.Double.Matd;
 import Matrix.Single.Mat;
 import Matrix.Single.Mati;
+import Vector.Single.Vec;
+
+import java.util.Arrays;
 
 public class Main {
     public static void main (String... args) {
-        Mati a = Rand.getMati(2,2);
+        Mat a = Rand.getMat(7,7, 1, 20);
 
         System.out.println(a);
-        System.out.println();
-        System.out.println(a.exp());
-        System.out.println(a.sqrt());
-        System.out.println(a.sqrt().pow(2));
+        System.out.println(a.eigen());
     }
 }

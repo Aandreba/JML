@@ -1,4 +1,4 @@
-package Testing.Benchmarks;
+package Benchmarks;
 
 import Mathx.Rand;
 import Matrix.Single.MatCL;

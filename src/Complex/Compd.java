@@ -129,6 +129,11 @@ public class Compd {
     }
 
     @Override
+    public Compd clone() {
+        return new Compd(real, imaginary);
+    }
+
+    @Override
     public String toString() {
         if (real == 0) {
             return imaginary+"i";

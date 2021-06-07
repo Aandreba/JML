@@ -1,5 +1,6 @@
-package Testing.Benchmarks;
+package Benchmarks;
 
+import Benchmarks.Benchmark;
 import Mathx.Rand;
 import Matrix.Double.Matd;
 import Matrix.Single.MatCL;

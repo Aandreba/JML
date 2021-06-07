@@ -1,6 +1,7 @@
 package Matrix.Double;
 
 import GPGPU.OpenCL.Context;
+import References.Double.Ref1Dd;
 import References.Double.Ref2Dd;
 import Vector.Double.Vecd;
 import Vector.Double.Vecid;
@@ -26,9 +27,9 @@ public class Matd implements Ref2Dd {
         }
     }
 
-    public Matd(Vecd... values) {
+    public Matd(Ref1Dd... values) {
         this.values = new Vecd[values.length];
-        this.values[0] = values[0];
+        this.values[0] = Vecd.fromRef(values[0]);
 
         for (int i=1;i<values.length;i++) {
             set(i, values[i]);
@@ -345,7 +346,7 @@ public class Matd implements Ref2Dd {
     }
 
     public Matrix.Single.Mat toFloat () {
-        return Matrix.Single.Mat.forEach(getRows(), getCols(), (i, j) -> (float) get(i, j));
+        return Matrix.Single.Mat.foreach(getRows(), getCols(), (i, j) -> (float) get(i, j));
     }
 
     @Override

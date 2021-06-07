@@ -1,5 +1,6 @@
 package Vector.Double;
 
+import Complex.Comp;
 import GPGPU.OpenCL.Context;
 import Complex.Compd;
 import Matrix.Double.Matid;
@@ -13,6 +14,9 @@ public class Vecid implements Ref1Did {
 
     public Vecid(int size) {
         this.values = new Compd[size];
+        for (int i=0;i<size;i++) {
+            this.values[i] = Compd.ZERO.clone();
+        }
     }
 
     public Vecid(Compd... values) {

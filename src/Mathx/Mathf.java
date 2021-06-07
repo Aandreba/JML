@@ -1,5 +1,7 @@
 package Mathx;
 
+import Complex.Comp;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -122,6 +124,38 @@ final public class Mathf {
 
     public static float stirlingBinomial (float n, float k) {
         return stirling(n) / (stirling(k) * stirling(n - k));
+    }
+
+    public static Comp[] quadratic (float a, float b, float c) {
+        Comp[] x = new Comp[2];
+        Comp sqrt = Comp.sqrt(b * b - 4*a*c);
+
+        float a2 = 2 * a;
+        x[0] = sqrt.add(-b).div(a2);
+        x[1] = sqrt.invSubtr(-b).div(a2);
+        return x;
+    }
+
+    public static Comp[] cubic (float a, float b, float c, float d) {
+        final Comp zeta = Comp.sqrt(-3).subtr(1).div(2);
+        Comp[] x = new Comp[3];
+
+        float b2 = b*b;
+        float d0 = b2 - 3*a*c;
+        float d1 = 2*b2*b - 9*a*b*c + 27*a*a*d;
+
+        Comp C = Comp.sqrt(d1*d1 - 4*d0*d0*d0).add(d1).div(2).pow(1f / 3);
+        Comp pow = Comp.ONE;
+        float k = -1 / (3 * a);
+
+        for (int i=0;i<3;i++) {
+            pow = pow.mul(zeta);
+            Comp u = pow.mul(C);
+
+            x[i] = u.add(b).add(u.invDiv(d0)).mul(k);
+        }
+
+        return x;
     }
 
     public static class Plot2D {

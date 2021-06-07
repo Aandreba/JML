@@ -1,9 +1,12 @@
 package Matrix.Single;
 
+import Complex.Comp;
 import GPGPU.OpenCL.Context;
-import Mathx.Extra.Floatx;
 import Mathx.Extra.Intx;
+import Mathx.Mathf;
+import Mathx.Rand;
 import Matrix.Double.Matd;
+import References.Single.Ref1D;
 import References.Single.Ref2D;
 import Vector.Single.Vec;
 import Vector.Single.Veci;
@@ -29,9 +32,9 @@ public class Mat implements Ref2D {
         }
     }
 
-    public Mat(Vec... values) {
+    public Mat(Ref1D... values) {
         this.values = new Vec[values.length];
-        this.values[0] = values[0];
+        this.values[0] = Vec.fromRef(values[0]);
 
         for (int i=1;i<values.length;i++) {
             set(i, values[i]);
@@ -87,7 +90,7 @@ public class Mat implements Ref2D {
         return Math.min(getCols(), b.getCols());
     }
 
-    public Mat forEach (Mat b, Vec.VecfForEach forEach) {
+    public Mat foreach(Mat b, Vec.VecfForEach forEach) {
         int rows = finalRows(b);
         int cols = finalCols(b);
 
@@ -101,7 +104,7 @@ public class Mat implements Ref2D {
         return matrix;
     }
 
-    public Mat forEach (float b, Vec.VecfForEach forEach) {
+    public Mat foreach (float b, Vec.VecfForEach forEach) {
         int rows = getRows();
         int cols = getCols();
 
@@ -115,7 +118,7 @@ public class Mat implements Ref2D {
         return matrix;
     }
 
-    public static Mat forEach (int rows, int cols, MatfForEachVecf forEach) {
+    public static Mat foreach(int rows, int cols, MatfForEachVecf forEach) {
         Mat matrix = new Mat(rows, cols);
 
         for (int i=0;i<rows;i++) {
@@ -130,7 +133,7 @@ public class Mat implements Ref2D {
         return matrix;
     }
 
-    public static Mat forEach (int rows, int cols, MatfForEachIndex forEach) {
+    public static Mat foreach(int rows, int cols, MatfForEachIndex forEach) {
         Mat matrix = new Mat(rows, cols);
 
         for (int i=0;i<rows;i++) {
@@ -143,35 +146,35 @@ public class Mat implements Ref2D {
     }
 
     public Mat add (Mat b) {
-        return forEach(b, Float::sum);
+        return foreach(b, Float::sum);
     }
 
     public Mat add (Vec b) {
-        return forEach(getRows(), getCols(), (i,j) -> get(i, j) + b.get(j));
+        return foreach(getRows(), getCols(), (i, j) -> get(i, j) + b.get(j));
     }
 
     public Mat add (float b) {
-        return forEach(b, Float::sum);
+        return foreach(b, Float::sum);
     }
 
     public Mat subtr (Mat b) {
-        return forEach(b, (x, y) -> x - y);
+        return foreach(b, (x, y) -> x - y);
     }
 
     public Mat subtr (Vec b) {
-        return forEach(getRows(), getCols(), (i,j) -> get(i, j) - b.get(j));
+        return foreach(getRows(), getCols(), (i, j) -> get(i, j) - b.get(j));
     }
 
     public Mat subtr (float b) {
-        return forEach(b, (x, y) -> x - y);
+        return foreach(b, (x, y) -> x - y);
     }
 
     public Mat invSubtr (Vec b) {
-        return forEach(getRows(), getCols(), (i,j) -> b.get(j) - get(i, j));
+        return foreach(getRows(), getCols(), (i, j) -> b.get(j) - get(i, j));
     }
 
     public Mat invSubtr (float b) {
-        return forEach(b, (x, y) -> y - x);
+        return foreach(b, (x, y) -> y - x);
     }
 
     public Mat mul (Mat b) {
@@ -179,7 +182,7 @@ public class Mat implements Ref2D {
         int cols = b.getCols();
         int dig = Math.min(getCols(), b.getRows());
 
-        return forEach(rows, cols, (i, j) -> {
+        return foreach(rows, cols, (i, j) -> {
             float sum = 0;
             for (int k=0;k<dig;k++) {
                 sum += get(i, k) * b.get(k, j);
@@ -198,43 +201,62 @@ public class Mat implements Ref2D {
     }
 
     public Mat scalMul (Mat b) {
-        return forEach(b, (x, y) -> x * y);
+        return foreach(b, (x, y) -> x * y);
     }
 
     public Mat scalMul (Vec b) {
-        return forEach(getRows(), getCols(), (i,j) -> get(i, j) * b.get(j));
+        return foreach(getRows(), getCols(), (i, j) -> get(i, j) * b.get(j));
     }
 
     public Mat scalMul (float b) {
-        return forEach(b, (x, y) -> x * y);
+        return foreach(b, (x, y) -> x * y);
     }
 
     public Mat scalDiv (Mat b) {
-        return forEach(b, (x, y) -> x / y);
+        return foreach(b, (x, y) -> x / y);
     }
 
     public Mat scalDiv (Vec b) {
-        return forEach(getRows(), getCols(), (i,j) -> get(i, j) / b.get(j));
+        return foreach(getRows(), getCols(), (i, j) -> get(i, j) / b.get(j));
     }
 
     public Mat scalDiv (float b) {
-        return forEach(b, (x, y) -> x / y);
+        return foreach(b, (x, y) -> x / y);
     }
 
     public Mat scalInvDiv (Vec b) {
-        return forEach(getRows(), getCols(), (i,j) -> b.get(j) / get(i, j));
+        return foreach(getRows(), getCols(), (i, j) -> b.get(j) / get(i, j));
     }
 
     public Mat scalInvDiv (float b) {
-        return forEach(b, (x, y) -> y / x);
+        return foreach(b, (x, y) -> y / x);
     }
 
-    public Mat inverse() {
-        if (!isSquare()) {
-            throw new ArithmeticException("Tried to invert non-square matrix");
+    public Mat inverse () {
+        int n = getCols();
+        int n2 = 2 * n;
+        Mat matrix = new Mat(getRows(), n2);
+
+        for (int i=0;i<getRows();i++) {
+            Vec vector = new Vec(n2);
+            for (int j=0;j<n;j++) {
+                vector.set(j, get(i,j));
+            }
+
+            vector.set(n + i, 1);
+            matrix.set(i, vector);
         }
 
-        return adj().scalMul(1 / det());
+        Mat rref = matrix.rref();
+        Mat result = new Mat(getRows(), n);
+
+        for (int i=0;i<getRows();i++) {
+            for (int j=0;j<n;j++) {
+                result.set(i, j, rref.get(i,n + j));
+            }
+        }
+
+        return result;
     }
 
     public Mat newtonInverse(Mat guess) {
@@ -252,43 +274,42 @@ public class Mat implements Ref2D {
     }
 
     public Mat cofactor () {
-        if (!isSquare()) {
-            throw new ArithmeticException("Tried to calculate cofactor of non-square matrix");
-        }
-
-        int n = getRows();
-        if (n == 1 && get(0,0) != 0) {
-            return new Mat(new Vec(1f));
-        } else if (n == 1) {
-            return new Mat(new Vec(0f));
-        } else if (n == 2) {
-            return new Mat(new Vec(get(1, 1), -get(0, 1)), new Vec(-get(1, 0), get(0, 0)));
-        }
-
-        int rowsm1 = n - 1;
-        Mat matrix = new Mat(n, n);
-
-        for (int i=0;i<n;i++) {
-            for (int j=0;j<n;j++) {
-                Mat det = new Mat(rowsm1, rowsm1);
-
-                for (int x=0;x<rowsm1;x++) {
-                    int X = x < i ? x : x + 1;
-                    for (int y=0;y<rowsm1;y++) {
-                        int Y = y < j ? y : y + 1;
-                        det.set(x, y, get(X, Y));
-                    }
-                }
-
-                matrix.set(i, j, ((i+j) & 1) == 1 ? -det.det() : det.det());
-            }
-        }
-
-        return matrix;
+        return adj().T();
     }
 
     public Mat adj () {
-        return cofactor().T();
+        return inverse().scalMul(det());
+    }
+
+    public Mat rref () {
+        Mat result = clone();
+        for (int i=0;i<getRows();i++) {
+            if (result.get(i).equals(new Vec(getCols()))) {
+                continue;
+            }
+
+            result.set(i, result.get(i).div(result.get(i,i)));
+            for (int j=0;j<getRows();j++) {
+                if (i == j) {
+                    continue;
+                }
+
+                result.set(j, result.get(j).subtr(result.get(i).mul(result.get(j,i))));
+            }
+        }
+
+        return result;
+    }
+
+    public float tr () {
+        float sum = 0;
+        int n = Math.min(getRows(), getCols());
+
+        for (int i=0;i<n;i++) {
+            sum += get(i,i);
+        }
+
+        return sum;
     }
 
     public float det () {
@@ -318,6 +339,10 @@ public class Mat implements Ref2D {
         }
 
         return sum;
+    }
+
+    public Eigen eigen () {
+        return new Eigen();
     }
 
     public Mat exp () {
@@ -426,29 +451,11 @@ public class Mat implements Ref2D {
         throw new ArithmeticException("No square root found");
     }
 
-    public Mat invSqrt () {
-        Mat y = this;
-        Mat z = identity(getRows());
-        Mat last = null;
-
-        while (!z.equals(last)) {
-            last = z;
-
-            Mat newY = y.add(z.inverse()).scalMul(0.5f);
-            Mat newZ = z.add(y.inverse()).scalMul(0.5f);
-
-            y = newY;
-            z = newZ;
-        }
-
-        return z;
-    }
-
     public Mat T () {
         int rows = getCols();
         int cols = getRows();
 
-        return forEach(rows, cols, (i, j) -> get(j, i));
+        return foreach(rows, cols, (i, j) -> get(j, i));
     }
 
     public Matd toDouble () {
@@ -486,11 +493,11 @@ public class Mat implements Ref2D {
     }
 
     public static Mat identity (int k) {
-        return forEach(k, k, (i, j) -> i == j ? 1 : 0);
+        return foreach(k, k, (i, j) -> i == j ? 1 : 0);
     }
 
     public static Mat fromRef (Ref2D ref) {
-        return ref instanceof Mat ? (Mat) ref : forEach(ref.getRows(), ref.getCols(), (MatfForEachIndex) ref::get);
+        return ref instanceof Mat ? (Mat) ref : foreach(ref.getRows(), ref.getCols(), (MatfForEachIndex) ref::get);
     }
 
     @Override
@@ -524,5 +531,94 @@ public class Mat implements Ref2D {
     @Override
     public int hashCode() {
         return Arrays.hashCode(values);
+    }
+
+    public class Eigen {
+        int n;
+        Comp[] values;
+
+        private Eigen () {
+            this.n = getRows();
+            this.values = calc();
+        }
+
+        @Override
+        public String toString() {
+            return "Eigen {" +
+                    "values=" + Arrays.toString(values) +
+                    '}';
+        }
+
+        private Comp[] calc () {
+            if (n == 1) {
+                return new Comp[]{ new Comp(get(0,0), 0) };
+            } else if (n == 2) {
+                return Mathf.quadratic(1, -tr(), det());
+            } else if (n == 3) {
+                float tr = tr();
+                float det = det();
+
+                return Mathf.cubic(-1, tr, (pow(2).tr() - tr * tr) / 2, det);
+            }
+
+            Comp[] vals = new Comp[n];
+            Comp tr = new Comp(tr(), 0);
+            Comp max = closeDownValue(tr);
+            Comp min = closeDownValue(Comp.ZERO);
+
+            vals[0] = max;
+            vals[1] = min;
+
+            /*if (n == 4) {
+                float det = det();
+
+                Comp k = tr.subtr(min.add(max));
+                Comp q = min.mul(max).invDiv(det);
+
+                Comp sqrt = k.mul(k).add(q.mul(4)).sqrt();
+                Comp x2 = k.mul(-1).add(sqrt).div(2);
+
+                System.out.println(x2+", "+closeDownValue(x2));
+                System.out.println(Arrays.toString(vals));
+                System.exit(1);
+            }*/
+
+            return vals;
+        }
+
+        private Comp closeDownValue (Comp value) {
+            Mati A = toComplex();
+            Mati I = Mati.identity(n);
+
+            float step = 1;
+            float dirX = 1;
+            float dirY = 1;
+            float lastDet = 0;
+            boolean flipDirOnReal = true;
+
+            for (int i=0;i<1000;i++) {
+                if (i > 0 && i % 100 == 0) {
+                    step /= 9;
+                }
+
+                Comp det = A.subtr(I.scalMul(value)).det();
+                float abs = det.modulus();
+
+                if (i > 0 && abs > lastDet) {
+                    if (flipDirOnReal) {
+                        dirX *= -1;
+                    } else {
+                        dirY *= -1;
+                    }
+
+                    flipDirOnReal = !flipDirOnReal;
+                }
+
+                value = new Comp(value.real + dirX * step, value.imaginary + dirY * step);
+                lastDet = abs;
+            }
+
+            return value;
+        }
     }
 }

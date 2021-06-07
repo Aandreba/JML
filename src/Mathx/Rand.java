@@ -215,11 +215,11 @@ final public class Rand {
     }
 
     public static Mat getMat(int rows, int cols) {
-        return Mat.forEach(rows, cols, (i, j) -> Rand.getFloat());
+        return Mat.foreach(rows, cols, (i, j) -> Rand.getFloat());
     }
 
     public static Mat getMat(int rows, int cols, float from, float to) {
-        return Mat.forEach(rows, cols, (i, j) -> Rand.getFloat(from, to));
+        return Mat.foreach(rows, cols, (i, j) -> Rand.getFloat(from, to));
     }
 
     public static Mati getMati (int rows, int cols) {

@@ -3,6 +3,7 @@ package Vector.Single;
 import GPGPU.OpenCL.Context;
 import Mathx.Mathf;
 import Matrix.Single.Mat;
+import References.Double.Ref1Dd;
 import References.Single.Ref1D;
 import Vector.Double.Vecd;
 
@@ -32,7 +33,7 @@ public class Vec implements Ref1D {
         }
     }
 
-    public Vec(float[] initialValues, Vec finalValues) {
+    public Vec(float[] initialValues, Ref1D finalValues) {
         int vecSize = finalValues.getSize();
         this.values = new float[initialValues.length + vecSize];
 
@@ -203,6 +204,10 @@ public class Vec implements Ref1D {
         }
 
         return val;
+    }
+
+    public Vec abs () {
+        return forEach(getSize(), i -> Mathf.abs(get(i)));
     }
 
     public float mean () {

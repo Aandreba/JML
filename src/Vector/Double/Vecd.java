@@ -31,7 +31,7 @@ public class Vecd implements Ref1Dd {
         }
     }
 
-    public Vecd(double[] initialValues, Vecd finalValues) {
+    public Vecd(double[] initialValues, Ref1Dd finalValues) {
         int vecSize = finalValues.getSize();
         this.values = new double[initialValues.length + vecSize];
 

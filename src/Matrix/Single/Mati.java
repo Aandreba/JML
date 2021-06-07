@@ -4,6 +4,7 @@ import GPGPU.OpenCL.Context;
 import Complex.Comp;
 import Matrix.Double.Matid;
 import References.Single.Complex.Ref2Di;
+import Vector.Single.Vec;
 import Vector.Single.Veci;
 import java.util.Arrays;
 
@@ -253,13 +254,31 @@ public class Mati implements Ref2Di {
         return forEach(b, (x, y) -> y.div(x));
     }
 
-    public Mati inverse() {
-        int rows = getRows();
-        if (rows != getCols()) {
-            throw new ArithmeticException("Tried to invert non-square matrix");
+    public Mati inverse () {
+        int n = getCols();
+        int n2 = 2 * n;
+        Mati matrix = new Mati(getRows(), n2);
+
+        for (int i=0;i<getRows();i++) {
+            Veci vector = new Veci(n2);
+            for (int j=0;j<n;j++) {
+                vector.set(j, get(i,j));
+            }
+
+            vector.set(n + i, Comp.ONE);
+            matrix.set(i, vector);
         }
 
-        return adj().scalMul(det().inverse());
+        Mati rref = matrix.rref();
+        Mati result = new Mati(getRows(), n);
+
+        for (int i=0;i<getRows();i++) {
+            for (int j=0;j<n;j++) {
+                result.set(i, j, rref.get(i,n + j));
+            }
+        }
+
+        return result;
     }
 
     public Mati newtonInverse(Mati guess) {
@@ -360,6 +379,26 @@ public class Mati implements Ref2Di {
             last = result.clone();
             result = result.add(pow.scalDiv(factorial));
             k++;
+        }
+
+        return result;
+    }
+
+    public Mati rref () {
+        Mati result = clone();
+        for (int i=0;i<getRows();i++) {
+            if (result.get(i).equals(new Veci(getCols()))) {
+                continue;
+            }
+
+            result.set(i, result.get(i).div(result.get(i,i)));
+            for (int j=0;j<getRows();j++) {
+                if (i == j) {
+                    continue;
+                }
+
+                result.set(j, result.get(j).subtr(result.get(i).mul(result.get(j,i))));
+            }
         }
 
         return result;

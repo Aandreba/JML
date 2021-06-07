@@ -1,4 +1,4 @@
-package Testing.Benchmarks;
+package Benchmarks;
 
 import java.util.Scanner;
 import java.util.function.Function;

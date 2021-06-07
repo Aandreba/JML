@@ -129,6 +129,11 @@ public class Comp {
     }
 
     @Override
+    public Comp clone() {
+        return new Comp(real, imaginary);
+    }
+
+    @Override
     public String toString() {
         if (Float.isNaN(real) || Float.isNaN(imaginary)) {
             return "NaN";
