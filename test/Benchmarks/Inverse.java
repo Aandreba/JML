@@ -1,32 +1,34 @@
 package Benchmarks;
 
-import Mathx.Rand;
-import Matrix.Single.Mat;
+import org.jml.Mathx.Rand;
+import org.jml.Matrix.Double.Matd;
+import org.jml.Matrix.Single.MatCL;
 
 public class Inverse {
     public static void main (String... args) {
-        int n, epochs;
+        int size, epochs;
 
-        System.out.println("Insert matrix size");
-        n = Benchmark.getInt(x -> x > 0);
+        System.out.println("Insert matrix sizes");
+        size = Benchmark.getInt(x -> x > 0);
 
         System.out.println("Insert epochs");
         epochs = Benchmark.getInt(x -> x > 0);
 
-        Mat[] a = new Mat[epochs];
+        Matd[] cpu1 = new Matd[epochs];
+        MatCL[] gpu1 = new MatCL[epochs];
+
         for (int i=0;i<epochs;i++) {
-            a[i] = Rand.getMat(n, n);
+            cpu1[i] = Rand.getMatd(size, size, -100, 100);
+            gpu1[i] = cpu1[i].toFloat().toCL();
         }
 
-        long adj = Benchmark.time(epochs, (i) -> {
-            a[i].inverse();
-        });
+        long cpu = Benchmark.time(epochs, i -> cpu1[i].inverse());
+        long gpu = Benchmark.time(epochs, i -> gpu1[i].inverse());
 
-        /*long rref = Benchmark.time(epochs, (i) -> {
-            a[i].rrefInverse();
-        });
-
-        System.out.println("Adj: "+adj+" ms");
-        System.out.println("RRef: "+rref+" ms");*/
+        System.out.println("CPU: "+cpu+" ns");
+        System.out.println("GPU: "+gpu+" ns");
+        System.out.println();
+        System.out.println("CPU Ratio: "+cpu*1f/gpu);
+        System.out.println("GPU Ratio: "+gpu*1f/cpu);
     }
 }

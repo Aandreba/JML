@@ -1,9 +1,8 @@
 package Benchmarks;
 
-import Benchmarks.Benchmark;
-import Mathx.Rand;
-import Matrix.Double.Matd;
-import Matrix.Single.MatCL;
+import org.jml.Mathx.Rand;
+import org.jml.Matrix.Double.Matd;
+import org.jml.Matrix.Single.MatCL;
 
 public class CL {
     public static void main (String... args) {

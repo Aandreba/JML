@@ -1,9 +1,9 @@
 package Benchmarks;
 
-import Mathx.Rand;
-import Matrix.Single.MatCL;
-import Matrix.Single.MatCUDA;
-import Matrix.Single.Mat;
+import org.jml.Mathx.Rand;
+import org.jml.Matrix.Single.MatCL;
+import org.jml.Matrix.Single.MatCUDA;
+import org.jml.Matrix.Single.Mat;
 
 import java.text.NumberFormat;
 

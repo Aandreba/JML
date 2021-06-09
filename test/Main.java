@@ -1,17 +1,16 @@
-import Mathx.Mathf;
-import Mathx.Rand;
-import Matrix.Double.Matd;
-import Matrix.Single.Mat;
-import Matrix.Single.Mati;
-import Vector.Single.Vec;
-
-import java.util.Arrays;
+import org.jml.Calculus.Func;
+import org.jml.Calculus.Function.Regular.Pow;
+import org.jml.Calculus.Function.Trigo.Sin;
+import org.jml.Mathx.Rand;
 
 public class Main {
     public static void main (String... args) {
-        Mat a = Rand.getMat(7,7, 1, 20);
+        Func func = new Pow(4).add(new Pow(2).apply(Sin.SIN)).;
 
-        System.out.println(a);
-        System.out.println(a.eigen());
+        double rand = Rand.getDouble();
+        System.out.println();
+        System.out.println(rand);
+        System.out.println(func.apply(rand));
+        System.out.println(func.deriv(rand));
     }
 }

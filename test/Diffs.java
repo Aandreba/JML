@@ -1,7 +1,5 @@
-package Testing;
-
-import Matrix.Single.Mat;
-import Matrix.Single.MatCL;
+import org.jml.Matrix.Double.MatCLd;
+import org.jml.Matrix.Single.MatCL;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -10,7 +8,7 @@ import java.util.Collections;
 public class Diffs {
     public static void main (String... args) {
         System.out.println();
-        compareFunctions(Mat.class, MatCL.class);
+        compareFunctions(MatCL.class, MatCLd.class);
     }
 
     public static void compareFunctions (Class a, Class b) {
