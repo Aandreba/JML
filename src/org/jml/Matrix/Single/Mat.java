@@ -1,9 +1,9 @@
 package org.jml.Matrix.Single;
 
-import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Mathx.Extra.Intx;
 import org.jml.Mathx.Mathf;
+import org.jml.Mathx.TaskManager;
 import org.jml.Matrix.Double.Matd;
 import org.jml.References.Single.Ref1D;
 import org.jml.References.Single.Ref2D;
@@ -234,14 +234,37 @@ public class Mat implements Ref2D {
         int cols = b.getCols();
         int dig = Math.min(getCols(), b.getRows());
 
-        return foreach(rows, cols, (i, j) -> {
-            float sum = 0;
-            for (int k=0;k<dig;k++) {
-                sum += get(i, k) * b.get(k, j);
-            }
+        if (rows * cols <= 15000) {
+            return foreach(rows, cols, (i, j) -> {
+                float sum = 0;
+                for (int k=0;k<dig;k++) {
+                    sum += get(i, k) * b.get(k, j);
+                }
 
-            return sum;
-        });
+                return sum;
+            });
+        }
+
+        TaskManager tasks = new TaskManager();
+        Mat result = new Mat(rows, cols);
+
+        for (int i=0;i<rows;i++) {
+            int finalI = i;
+            for (int j=0;j<cols;j++) {
+                int finalJ = j;
+                tasks.add(new TaskManager.Task(() -> {
+                    float sum = 0;
+                    for (int k=0;k<dig;k++) {
+                        sum += get(finalI, k) * b.get(k, finalJ);
+                    }
+
+                    result.set(finalI, finalJ, sum);
+                }));
+            }
+        }
+
+        tasks.run();
+        return result;
     }
 
     public Vec mul (Vec b) {
@@ -309,20 +332,6 @@ public class Mat implements Ref2D {
         }
 
         return result;
-    }
-
-    public Mat newtonInverse(Mat guess) {
-        Mat y = guess;
-        Mat last = null;
-
-        int n = 0;
-        while (!y.equals(last) && n < 100) {
-            last = y;
-            y = y.scalMul(2).subtr(y.mul(this).mul(y));
-            n++;
-        }
-
-        return y;
     }
 
     public Mat cofactor () {
@@ -395,8 +404,26 @@ public class Mat implements Ref2D {
         return sum;
     }
 
-    public Eigen eigen () {
-        return new Eigen();
+    public float[] fadlev () {
+        int n = getRows();
+        float[] poly = new float[n+1];
+        poly[0] = 1;
+
+        Mat y = Mat.this;
+        for (int i=1;i<=n;i++) {
+            poly[i] = -(1f/i) * y.tr();
+            y = mul(y).add(scalMul(poly[i]));
+        }
+
+        return poly;
+    }
+
+    public Veci eigvals () {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate eigenvalues of non-square matrix");
+        }
+
+        return Mathf.poly(fadlev());
     }
 
     public Mat exp () {
@@ -478,18 +505,10 @@ public class Mat implements Ref2D {
         Mat y = this;
         Mat z = identity(getRows());
 
-        Mat zInverse = null;
-        Mat yInverse = null;
         int n = 1;
-
         while (n <= 1000) {
-            if (n <= 10) {
-                zInverse = z.inverse();
-                yInverse = y.inverse();
-            } else {
-                zInverse = z.newtonInverse(zInverse);
-                yInverse = y.newtonInverse(yInverse);
-            }
+            Mat zInverse = z.inverse();
+            Mat yInverse = y.inverse();
 
             Mat newY = y.add(zInverse).scalDiv(2);
             if (newY.equals(y)) {
@@ -529,7 +548,7 @@ public class Mat implements Ref2D {
     }
 
     public Matd toDouble () {
-        return Matd.forEach(getRows(), getCols(), (Matd.MatForEachIndex) this::get);
+        return Matd.foreach(getRows(), getCols(), (Matd.MatForEachIndex) this::get);
     }
 
     @Override
@@ -637,6 +656,14 @@ public class Mat implements Ref2D {
             float sum = Mathf.summation(0, nm1, p -> l.get(nm1,p) * u.get(p,nm1));
             u.set(nm1, nm1, get(nm1, nm1) - sum);
         }
+
+        @Override
+        public String toString() {
+            return "LU {" +
+                    "l=" + l +
+                    ", u=" + u +
+                    '}';
+        }
     }
 
     public class QR {
@@ -665,52 +692,13 @@ public class Mat implements Ref2D {
             this.q = new Mat(e).T();
             this.r = Mat.foreach(getRows(), getCols(), (i,j) -> j >= i ? e[i].dot(a.get(j)) : 0);
         }
-    }
-
-    public class Eigen {
-        int n;
-        Comp[] values;
-
-        private Eigen () {
-            this.n = getRows();
-            this.values = calc();
-        }
-
-        public Comp getValue (int pos) {
-            return values[pos];
-        }
-
-        public Veci getVector (int pos) {
-            Comp value = values[pos];
-            Mati matrix = toComplex().subtr(Mati.identity(n).scalMul(value)).rref();
-
-            Veci vector = new Veci(n);
-            for (int i = 0; i< n -1; i++) {
-                vector.set(i, matrix.get(i, n -1).mul(-1).div(matrix.get(i,i)));
-            }
-
-            vector.set(n -1, Comp.ONE);
-            return vector;
-        }
 
         @Override
         public String toString() {
-            return "Eigen {" +
-                    "values=" + Arrays.toString(values) +
+            return "QR {" +
+                    "q=" + q +
+                    ", r=" + r +
                     '}';
-        }
-
-        private Comp[] calc () {
-            if (n == 1) {
-                return new Comp[]{ new Comp(get(0,0), 0) };
-            } else if (n == 2) {
-                return Mathf.quadratic(1, -tr(), det());
-            } else if (n == 3) {
-                float tr = tr();
-                return Mathf.cubic(-1, tr, (pow(2).tr() - tr * tr) / 2, det());
-            }
-
-            return null;
         }
     }
 }

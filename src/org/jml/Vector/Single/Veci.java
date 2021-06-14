@@ -80,7 +80,7 @@ public class Veci implements Ref1Di {
         return Math.min(getSize(), b.getSize());
     }
 
-    public Veci forEach (Veci b, VecifForEach forEach) {
+    public Veci foreach(Veci b, VecifForEach forEach) {
         int size = finalLen(b);
         Veci vector = new Veci(size);
 
@@ -91,7 +91,7 @@ public class Veci implements Ref1Di {
         return vector;
     }
 
-    public Veci forEach (Comp b, VecifForEach forEach) {
+    public Veci foreach(Comp b, VecifForEach forEach) {
         int size = getSize();
         Veci vector = new Veci(size);
 
@@ -102,11 +102,11 @@ public class Veci implements Ref1Di {
         return vector;
     }
 
-    public Veci forEach (float b, VecifForEach forEach) {
-        return forEach(new Comp(b, 0), forEach);
+    public Veci foreach(float b, VecifForEach forEach) {
+        return foreach(new Comp(b, 0), forEach);
     }
 
-    public static Veci forEach (int size, VecifForEachIndex forEach) {
+    public static Veci foreach(int size, VecifForEachIndex forEach) {
         Veci vector = new Veci(size);
         for (int i=0;i<size;i++) {
             vector.set(i, forEach.apply(i));
@@ -116,72 +116,72 @@ public class Veci implements Ref1Di {
     }
 
     public Veci add (Veci b) {
-        return forEach(b, Comp::add);
+        return foreach(b, Comp::add);
     }
 
     public Veci add (Comp b) {
-        return forEach(b, Comp::add);
+        return foreach(b, Comp::add);
     }
 
     public Veci add (float b) {
-        return forEach(b, Comp::add);
+        return foreach(b, Comp::add);
     }
 
     public Veci subtr (Veci b) {
-        return forEach(b, Comp::subtr);
+        return foreach(b, Comp::subtr);
     }
 
     public Veci subtr (Comp b) {
-        return forEach(b, Comp::subtr);
+        return foreach(b, Comp::subtr);
     }
 
     public Veci subtr (float b) {
-        return forEach(b, Comp::subtr);
+        return foreach(b, Comp::subtr);
     }
 
     public Veci invSubtr (Comp b) {
-        return forEach(b, (x, y) -> y.subtr(x));
+        return foreach(b, (x, y) -> y.subtr(x));
     }
 
     public Veci invSubtr (float b) {
-        return forEach(b, (x, y) -> y.subtr(x));
+        return foreach(b, (x, y) -> y.subtr(x));
     }
 
     public Veci mul (Veci b) {
-        return forEach(b, Comp::mul);
+        return foreach(b, Comp::mul);
     }
 
     public Veci mul (Comp b) {
-        return forEach(b, Comp::mul);
+        return foreach(b, Comp::mul);
     }
 
     public Veci mul (float b) {
-        return forEach(b, Comp::mul);
+        return foreach(b, Comp::mul);
     }
 
     public Veci div (Veci b) {
-        return forEach(b, Comp::div);
+        return foreach(b, Comp::div);
     }
 
     public Veci div (Comp b) {
-        return forEach(b, Comp::div);
+        return foreach(b, Comp::div);
     }
 
     public Veci div (float b) {
-        return forEach(b, Comp::div);
+        return foreach(b, Comp::div);
     }
 
     public Veci invDiv (Comp b) {
-        return forEach(b, (x, y) -> y.div(x));
+        return foreach(b, (x, y) -> y.div(x));
     }
 
     public Veci invDiv (float b) {
-        return forEach(b, (x, y) -> y.div(x));
+        return foreach(b, (x, y) -> y.div(x));
     }
 
     @Override
     public Veci conj() {
-        return Veci.forEach(getSize(), i -> get(i).conj());
+        return Veci.foreach(getSize(), i -> get(i).conj());
     }
 
     public float magnitude2 () {
@@ -214,7 +214,7 @@ public class Veci implements Ref1Di {
     }
 
     public Comp inner (Veci b) {
-        return rowMatrix().forEach(1, (x,y) -> x.conj()).mul(b.colMatrix()).get(0,0);
+        return rowMatrix().foreach(1, (x, y) -> x.conj()).mul(b.colMatrix()).get(0,0);
     }
 
     public Veci cross (Veci b) {
@@ -291,7 +291,7 @@ public class Veci implements Ref1Di {
     }
 
     public static Veci fromRef (Ref1Di ref) {
-        return ref instanceof Veci ? (Veci) ref : forEach(ref.getSize(), ref::get);
+        return ref instanceof Veci ? (Veci) ref : foreach(ref.getSize(), ref::get);
     }
 
     @Override

@@ -8,6 +8,7 @@ import java.util.Objects;
 public class Comp {
     final public static Comp ZERO = new Comp();
     final public static Comp ONE = new Comp(1,0);
+    final public static Comp ONEI = new Comp(0,1);
     final public static Comp MONE = new Comp(-1,0);
 
     final public float real, imaginary;
@@ -68,6 +69,14 @@ public class Comp {
     }
 
     // PROPERTIES
+    public boolean isNan () {
+        return Float.isNaN(real) || Float.isNaN(imaginary);
+    }
+
+    public boolean isInfinite () {
+        return Float.isInfinite(real) || Float.isInfinite(imaginary);
+    }
+
     public float modulus () {
         return Mathf.hypot(real, imaginary);
     }

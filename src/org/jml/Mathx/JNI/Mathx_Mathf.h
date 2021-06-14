@@ -2,8 +2,8 @@
 #include <jni.h>
 /* Header for class Mathx_Mathf */
 
-#ifndef _Included_Mathx_Mathf
-#define _Included_Mathx_Mathf
+#ifndef _Included_org_jml_Mathx_Mathf
+#define _Included_org_jml_Mathx_Mathf
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -20,7 +20,7 @@ extern "C" {
  * Method:    sin
  * Signature: (F)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_sin
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_sin
   (JNIEnv *, jclass, jfloat);
 
 /*
@@ -28,7 +28,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_sin
  * Method:    cos
  * Signature: (F)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_cos
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_cos
   (JNIEnv *, jclass, jfloat);
 
 /*
@@ -36,7 +36,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_cos
  * Method:    tan
  * Signature: (F)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_tan
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_tan
   (JNIEnv *, jclass, jfloat);
 
 /*
@@ -44,7 +44,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_tan
  * Method:    asin
  * Signature: (F)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_asin
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_asin
   (JNIEnv *, jclass, jfloat);
 
 /*
@@ -52,7 +52,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_asin
  * Method:    acos
  * Signature: (F)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_acos
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_acos
   (JNIEnv *, jclass, jfloat);
 
 /*
@@ -60,7 +60,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_acos
  * Method:    atan
  * Signature: (F)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_atan
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_atan
   (JNIEnv *, jclass, jfloat);
 
 /*
@@ -68,7 +68,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_atan
  * Method:    atan2
  * Signature: (FF)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_atan2
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_atan2
   (JNIEnv *, jclass, jfloat, jfloat);
 
 /*
@@ -76,7 +76,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_atan2
  * Method:    sinh
  * Signature: (F)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_sinh
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_sinh
   (JNIEnv *, jclass, jfloat);
 
 /*
@@ -84,7 +84,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_sinh
  * Method:    cosh
  * Signature: (F)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_cosh
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_cosh
   (JNIEnv *, jclass, jfloat);
 
 /*
@@ -92,7 +92,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_cosh
  * Method:    tanh
  * Signature: (F)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_tanh
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_tanh
   (JNIEnv *, jclass, jfloat);
 
 /*
@@ -100,7 +100,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_tanh
  * Method:    asinh
  * Signature: (F)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_asinh
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_asinh
   (JNIEnv *, jclass, jfloat);
 
 /*
@@ -108,7 +108,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_asinh
  * Method:    acosh
  * Signature: (F)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_acosh
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_acosh
   (JNIEnv *, jclass, jfloat);
 
 /*
@@ -116,7 +116,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_acosh
  * Method:    atanh
  * Signature: (F)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_atanh
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_atanh
   (JNIEnv *, jclass, jfloat);
 
 /*
@@ -124,7 +124,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_atanh
  * Method:    pow
  * Signature: (FF)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_pow
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_pow
   (JNIEnv *, jclass, jfloat, jfloat);
 
 /*
@@ -132,7 +132,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_pow
  * Method:    exp
  * Signature: (F)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_exp
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_exp
   (JNIEnv *, jclass, jfloat);
 
 /*
@@ -140,7 +140,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_exp
  * Method:    expm1
  * Signature: (F)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_expm1
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_expm1
   (JNIEnv *, jclass, jfloat);
 
 /*
@@ -148,7 +148,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_expm1
  * Method:    log
  * Signature: (F)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_log
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_log
   (JNIEnv *, jclass, jfloat);
 
 /*
@@ -156,7 +156,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_log
  * Method:    log1p
  * Signature: (F)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_log1p
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_log1p
   (JNIEnv *, jclass, jfloat);
 
 /*
@@ -164,7 +164,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_log1p
  * Method:    log2
  * Signature: (F)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_log2
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_log2
   (JNIEnv *, jclass, jfloat);
 
 /*
@@ -172,7 +172,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_log2
  * Method:    log10
  * Signature: (F)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_log10
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_log10
   (JNIEnv *, jclass, jfloat);
 
 /*
@@ -180,7 +180,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_log10
  * Method:    sqrt
  * Signature: (F)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_sqrt
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_sqrt
   (JNIEnv *, jclass, jfloat);
 
 /*
@@ -188,7 +188,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_sqrt
  * Method:    cbrt
  * Signature: (F)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_cbrt
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_cbrt
   (JNIEnv *, jclass, jfloat);
 
 /*
@@ -196,7 +196,7 @@ JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_cbrt
  * Method:    hypot
  * Signature: (FF)F
  */
-JNIEXPORT jfloat JNICALL Java_Mathx_Mathf_hypot
+JNIEXPORT jfloat JNICALL Java_org_jml_Mathx_Mathf_hypot
   (JNIEnv *, jclass, jfloat, jfloat);
 
 #ifdef __cplusplus

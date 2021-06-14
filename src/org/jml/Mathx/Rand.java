@@ -212,11 +212,11 @@ final public class Rand {
     }
 
     public static Matd getMatd(int rows, int cols) {
-        return Matd.forEach(rows, cols, (i, j) -> Rand.getDouble());
+        return Matd.foreach(rows, cols, (i, j) -> Rand.getDouble());
     }
 
     public static Matd getMatd(int rows, int cols, double from, double to) {
-        return Matd.forEach(rows, cols, (i, j) -> Rand.getDouble(from, to));
+        return Matd.foreach(rows, cols, (i, j) -> Rand.getDouble(from, to));
     }
 
     public static Mat getMat(int rows, int cols) {
@@ -228,19 +228,19 @@ final public class Rand {
     }
 
     public static Mati getMati (int rows, int cols) {
-        return Mati.forEach(rows, cols, (i, j) -> Rand.getComp());
+        return Mati.foreach(rows, cols, (i, j) -> Rand.getComp());
     }
 
     public static Mati getMati (int rows, int cols, Comp from, Comp to) {
-        return Mati.forEach(rows, cols, (i, j) -> Rand.getComp(from, to));
+        return Mati.foreach(rows, cols, (i, j) -> Rand.getComp(from, to));
     }
 
     public static Matid getMatid (int rows, int cols) {
-        return Matid.forEach(rows, cols, (i, j) -> Rand.getCompd());
+        return Matid.foreach(rows, cols, (i, j) -> Rand.getCompd());
     }
 
     public static Matid getMatid (int rows, int cols, Compd from, Compd to) {
-        return Matid.forEach(rows, cols, (i, j) -> Rand.getCompd(from, to));
+        return Matid.foreach(rows, cols, (i, j) -> Rand.getCompd(from, to));
     }
 
     public static int choiceIndex(Vec weights) {

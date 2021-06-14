@@ -1,15 +1,20 @@
 package org.jml.Matrix.Double;
 
-import org.jml.Complex.Double.Compd;
 import org.jml.GPGPU.OpenCL.Context;
+import org.jml.Mathx.Extra.Intx;
 import org.jml.Mathx.Mathd;
+import org.jml.Mathx.Mathf;
+import org.jml.Mathx.TaskManager;
 import org.jml.Matrix.Single.Mat;
 import org.jml.References.Double.Ref1Dd;
 import org.jml.References.Double.Ref2Dd;
 import org.jml.Vector.Double.Vecd;
 import org.jml.Vector.Double.Vecid;
+import org.jml.Vector.Single.Vec;
 
 import java.util.Arrays;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class Matd implements Ref2Dd {
     final protected Vecd[] values;
@@ -110,7 +115,33 @@ public class Matd implements Ref2Dd {
         return Math.min(getCols(), b.getCols());
     }
 
-    public Matd forEach (Matd b, Vecd.VecForEach forEach) {
+    public Matd foreachValue (Function<Double, Double> valueFunction) {
+        int rows = getRows();
+        int cols = getCols();
+
+        Matd matrix = new Matd(rows, cols);
+        for (int i=0;i<rows;i++) {
+            for (int j=0;j<cols;j++) {
+                matrix.set(i, j, valueFunction.apply(get(i,j)));
+            }
+        }
+
+        return matrix;
+    }
+
+    public Matd foreachVector (Function<Vecd, Vecd> vectorFunction) {
+        int rows = getRows();
+        int cols = getCols();
+
+        Matd matrix = new Matd(rows, cols);
+        for (int i=0;i<rows;i++) {
+            matrix.set(i, vectorFunction.apply(get(i)));
+        }
+
+        return matrix;
+    }
+
+    public Matd foreach(Matd b, Vecd.VecForEach forEach) {
         int rows = finalRows(b);
         int cols = finalCols(b);
 
@@ -124,7 +155,7 @@ public class Matd implements Ref2Dd {
         return matrix;
     }
 
-    public Matd forEach (double b, Vecd.VecForEach forEach) {
+    public Matd foreach(double b, Vecd.VecForEach forEach) {
         int rows = getRows();
         int cols = getCols();
 
@@ -138,7 +169,7 @@ public class Matd implements Ref2Dd {
         return matrix;
     }
 
-    public static Matd forEach (int rows, int cols, MatForEachVec forEach) {
+    public static Matd foreach(int rows, int cols, MatForEachVec forEach) {
         Matd matrix = new Matd(rows, cols);
 
         for (int i=0;i<rows;i++) {
@@ -153,7 +184,7 @@ public class Matd implements Ref2Dd {
         return matrix;
     }
 
-    public static Matd forEach (int rows, int cols, MatForEachIndex forEach) {
+    public static Matd foreach(int rows, int cols, MatForEachIndex forEach) {
         Matd matrix = new Matd(rows, cols);
 
         for (int i=0;i<rows;i++) {
@@ -166,35 +197,35 @@ public class Matd implements Ref2Dd {
     }
 
     public Matd add (Matd b) {
-        return forEach(b, Double::sum);
+        return foreach(b, Double::sum);
     }
 
     public Matd add (Vecd b) {
-        return forEach(getRows(), getCols(), (i,j) -> get(i, j) + b.get(j));
+        return foreach(getRows(), getCols(), (i, j) -> get(i, j) + b.get(j));
     }
 
     public Matd add (double b) {
-        return forEach(b, Double::sum);
+        return foreach(b, Double::sum);
     }
 
     public Matd subtr (Matd b) {
-        return forEach(b, (x, y) -> x - y);
+        return foreach(b, (x, y) -> x - y);
     }
 
     public Matd subtr (Vecd b) {
-        return forEach(getRows(), getCols(), (i,j) -> get(i, j) - b.get(j));
+        return foreach(getRows(), getCols(), (i, j) -> get(i, j) - b.get(j));
     }
 
     public Matd subtr (double b) {
-        return forEach(b, (x, y) -> x - y);
+        return foreach(b, (x, y) -> x - y);
     }
 
     public Matd invSubtr (Vecd b) {
-        return forEach(getRows(), getCols(), (i,j) -> b.get(j) - get(i, j));
+        return foreach(getRows(), getCols(), (i, j) -> b.get(j) - get(i, j));
     }
 
     public Matd invSubtr (double b) {
-        return forEach(b, (x, y) -> y - x);
+        return foreach(b, (x, y) -> y - x);
     }
 
     public Matd mul (Matd b) {
@@ -202,14 +233,37 @@ public class Matd implements Ref2Dd {
         int cols = b.getCols();
         int dig = Math.min(getCols(), b.getRows());
 
-        return forEach(rows, cols, (i, j) -> {
-            double sum = 0;
-            for (int k=0;k<dig;k++) {
-                sum += get(i, k) * b.get(k, j);
-            }
+        if (rows * cols <= 15000) {
+            return foreach(rows, cols, (i, j) -> {
+                double sum = 0;
+                for (int k=0;k<dig;k++) {
+                    sum += get(i, k) * b.get(k, j);
+                }
 
-            return sum;
-        });
+                return sum;
+            });
+        }
+
+        TaskManager tasks = new TaskManager();
+        Matd result = new Matd(rows, cols);
+
+        for (int i=0;i<rows;i++) {
+            int finalI = i;
+            for (int j=0;j<cols;j++) {
+                int finalJ = j;
+                tasks.add(new TaskManager.Task(() -> {
+                    double sum = 0;
+                    for (int k=0;k<dig;k++) {
+                        sum += get(finalI, k) * b.get(k, finalJ);
+                    }
+
+                    result.set(finalI, finalJ, sum);
+                }));
+            }
+        }
+
+        tasks.run();
+        return result;
     }
 
     public Vecd mul (Vecd b) {
@@ -221,35 +275,35 @@ public class Matd implements Ref2Dd {
     }
 
     public Matd scalMul (Matd b) {
-        return forEach(b, (x, y) -> x * y);
+        return foreach(b, (x, y) -> x * y);
     }
 
     public Matd scalMul (Vecd b) {
-        return forEach(getRows(), getCols(), (i,j) -> get(i, j) * b.get(j));
+        return foreach(getRows(), getCols(), (i, j) -> get(i, j) * b.get(j));
     }
 
     public Matd scalMul (double b) {
-        return forEach(b, (x, y) -> x * y);
+        return foreach(b, (x, y) -> x * y);
     }
 
     public Matd scalDiv (Matd b) {
-        return forEach(b, (x, y) -> x / y);
+        return foreach(b, (x, y) -> x / y);
     }
 
     public Matd scalDiv (Vecd b) {
-        return forEach(getRows(), getCols(), (i,j) -> get(i, j) / b.get(j));
+        return foreach(getRows(), getCols(), (i, j) -> get(i, j) / b.get(j));
     }
 
     public Matd scalDiv (double b) {
-        return forEach(b, (x, y) -> x / y);
+        return foreach(b, (x, y) -> x / y);
     }
 
     public Matd scalInvDiv (Vecd b) {
-        return forEach(getRows(), getCols(), (i,j) -> b.get(j) / get(i, j));
+        return foreach(getRows(), getCols(), (i, j) -> b.get(j) / get(i, j));
     }
 
     public Matd scalInvDiv (double b) {
-        return forEach(b, (x, y) -> y / x);
+        return foreach(b, (x, y) -> y / x);
     }
 
     public Matd inverse() {
@@ -347,6 +401,28 @@ public class Matd implements Ref2Dd {
         return sum;
     }
 
+    public double[] fadlev () {
+        int n = getRows();
+        double[] poly = new double[n+1];
+        poly[0] = 1;
+
+        Matd y = Matd.this;
+        for (int i=1;i<=n;i++) {
+            poly[i] = -(1f/i) * y.tr();
+            y = mul(y).add(scalMul(poly[i]));
+        }
+
+        return poly;
+    }
+
+    public Vecid eigvals () {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate eigenvalues of non-square matrix");
+        }
+
+        return Mathd.poly(fadlev());
+    }
+
     public Matd pow (int x) {
         if (!isSquare()) {
             throw new ArithmeticException("Tried to calculate power of non-square matrix");
@@ -362,8 +438,27 @@ public class Matd implements Ref2Dd {
         return result;
     }
 
-    public Eigend eigen () {
-        return new Eigend();
+    public Matd sqrt () {
+        Matd y = this;
+        Matd z = identity(getRows());
+
+        int n = 1;
+        while (n <= 1000) {
+           Matd zInverse = z.inverse();
+           Matd yInverse = y.inverse();
+
+            Matd newY = y.add(zInverse).scalDiv(2);
+            if (newY.equals(y)) {
+                return y;
+            }
+
+            Matd newZ = z.add(yInverse).scalDiv(2);
+            y = newY;
+            z = newZ;
+            n++;
+        }
+
+        throw new ArithmeticException("No square root found");
     }
 
     public Matd exp () {
@@ -391,11 +486,62 @@ public class Matd implements Ref2Dd {
         return result;
     }
 
+    public Matd log1p() {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate logarithm of non-square matrix");
+        }
+
+        Matd y = this;
+        Matd last = null;
+        Matd pow = this;
+
+        int n = 2;
+        while (!y.equals(last)) {
+            pow = pow.mul(this);
+            Matd x = pow.scalDiv(n);
+
+            last = y;
+            if (Intx.isOdd(n)) {
+                y = y.add(x);
+            } else {
+                y = y.subtr(x);
+            }
+
+            n++;
+        }
+
+        return y;
+    }
+
+    public Matd log () {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate logarithm of non-square matrix");
+        }
+
+        return subtr(identity(getRows())).log1p();
+    }
+
+    public LUd lu () {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate LU decomposition of non-square matrix");
+        }
+
+        return new LUd();
+    }
+
+    public QRd qr () {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate QR decomposition of non-square matrix");
+        }
+
+        return new QRd();
+    }
+
     public Matd T () {
         int rows = getCols();
         int cols = getRows();
 
-        return forEach(rows, cols, (i, j) -> get(j, i));
+        return foreach(rows, cols, (i, j) -> get(j, i));
     }
 
     public Mat toFloat () {
@@ -420,6 +566,8 @@ public class Matd implements Ref2Dd {
         return toCL(Context.DEFAULT);
     }
 
+    public MatCUDAd toCUDA () { return new MatCUDAd(this); }
+
     public Vecd toVectorRow () {
         return Vecd.fromRef(rowMajor());
     }
@@ -429,11 +577,11 @@ public class Matd implements Ref2Dd {
     }
 
     public static Matd identity (int k) {
-        return forEach(k, k, (i, j) -> i == j ? 1 : 0);
+        return foreach(k, k, (i, j) -> i == j ? 1 : 0);
     }
 
     public static Matd fromRef (Ref2Dd ref) {
-        return ref instanceof Matd ? (Matd) ref : forEach(ref.getRows(), ref.getCols(), (MatForEachIndex) ref::get);
+        return ref instanceof Matd ? (Matd) ref : foreach(ref.getRows(), ref.getCols(), (MatForEachIndex) ref::get);
     }
 
     @Override
@@ -469,77 +617,83 @@ public class Matd implements Ref2Dd {
         return Arrays.hashCode(values);
     }
 
-    public class Eigend {
-        int n;
-        Compd[] values;
+    public class LUd {
+        final public Matd l, u;
 
-        private Eigend () {
-            this.n = getRows();
-            this.values = calc();
+        private LUd () {
+            int n = getRows();
+            int nm1 = n - 1;
+            this.l = identity(n);
+            this.u = new Matd(n, n);
+
+            for (int j=0;j<n;j++) {
+                u.set(0, j, get(0, j));
+                l.set(j, 0, get(j, 0) / u.get(0, 0));
+            }
+
+            for (int q=1;q<nm1;q++) {
+                int k = q;
+                int im1 = q - 1;
+
+                for (int p=k+1;p<n;p++) {
+                    int m = p;
+                    double sumA = Mathd.summation(0, im1, j -> l.get(k, j) * u.get(j, k));
+                    u.set(k, k, get(k, k) - sumA);
+
+                    double sumB = Mathd.summation(0, im1, j -> l.get(k, j) * u.get(j, m));
+                    u.set(k, m, get(k, m) - sumB);
+
+                    double sumC = Mathd.summation(0, im1, j -> l.get(m, j) * u.get(j, k));
+                    l.set(m, k, (get(m, k) - sumC) / u.get(k, k));
+                }
+            }
+
+            double sum = Mathd.summation(0, nm1, p -> l.get(nm1,p) * u.get(p,nm1));
+            u.set(nm1, nm1, get(nm1, nm1) - sum);
         }
 
         @Override
         public String toString() {
-            return "Eigen {" +
-                    "values=" + Arrays.toString(values) +
+            return "LU {" +
+                    "l=" + l +
+                    ", u=" + u +
                     '}';
         }
+    }
 
-        private Compd[] calc () {
-            if (n == 1) {
-                return new Compd[]{ new Compd(get(0,0), 0) };
-            } else if (n == 2) {
-                return Mathd.quadratic(1, -tr(), det());
-            } else if (n == 3) {
-                double tr = tr();
-                double det = det();
+    public class QRd {
+        final public Matd q, r;
 
-                return Mathd.cubic(-1, tr, (pow(2).tr() - tr * tr) / 2, det);
+        private QRd () {
+            final BiFunction<Vecd, Vecd, Vecd> projFunc = (u, a) -> u.mul(u.dot(a) / u.dot(u));
+
+            Matd a = T();
+            Vecd[] u = new Vecd[getCols()];
+            Vecd[] e = new Vecd[getCols()];
+
+            u[0] = a.get(0);
+            e[0] = u[0].unit();
+
+            for (int i=1;i<getCols();i++) {
+                Vecd proj = new Vecd(getCols());
+                for (int j=0;j<i;j++) {
+                    proj = proj.add(projFunc.apply(u[j], a.get(i)));
+                }
+
+                u[i] = a.get(i).subtr(proj);
+                e[i] = u[i].unit();
             }
 
-            Compd[] vals = new Compd[2];
-            Compd tr = new Compd(tr(), 0);
-            Compd max = closeDownValue(tr);
-            Compd min = closeDownValue(Compd.ZERO);
-
-            vals[0] = max;
-            vals[1] = min;
-            return vals;
+            this.q = new Matd(e).T();
+            this.r = Matd.foreach(getRows(), getCols(), (i,j) -> j >= i ? e[i].dot(a.get(j)) : 0);
         }
 
-        private Compd closeDownValue (Compd value) {
-            Matid A = toComplex();
-            Matid I = Matid.identity(n);
-
-            double step = 1;
-            double dirX = 1;
-            double dirY = 1;
-            double lastDet = 0;
-            boolean flipDirOnReal = true;
-
-            for (int i=0;i<1000;i++) {
-                if (i > 0 && i % 100 == 0) {
-                    step /= 9;
-                }
-
-                Compd det = A.subtr(I.scalMul(value)).det();
-                double abs = det.modulus();
-
-                if (i > 0 && abs > lastDet) {
-                    if (flipDirOnReal) {
-                        dirX *= -1;
-                    } else {
-                        dirY *= -1;
-                    }
-
-                    flipDirOnReal = !flipDirOnReal;
-                }
-
-                value = new Compd(value.real + dirX * step, value.imaginary + dirY * step);
-                lastDet = abs;
-            }
-
-            return value;
+        @Override
+        public String toString() {
+            return "QR {" +
+                    "q=" + q +
+                    ", r=" + r +
+                    '}';
         }
     }
 }

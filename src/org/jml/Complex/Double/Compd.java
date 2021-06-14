@@ -8,6 +8,7 @@ import java.util.Objects;
 public class Compd {
     final public static Compd ZERO = new Compd();
     final public static Compd ONE = new Compd(1,0);
+    final public static Compd ONEI = new Compd(0,1);
     final public static Compd MONE = new Compd(-1,0);
 
     final public double real, imaginary;
@@ -68,6 +69,14 @@ public class Compd {
     }
 
     // PROPERTIES
+    public boolean isNan () {
+        return Double.isNaN(real) || Double.isNaN(imaginary);
+    }
+
+    public boolean isInfinite () {
+        return Double.isInfinite(real) || Double.isInfinite(imaginary);
+    }
+
     public double modulus () {
         return Math.hypot(real, imaginary);
     }

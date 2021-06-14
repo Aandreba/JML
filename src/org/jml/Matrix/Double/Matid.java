@@ -1,7 +1,9 @@
 package org.jml.Matrix.Double;
 
+import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Complex.Double.Compd;
+import org.jml.Mathx.TaskManager;
 import org.jml.Matrix.Single.Mati;
 import org.jml.References.Double.Complex.Ref2Did;
 import org.jml.Vector.Double.Vecid;
@@ -107,7 +109,7 @@ public class Matid implements Ref2Did {
         return Math.min(getCols(), b.getCols());
     }
 
-    public Matid forEach (Matid b, Vecid.VeciForEach forEach) {
+    public Matid foreach(Matid b, Vecid.VeciForEach forEach) {
         int rows = finalRows(b);
         int cols = finalCols(b);
 
@@ -121,7 +123,7 @@ public class Matid implements Ref2Did {
         return matrix;
     }
 
-    public Matid forEach (Compd b, Vecid.VeciForEach forEach) {
+    public Matid foreach(Compd b, Vecid.VeciForEach forEach) {
         int rows = getRows();
         int cols = getCols();
 
@@ -135,11 +137,11 @@ public class Matid implements Ref2Did {
         return matrix;
     }
 
-    public Matid forEach (double b, Vecid.VeciForEach forEach) {
-        return forEach(new Compd(b, 0), forEach);
+    public Matid foreach(double b, Vecid.VeciForEach forEach) {
+        return foreach(new Compd(b, 0), forEach);
     }
 
-    public static Matid forEach (int rows, int cols, MatiForEachVeci forEach) {
+    public static Matid foreach(int rows, int cols, MatiForEachVeci forEach) {
         Matid matrix = new Matid(rows, cols);
 
         for (int i=0;i<rows;i++) {
@@ -154,7 +156,7 @@ public class Matid implements Ref2Did {
         return matrix;
     }
 
-    public static Matid forEach (int rows, int cols, MatiForEachIndex forEach) {
+    public static Matid foreach(int rows, int cols, MatiForEachIndex forEach) {
         Matid matrix = new Matid(rows, cols);
 
         for (int i=0;i<rows;i++) {
@@ -167,47 +169,47 @@ public class Matid implements Ref2Did {
     }
 
     public Matid add (Matid b) {
-        return forEach(b, Compd::add);
+        return foreach(b, Compd::add);
     }
 
     public Matid add (Vecid b) {
-        return forEach(getRows(), getCols(), (i,j) -> get(i, j).add(b.get(j)));
+        return foreach(getRows(), getCols(), (i, j) -> get(i, j).add(b.get(j)));
     }
 
     public Matid add (Compd b) {
-        return forEach(b, Compd::add);
+        return foreach(b, Compd::add);
     }
 
     public Matid add (double b) {
-        return forEach(b, Compd::add);
+        return foreach(b, Compd::add);
     }
 
     public Matid subtr (Matid b) {
-        return forEach(b, Compd::subtr);
+        return foreach(b, Compd::subtr);
     }
 
     public Matid subtr (Vecid b) {
-        return forEach(getRows(), getCols(), (i,j) -> get(i, j).subtr(b.get(j)));
+        return foreach(getRows(), getCols(), (i, j) -> get(i, j).subtr(b.get(j)));
     }
 
     public Matid subtr (Compd b) {
-        return forEach(b, Compd::subtr);
+        return foreach(b, Compd::subtr);
     }
 
     public Matid subtr (double b) {
-        return forEach(b, Compd::subtr);
+        return foreach(b, Compd::subtr);
     }
 
     public Matid invSubtr (Vecid b) {
-        return forEach(getRows(), getCols(), (i,j) -> b.get(j).subtr(get(i, j)));
+        return foreach(getRows(), getCols(), (i, j) -> b.get(j).subtr(get(i, j)));
     }
 
     public Matid invSubtr (Compd b) {
-        return forEach(getRows(), getCols(), (i,j) -> b.subtr(get(i, j)));
+        return foreach(getRows(), getCols(), (i, j) -> b.subtr(get(i, j)));
     }
 
     public Matid invSubtr (double b) {
-        return forEach(getRows(), getCols(), (i,j) -> get(i, j).invSubtr(b));
+        return foreach(getRows(), getCols(), (i, j) -> get(i, j).invSubtr(b));
     }
 
     public Matid mul (Matid b) {
@@ -215,14 +217,37 @@ public class Matid implements Ref2Did {
         int cols = b.getCols();
         int dig = Math.min(getCols(), b.getRows());
 
-        return forEach(rows, cols, (i, j) -> {
-            Compd sum = new Compd();
-            for (int k=0;k<dig;k++) {
-                sum = sum.add(get(i, k).mul(b.get(k, j)));
-            }
+        if (rows * cols <= 7500) {
+            return foreach(rows, cols, (i, j) -> {
+                Compd sum = Compd.ZERO;
+                for (int k=0;k<dig;k++) {
+                    sum = sum.add(get(i, k).mul(b.get(k, j)));
+                }
 
-            return sum;
-        });
+                return sum;
+            });
+        }
+
+        TaskManager tasks = new TaskManager();
+        Matid result = new Matid(rows, cols);
+
+        for (int i=0;i<rows;i++) {
+            int finalI = i;
+            for (int j=0;j<cols;j++) {
+                int finalJ = j;
+                tasks.add(new TaskManager.Task(() -> {
+                    Compd sum = Compd.ZERO;
+                    for (int k=0;k<dig;k++) {
+                        sum = sum.add(get(finalI, k).mul(b.get(k, finalJ)));
+                    }
+
+                    result.set(finalI, finalJ, sum);
+                }));
+            }
+        }
+
+        tasks.run();
+        return result;
     }
 
     public Vecid mul (Vecid b) {
@@ -234,52 +259,52 @@ public class Matid implements Ref2Did {
     }
 
     public Matid scalMul (Matid b) {
-        return forEach(b, Compd::mul);
+        return foreach(b, Compd::mul);
     }
 
     public Matid scalMul (Vecid b) {
-        return forEach(getRows(), getCols(), (i,j) -> get(i, j).mul(b.get(j)));
+        return foreach(getRows(), getCols(), (i, j) -> get(i, j).mul(b.get(j)));
     }
 
     public Matid scalMul (Compd b) {
-        return forEach(b, Compd::mul);
+        return foreach(b, Compd::mul);
     }
 
     public Matid scalMul (double b) {
-        return forEach(b, Compd::mul);
+        return foreach(b, Compd::mul);
     }
 
     public Matid scalDiv (Matid b) {
-        return forEach(b, Compd::div);
+        return foreach(b, Compd::div);
     }
 
     public Matid scalDiv (Vecid b) {
-        return forEach(getRows(), getCols(), (i,j) -> get(i, j).div(b.get(j)));
+        return foreach(getRows(), getCols(), (i, j) -> get(i, j).div(b.get(j)));
     }
 
     public Matid scalDiv (Compd b) {
-        return forEach(b, Compd::div);
+        return foreach(b, Compd::div);
     }
 
     public Matid scalDiv (double b) {
-        return forEach(b, Compd::div);
+        return foreach(b, Compd::div);
     }
 
     public Matid scalInvDiv (Vecid b) {
-        return forEach(getRows(), getCols(), (i,j) -> b.get(j).div(get(i,j)));
+        return foreach(getRows(), getCols(), (i, j) -> b.get(j).div(get(i,j)));
     }
 
     public Matid scalInvDiv (Compd b) {
-        return forEach(b, (x, y) -> y.div(x));
+        return foreach(b, (x, y) -> y.div(x));
     }
 
     public Matid scalInvDiv (double b) {
-        return forEach(b, (x, y) -> y.div(x));
+        return foreach(b, (x, y) -> y.div(x));
     }
 
     @Override
     public Matid conj() {
-        return Matid.forEach(getRows(), getCols(), (i,j) -> get(i,j).conj());
+        return Matid.foreach(getRows(), getCols(), (i, j) -> get(i,j).conj());
     }
 
     public Matid inverse() {
@@ -399,11 +424,11 @@ public class Matid implements Ref2Did {
         int rows = getCols();
         int cols = getRows();
 
-        return forEach(rows, cols, (i, j) -> get(j, i));
+        return foreach(rows, cols, (i, j) -> get(j, i));
     }
 
     public Mati toFloat () {
-        return Mati.forEach(getRows(), getCols(), (i, j) -> get(i, j).toFloat());
+        return Mati.foreach(getRows(), getCols(), (i, j) -> get(i, j).toFloat());
     }
 
     public MatCUDAid toCUDA () {
@@ -427,11 +452,11 @@ public class Matid implements Ref2Did {
     }
 
     public static Matid identity (int k) {
-        return forEach(k, k, (i, j) -> i == j ? new Compd(1,0) : new Compd());
+        return foreach(k, k, (i, j) -> i == j ? new Compd(1,0) : new Compd());
     }
 
     public static Matid fromRef (Ref2Did ref) {
-        return ref instanceof Matid ? (Matid) ref : forEach(ref.getRows(), ref.getCols(), (MatiForEachIndex) ref::get);
+        return ref instanceof Matid ? (Matid) ref : foreach(ref.getRows(), ref.getCols(), (MatiForEachIndex) ref::get);
     }
 
     @Override

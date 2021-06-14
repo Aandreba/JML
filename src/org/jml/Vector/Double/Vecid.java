@@ -83,7 +83,7 @@ public class Vecid implements Ref1Did {
         return Math.min(getSize(), b.getSize());
     }
 
-    public Vecid forEach (Vecid b, VeciForEach forEach) {
+    public Vecid foreach(Vecid b, VeciForEach forEach) {
         int size = finalLen(b);
         Vecid vector = new Vecid(size);
 
@@ -94,7 +94,7 @@ public class Vecid implements Ref1Did {
         return vector;
     }
 
-    public Vecid forEach (Compd b, VeciForEach forEach) {
+    public Vecid foreach(Compd b, VeciForEach forEach) {
         int size = getSize();
         Vecid vector = new Vecid(size);
 
@@ -105,11 +105,11 @@ public class Vecid implements Ref1Did {
         return vector;
     }
 
-    public Vecid forEach (double b, VeciForEach forEach) {
-        return forEach(new Compd(b, 0), forEach);
+    public Vecid foreach(double b, VeciForEach forEach) {
+        return foreach(new Compd(b, 0), forEach);
     }
 
-    public Vecid forEach (VeciForEachValue forEach) {
+    public Vecid foreach(VeciForEachValue forEach) {
         int size = getSize();
         Vecid vector = new Vecid(size);
 
@@ -120,7 +120,7 @@ public class Vecid implements Ref1Did {
         return vector;
     }
 
-    public static Vecid forEach (int size, VeciForEachIndex forEach) {
+    public static Vecid foreach(int size, VeciForEachIndex forEach) {
         Vecid vector = new Vecid(size);
         for (int i=0;i<size;i++) {
             vector.set(i, forEach.apply(i));
@@ -130,72 +130,72 @@ public class Vecid implements Ref1Did {
     }
 
     public Vecid add (Vecid b) {
-        return forEach(b, Compd::add);
+        return foreach(b, Compd::add);
     }
 
     public Vecid add (Compd b) {
-        return forEach(b, Compd::add);
+        return foreach(b, Compd::add);
     }
 
     public Vecid add (double b) {
-        return forEach(b, Compd::add);
+        return foreach(b, Compd::add);
     }
 
     public Vecid subtr (Vecid b) {
-        return forEach(b, Compd::subtr);
+        return foreach(b, Compd::subtr);
     }
 
     public Vecid subtr (Compd b) {
-        return forEach(b, Compd::subtr);
+        return foreach(b, Compd::subtr);
     }
 
     public Vecid subtr (double b) {
-        return forEach(b, Compd::subtr);
+        return foreach(b, Compd::subtr);
     }
 
     public Vecid invSubtr (Compd b) {
-        return forEach(b, (x, y) -> y.subtr(x));
+        return foreach(b, (x, y) -> y.subtr(x));
     }
 
     public Vecid invSubtr (double b) {
-        return forEach(b, (x, y) -> y.subtr(x));
+        return foreach(b, (x, y) -> y.subtr(x));
     }
 
     public Vecid mul (Vecid b) {
-        return forEach(b, Compd::mul);
+        return foreach(b, Compd::mul);
     }
 
     public Vecid mul (Compd b) {
-        return forEach(b, Compd::mul);
+        return foreach(b, Compd::mul);
     }
 
     public Vecid mul (double b) {
-        return forEach(b, Compd::mul);
+        return foreach(b, Compd::mul);
     }
 
     public Vecid div (Vecid b) {
-        return forEach(b, Compd::div);
+        return foreach(b, Compd::div);
     }
 
     public Vecid div (Compd b) {
-        return forEach(b, Compd::div);
+        return foreach(b, Compd::div);
     }
 
     public Vecid div (double b) {
-        return forEach(b, Compd::div);
+        return foreach(b, Compd::div);
     }
 
     public Vecid invDiv (Compd b) {
-        return forEach(b, (x, y) -> y.div(x));
+        return foreach(b, (x, y) -> y.div(x));
     }
 
     public Vecid invDiv (double b) {
-        return forEach(b, (x, y) -> y.div(x));
+        return foreach(b, (x, y) -> y.div(x));
     }
 
     @Override
     public Vecid conj() {
-        return Vecid.forEach(getSize(), i -> get(i).conj());
+        return Vecid.foreach(getSize(), i -> get(i).conj());
     }
 
     public double magnitude2 () {
@@ -297,7 +297,7 @@ public class Vecid implements Ref1Did {
     }
 
     public static Vecid fromRef (Ref1Did ref) {
-        return ref instanceof Vecid ? (Vecid) ref : forEach(ref.getSize(), ref::get);
+        return ref instanceof Vecid ? (Vecid) ref : foreach(ref.getSize(), ref::get);
     }
 
     @Override
