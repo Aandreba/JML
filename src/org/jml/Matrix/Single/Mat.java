@@ -252,14 +252,14 @@ public class Mat implements Ref2D {
             int finalI = i;
             for (int j=0;j<cols;j++) {
                 int finalJ = j;
-                tasks.add(new TaskManager.Task(() -> {
+                tasks.add(() -> {
                     float sum = 0;
                     for (int k=0;k<dig;k++) {
                         sum += get(finalI, k) * b.get(k, finalJ);
                     }
 
                     result.set(finalI, finalJ, sum);
-                }));
+                });
             }
         }
 

@@ -237,14 +237,14 @@ public class Mati implements Ref2Di {
             int finalI = i;
             for (int j=0;j<cols;j++) {
                 int finalJ = j;
-                tasks.add(new TaskManager.Task(() -> {
+                tasks.add(() -> {
                     Comp sum = Comp.ZERO;
                     for (int k=0;k<dig;k++) {
                         sum = sum.add(get(finalI, k).mul(b.get(k, finalJ)));
                     }
 
                     result.set(finalI, finalJ, sum);
-                }));
+                });
             }
         }
 

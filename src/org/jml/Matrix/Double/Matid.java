@@ -235,14 +235,14 @@ public class Matid implements Ref2Did {
             int finalI = i;
             for (int j=0;j<cols;j++) {
                 int finalJ = j;
-                tasks.add(new TaskManager.Task(() -> {
+                tasks.add(() -> {
                     Compd sum = Compd.ZERO;
                     for (int k=0;k<dig;k++) {
                         sum = sum.add(get(finalI, k).mul(b.get(k, finalJ)));
                     }
 
                     result.set(finalI, finalJ, sum);
-                }));
+                });
             }
         }
 
