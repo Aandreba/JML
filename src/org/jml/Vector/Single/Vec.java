@@ -2,7 +2,6 @@ package org.jml.Vector.Single;
 
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Mathx.Mathf;
-import org.jml.Mathx.TaskManager;
 import org.jml.Matrix.Single.Mat;
 import org.jml.References.Single.Ref1D;
 import org.jml.Vector.Double.Vecd;
@@ -74,7 +73,7 @@ public class Vec implements Ref1D {
         return Math.min(getSize(), b.getSize());
     }
 
-    public Vec forEach (Vec b, VecfForEach forEach) {
+    public Vec foreach(Vec b, VecfForEach forEach) {
         int size = finalLen(b);
         Vec vector = new Vec(size);
 
@@ -85,7 +84,7 @@ public class Vec implements Ref1D {
         return vector;
     }
 
-    public Vec forEach (float b, VecfForEach forEach) {
+    public Vec foreach(float b, VecfForEach forEach) {
         int size = getSize();
         Vec vector = new Vec(size);
 
@@ -96,7 +95,7 @@ public class Vec implements Ref1D {
         return vector;
     }
 
-    public Vec forEach (VecfForEachValue forEach) {
+    public Vec foreach(VecfForEachValue forEach) {
         int size = getSize();
         Vec vector = new Vec(size);
 
@@ -107,7 +106,7 @@ public class Vec implements Ref1D {
         return vector;
     }
 
-    public static Vec forEach (int size, VecfForEachIndex forEach) {
+    public static Vec foreach(int size, VecfForEachIndex forEach) {
         Vec vector = new Vec(size);
         for (int i=0;i<size;i++) {
             vector.set(i, forEach.apply(i));
@@ -117,43 +116,43 @@ public class Vec implements Ref1D {
     }
 
     public Vec add (Vec b) {
-        return forEach(b, Float::sum);
+        return foreach(b, Float::sum);
     }
 
     public Vec add (float b) {
-        return forEach(b, Float::sum);
+        return foreach(b, Float::sum);
     }
 
     public Vec subtr (Vec b) {
-        return forEach(b, (x, y) -> x - y);
+        return foreach(b, (x, y) -> x - y);
     }
 
     public Vec subtr (float b) {
-        return forEach(b, (x, y) -> x - y);
+        return foreach(b, (x, y) -> x - y);
     }
 
     public Vec invSubtr (float b) {
-        return forEach(b, (x, y) -> y - x);
+        return foreach(b, (x, y) -> y - x);
     }
 
     public Vec mul (Vec b) {
-        return forEach(b, (x, y) -> x * y);
+        return foreach(b, (x, y) -> x * y);
     }
 
     public Vec mul (float b) {
-        return forEach(b, (x, y) -> x * y);
+        return foreach(b, (x, y) -> x * y);
     }
 
     public Vec div (Vec b) {
-        return forEach(b, (x, y) -> x / y);
+        return foreach(b, (x, y) -> x / y);
     }
 
     public Vec div (float b) {
-        return forEach(b, (x, y) -> x / y);
+        return foreach(b, (x, y) -> x / y);
     }
 
     public Vec invDiv(float b) {
-        return forEach(b, (x, y) -> y / x);
+        return foreach(b, (x, y) -> y / x);
     }
 
     public float magnitude2 () {
@@ -207,7 +206,7 @@ public class Vec implements Ref1D {
     }
 
     public Vec abs () {
-        return forEach(getSize(), i -> Mathf.abs(get(i)));
+        return foreach(getSize(), i -> Mathf.abs(get(i)));
     }
 
     public float mean () {
@@ -307,7 +306,7 @@ public class Vec implements Ref1D {
     }
 
     public static Vec fromRef (Ref1D ref) {
-        return ref instanceof Vec ? (Vec) ref : forEach(ref.getSize(), ref::get);
+        return ref instanceof Vec ? (Vec) ref : foreach(ref.getSize(), ref::get);
     }
 
     @Override

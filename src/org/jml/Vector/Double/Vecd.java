@@ -72,7 +72,7 @@ public class Vecd implements Ref1Dd {
         return Math.min(getSize(), b.getSize());
     }
 
-    public Vecd forEach (Vecd b, VecForEach forEach) {
+    public Vecd foreach(Vecd b, VecForEach forEach) {
         int size = finalLen(b);
         Vecd vector = new Vecd(size);
 
@@ -83,7 +83,7 @@ public class Vecd implements Ref1Dd {
         return vector;
     }
 
-    public Vecd forEach (double b, VecForEach forEach) {
+    public Vecd foreach(double b, VecForEach forEach) {
         int size = getSize();
         Vecd vector = new Vecd(size);
 
@@ -94,7 +94,7 @@ public class Vecd implements Ref1Dd {
         return vector;
     }
 
-    public Vecd forEach (VecForEachValue forEach) {
+    public Vecd foreach(VecForEachValue forEach) {
         int size = getSize();
         Vecd vector = new Vecd(size);
 
@@ -105,7 +105,7 @@ public class Vecd implements Ref1Dd {
         return vector;
     }
 
-    public static Vecd forEach (int size, VecForEachIndex forEach) {
+    public static Vecd foreach(int size, VecForEachIndex forEach) {
         Vecd vector = new Vecd(size);
         for (int i=0;i<size;i++) {
             vector.set(i, forEach.apply(i));
@@ -115,43 +115,43 @@ public class Vecd implements Ref1Dd {
     }
 
     public Vecd add (Vecd b) {
-        return forEach(b, Double::sum);
+        return foreach(b, Double::sum);
     }
 
     public Vecd add (double b) {
-        return forEach(b, Double::sum);
+        return foreach(b, Double::sum);
     }
 
     public Vecd subtr (Vecd b) {
-        return forEach(b, (x, y) -> x - y);
+        return foreach(b, (x, y) -> x - y);
     }
 
     public Vecd subtr (double b) {
-        return forEach(b, (x, y) -> x - y);
+        return foreach(b, (x, y) -> x - y);
     }
 
     public Vecd invSubtr (double b) {
-        return forEach(b, (x, y) -> y - x);
+        return foreach(b, (x, y) -> y - x);
     }
 
     public Vecd mul (Vecd b) {
-        return forEach(b, (x, y) -> x * y);
+        return foreach(b, (x, y) -> x * y);
     }
 
     public Vecd mul (double b) {
-        return forEach(b, (x, y) -> x * y);
+        return foreach(b, (x, y) -> x * y);
     }
 
     public Vecd div (Vecd b) {
-        return forEach(b, (x, y) -> x / y);
+        return foreach(b, (x, y) -> x / y);
     }
 
     public Vecd div (double b) {
-        return forEach(b, (x, y) -> x / y);
+        return foreach(b, (x, y) -> x / y);
     }
 
     public Vecd invDiv(double b) {
-        return forEach(b, (x, y) -> y / x);
+        return foreach(b, (x, y) -> y / x);
     }
 
     public double magnitude2 () {
@@ -253,7 +253,7 @@ public class Vecd implements Ref1Dd {
     }
 
     public static Vecd fromRef (Ref1Dd ref) {
-        return ref instanceof Vecd ? (Vecd) ref : forEach(ref.getSize(), ref::get);
+        return ref instanceof Vecd ? (Vecd) ref : foreach(ref.getSize(), ref::get);
     }
 
     @Override
