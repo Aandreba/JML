@@ -28,6 +28,10 @@ public class TaskManager extends ArrayList<TaskManager.Task> implements Runnable
         Collections.addAll(this, tasks);
     }
 
+    public boolean add (Runnable run) {
+        return add(new Task(run));
+    }
+
     public void run () {
         // Pre-Run Sorting by priority
         sort(Comparator.comparingInt(x -> x.priority));

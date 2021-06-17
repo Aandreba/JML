@@ -2,6 +2,7 @@ package org.jml.Vector.Single;
 
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Mathx.Mathf;
+import org.jml.Mathx.TaskManager;
 import org.jml.Matrix.Single.Mat;
 import org.jml.References.Single.Ref1D;
 import org.jml.Vector.Double.Vecd;

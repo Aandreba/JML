@@ -1,32 +1,28 @@
 package Benchmarks;
 
 import org.jml.Mathx.Rand;
-import org.jml.Matrix.Double.MatCLd;
-import org.jml.Matrix.Double.MatCUDAd;
 import org.jml.Matrix.Double.Matd;
-import org.jml.Matrix.Single.Mat;
-import org.jml.Matrix.Single.MatCL;
-import org.jml.Matrix.Single.MatCUDA;
+import org.jml.Vector.Single.Vec;
 
 public class Tasks {
     public static void main (String... args) {
         int size, epochs;
 
-        System.out.println("Insert matrix sizes");
+        System.out.println("Insert vector sizes");
         size = Benchmark.getInt(x -> x > 0);
 
         System.out.println("Insert epochs");
         epochs = Benchmark.getInt(x -> x > 0);
 
-        MatCUDAd[] a = new MatCUDAd[epochs];
-        MatCUDAd[] b = new MatCUDAd[epochs];
+        Vec[] a = new Vec[epochs];
+        Vec[] b = new Vec[epochs];
 
         for (int i=0;i<epochs;i++) {
-            a[i] = Rand.getMatd(size, size, -100, 100).toCUDA();
-            b[i] = Rand.getMatd(size, size, -100, 100).toCUDA();
+            a[i] = Rand.getVec(size, -100, 100);
+            b[i] = Rand.getVec(size, -100, 100);
         }
 
-        long time = Benchmark.time(epochs, i -> a[i].mul(b[i]));
+        long time = Benchmark.time(epochs, i -> a[i].add(b[i]));
         System.out.println("Time: "+(time * 0.000001f)+" ms");
     }
 
