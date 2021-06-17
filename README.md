@@ -17,4 +17,4 @@ Java Library for mathematical computation
 - <a href="https://github.com/jcuda/jcublas">jcublas</a>
 
 ## Installation
-Installation is as simple as importing the following JAR into your IDE of choice
+Installation is as simple as importing <a href="https://github.com/Aandreba/jml/releases">the following release</a> into your IDE of choice
