@@ -4,7 +4,6 @@ import org.jml.GPGPU.OpenCL.Buffer.FloatBuffer;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.GPGPU.OpenCL.Query;
 import org.jml.Matrix.Single.MatCL;
-import org.jml.References.Single.Ref1D;
 import org.jml.Vector.Double.VecCLd;
 import org.jocl.*;
 import org.jocl.blast.CLBlast;
@@ -15,8 +14,8 @@ public class VecCL extends FloatBuffer {
         super(context, size);
     }
 
-    public VecCL(Context context, Ref1D values) {
-        this(context, values.getSize());
+    public VecCL(Context context, Vec values) {
+        this(context, values.size());
         set(values.toArray());
     }
 
@@ -29,12 +28,17 @@ public class VecCL extends FloatBuffer {
         super(Context.DEFAULT, size);
     }
 
-    public VecCL(Ref1D values) {
+    public VecCL(Vec values) {
         this(Context.DEFAULT, values);
     }
 
     public VecCL(float... values) {
         this(Context.DEFAULT, values);
+    }
+
+    public VecCL (FloatBuffer buffer) {
+        this(buffer.getContext(), buffer.size);
+        set(buffer.size, buffer, 0, 1, 0, 1);
     }
 
     private void checkCompatibility (VecCL b) {
@@ -238,7 +242,6 @@ public class VecCL extends FloatBuffer {
         return matrix;
     }
 
-    @Override
     public VecCLd toDouble() {
         float[] values = toArray();
         double[] casted = new double[values.length];
@@ -266,7 +269,7 @@ public class VecCL extends FloatBuffer {
         float[] vals = toArray();
         StringBuilder builder = new StringBuilder();
 
-        for (int i=0;i<getSize();i++) {
+        for (int i = 0; i< size(); i++) {
             builder.append(", ").append(vals[i]);
         }
 

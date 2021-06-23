@@ -1,13 +1,14 @@
 package org.jml.Vector.Double;
 
+import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Matrix.Double.Matd;
-import org.jml.References.Double.Ref1Dd;
 import org.jml.Vector.Single.Vec;
+import org.jml.Vector.Single.Veci;
 
 import java.util.Arrays;
 
-public class Vecd implements Ref1Dd {
+public class Vecd {
     final protected double[] values;
 
     public Vecd(int size) {
@@ -19,7 +20,7 @@ public class Vecd implements Ref1Dd {
     }
 
     public Vecd(Vecd initialValues, double... finalValues) {
-        int vecSize = initialValues.getSize();
+        int vecSize = initialValues.size();
         this.values = new double[vecSize + finalValues.length];
 
         for (int i=0;i<vecSize;i++) {
@@ -31,8 +32,8 @@ public class Vecd implements Ref1Dd {
         }
     }
 
-    public Vecd(double[] initialValues, Ref1Dd finalValues) {
-        int vecSize = finalValues.getSize();
+    public Vecd(double[] initialValues, Vecd finalValues) {
+        int vecSize = finalValues.size();
         this.values = new double[initialValues.length + vecSize];
 
         for (int i=0;i<initialValues.length;i++) {
@@ -56,7 +57,7 @@ public class Vecd implements Ref1Dd {
         double apply (double value);
     }
 
-    public int getSize () {
+    public int size () {
         return values.length;
     }
 
@@ -64,12 +65,32 @@ public class Vecd implements Ref1Dd {
         return this.values[pos];
     }
 
+    public void set (Vecd values) {
+        if (values.size() != size()) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        for (int i=0;i<size();i++) {
+            this.values[i] = values.get(i);
+        }
+    }
+
+    public void set (double... values) {
+        if (values.length != size()) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        for (int i=0;i<size();i++) {
+            this.values[i] = values[i];
+        }
+    }
+
     public void set (int pos, double value) {
         this.values[pos] = value;
     }
 
     private int finalLen (Vecd b) {
-        return Math.min(getSize(), b.getSize());
+        return Math.min(size(), b.size());
     }
 
     public Vecd foreach(Vecd b, VecForEach forEach) {
@@ -84,7 +105,7 @@ public class Vecd implements Ref1Dd {
     }
 
     public Vecd foreach(double b, VecForEach forEach) {
-        int size = getSize();
+        int size = size();
         Vecd vector = new Vecd(size);
 
         for (int i=0;i<size;i++) {
@@ -95,7 +116,7 @@ public class Vecd implements Ref1Dd {
     }
 
     public Vecd foreach(VecForEachValue forEach) {
-        int size = getSize();
+        int size = size();
         Vecd vector = new Vecd(size);
 
         for (int i=0;i<size;i++) {
@@ -156,7 +177,7 @@ public class Vecd implements Ref1Dd {
 
     public double magnitude2 () {
         double sum = 0;
-        for (int i=0;i<getSize();i++) {
+        for (int i = 0; i< size(); i++) {
             sum += get(i) * get(i);
         }
 
@@ -197,7 +218,7 @@ public class Vecd implements Ref1Dd {
 
     public double sum () {
         double val = 0;
-        for (int i=0;i<getSize();i++) {
+        for (int i = 0; i< size(); i++) {
             val += get(i);
         }
 
@@ -205,7 +226,7 @@ public class Vecd implements Ref1Dd {
     }
 
     public double mean () {
-        return sum() / getSize();
+        return sum() / size();
     }
 
     public Vecd sub (int... pos) { // Subvector
@@ -217,21 +238,20 @@ public class Vecd implements Ref1Dd {
         return vector;
     }
 
-    @Override
+    
     public double[] toArray() {
         return values.clone();
     }
 
     public Vec toFloat () {
-        Vec vector = new Vec(getSize());
-        for (int i=0;i<getSize();i++) {
+        Vec vector = new Vec(size());
+        for (int i = 0; i< size(); i++) {
             vector.set(i, (float) get(i));
         }
 
         return vector;
     }
 
-    @Override
     public Vecid toComplex() {
         return new Vecid(values);
     }
@@ -251,27 +271,20 @@ public class Vecd implements Ref1Dd {
     public Matd colMatrix () {
         return rowMatrix().T();
     }
-
-    public static Vecd fromRef (Ref1Dd ref) {
-        return ref instanceof Vecd ? (Vecd) ref : foreach(ref.getSize(), ref::get);
-    }
-
-    @Override
+    
     public Vecd clone() {
         return new Vecd(values.clone());
     }
-
-    @Override
+    
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        for (int i=0;i<getSize();i++) {
+        for (int i = 0; i< size(); i++) {
             builder.append(", ").append(get(i));
         }
 
         return "{ " + builder.substring(2) + " }";
     }
 
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -279,7 +292,7 @@ public class Vecd implements Ref1Dd {
         return Arrays.equals(values, doubles.values);
     }
 
-    @Override
+    
     public int hashCode() {
         return Arrays.hashCode(values);
     }

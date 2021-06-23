@@ -3,8 +3,6 @@ package org.jml.Matrix.Double;
 import org.jml.Complex.Double.Compd;
 import org.jml.GPGPU.CUDA.CUDA;
 import org.jml.Matrix.Single.MatCUDAi;
-import org.jml.References.Double.Complex.Ref1Did;
-import org.jml.References.Double.Complex.Ref2Did;
 import org.jml.Vector.Double.VecCUDAid;
 import org.jml.Vector.Double.Vecid;
 import jcuda.Pointer;
@@ -12,7 +10,7 @@ import jcuda.cuComplex;
 import jcuda.cuDoubleComplex;
 import jcuda.jcublas.JCublas;
 
-public class MatCUDAid implements Ref2Did {
+public class MatCUDAid {
     static {
         CUDA.init();
     }
@@ -28,9 +26,9 @@ public class MatCUDAid implements Ref2Did {
         JCublas.cublasAlloc(size, VecCUDAid.ELEMSIZE, id);
     }
 
-    public MatCUDAid(Ref2Did values) {
-        this(values.getRows(), values.getCols());
-        set(values.colMajor().toArray());
+    public MatCUDAid(Matid values) {
+        this(values.rows(), values.cols());
+        set(values.colMajor());
     }
 
     public MatCUDAid(VecCUDAid values, int rows) {
@@ -155,13 +153,11 @@ public class MatCUDAid implements Ref2Did {
         JCublas.cublasFree(id);
     }
 
-    @Override
-    public int getRows () {
+    public int rows() {
         return rows;
     }
 
-    @Override
-    public int getCols () {
+    public int cols() {
         return cols;
     }
 
@@ -171,8 +167,7 @@ public class MatCUDAid implements Ref2Did {
 
         return array;
     }
-
-    @Override
+    
     public Compd get (int row, int col) {
         double[] array = toDoubleArray();
         int i = (col * rows) + row;
@@ -180,8 +175,7 @@ public class MatCUDAid implements Ref2Did {
 
         return new Compd(array[j], array[j+1]);
     }
-
-    @Override
+    
     public VecCUDAid get (int row) {
         double[] array = toDoubleArray();
         Compd[] result = new Compd[cols];
@@ -195,7 +189,7 @@ public class MatCUDAid implements Ref2Did {
         return new VecCUDAid(result);
     }
 
-    @Override
+    
     public void set (int row, int col, Compd val) {
         double[] array = toDoubleArray();
         int i = (col * rows) + row;
@@ -206,8 +200,8 @@ public class MatCUDAid implements Ref2Did {
         JCublas.cublasSetVector(size, VecCUDAid.ELEMSIZE, Pointer.to(array), 1, id, 1);
     }
 
-    @Override
-    public void set (int row, Ref1Did values) {
+    
+    public void set (int row, Vecid values) {
         double[] array = toDoubleArray();
         for (int i=0;i<cols;i++) {
             int j = (i * rows) + row;
@@ -235,7 +229,7 @@ public class MatCUDAid implements Ref2Did {
         JCublas.cublasSetVector(size, VecCUDAid.ELEMSIZE, Pointer.to(cuda), 1, id, 1);
     }
 
-    @Override
+    
     public Compd[][] toArray() {
         double[] array = toDoubleArray();
         Compd[][] result = new Compd[rows][cols];
@@ -255,7 +249,7 @@ public class MatCUDAid implements Ref2Did {
         return new Matid(toArray());
     }
 
-    @Override
+    
     public MatCUDAi toFloat () {
         cuDoubleComplex[] array = new cuDoubleComplex[size];
         JCublas.cublasGetMatrix(rows, cols, Pointer.to(id), rows, array, 0, rows);
@@ -270,18 +264,18 @@ public class MatCUDAid implements Ref2Did {
         return result;
     }
 
-    @Override
+    
     public String toString() {
         Compd[][] array = toArray();
         StringBuilder builder = new StringBuilder();
-        for (int i=0;i<getRows();i++) {
+        for (int i = 0; i< rows(); i++) {
             builder.append(", ").append(new Vecid(array[i]).toString());
         }
 
         return "{ "+builder.substring(2)+" }";
     }
 
-    @Override
+    
     public MatCUDAid clone() {
         MatCUDAid clone = new MatCUDAid(rows, cols);
         JCublas.cublasZcopy(size, this.id, 1, clone.id, 1);

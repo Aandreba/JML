@@ -3,14 +3,12 @@ package org.jml.Vector.Double;
 import org.jml.Complex.Double.Compd;
 import org.jml.GPGPU.CUDA.CUDA;
 import org.jml.Matrix.Double.MatCUDAid;
-import org.jml.References.Double.Complex.Ref1Did;
 import jcuda.Pointer;
 import jcuda.Sizeof;
 import jcuda.jcublas.JCublas;
-
 import java.util.Arrays;
 
-public class VecCUDAid implements Ref1Did {
+public class VecCUDAid {
     final public static int ELEMSIZE = 2 * Sizeof.DOUBLE;
     static {
         CUDA.init();
@@ -198,12 +196,12 @@ public class VecCUDAid implements Ref1Did {
         return vals;
     }
 
-    @Override
+    
     public int getSize() {
         return size;
     }
 
-    @Override
+    
     public Compd get (int pos) {
         if (pos < 0 || pos >= size) {
             throw new IndexOutOfBoundsException();
@@ -215,7 +213,7 @@ public class VecCUDAid implements Ref1Did {
         return new Compd(array[j], array[j+1]);
     }
 
-    @Override
+    
     public void set (int pos, Compd val) {
         if (pos < 0 || pos >= size) {
             throw new IndexOutOfBoundsException();
@@ -229,7 +227,7 @@ public class VecCUDAid implements Ref1Did {
         JCublas.cublasSetVector(size, ELEMSIZE, Pointer.to(array), 1, id, 1);
     }
 
-    @Override
+    
     public Compd[] toArray() {
         double[] array = toDoubleArray();
         Compd[] result = new Compd[size];
@@ -254,7 +252,7 @@ public class VecCUDAid implements Ref1Did {
         return new MatCUDAid(this, size);
     }
 
-    @Override
+    
     public String toString() {
         Compd[] vals = toArray();
         StringBuilder builder = new StringBuilder();
@@ -266,7 +264,7 @@ public class VecCUDAid implements Ref1Did {
         return "{ " + builder.substring(2) + " }";
     }
 
-    @Override
+    
     public VecCUDAid clone() {
         VecCUDAid clone = new VecCUDAid(size);
         JCublas.cublasZcopy(size, id, 1, clone.id, 1);

@@ -6,8 +6,6 @@ import org.jml.GPGPU.OpenCL.Query;
 import org.jml.Complex.Double.Compd;
 import org.jml.Complex.Single.Comp;
 import org.jml.Matrix.Single.MatCLi;
-import org.jml.References.Double.Complex.Ref1Did;
-import org.jml.References.Double.Complex.Ref2Did;
 import org.jml.Vector.Double.VecCLid;
 import org.jml.Vector.Double.Vecid;
 import org.jml.Vector.Single.VecCLi;
@@ -17,7 +15,7 @@ import org.jocl.blast.CLBlastTranspose;
 import org.jocl.cl_event;
 import org.jocl.cl_mem;
 
-public class MatCLid implements Ref2Did {
+public class MatCLid {
     final VecCLid vector;
     final int rows, cols;
 
@@ -27,9 +25,9 @@ public class MatCLid implements Ref2Did {
         this.cols = cols;
     }
 
-    public MatCLid(Context context, Ref2Did values) {
-        this(context, values.getRows(), values.getCols());
-        this.vector.set(values.rowMajor().toArray());
+    public MatCLid(Context context, Matid values) {
+        this(context, values.rows(), values.cols());
+        this.vector.set(values.rowMajor());
     }
 
     public MatCLid(Context context, Vecid... values) {
@@ -38,7 +36,7 @@ public class MatCLid implements Ref2Did {
 
     public MatCLid(VecCLid vector, int cols) {
         this.vector = vector;
-        this.rows = vector.getSize() / cols;
+        this.rows = vector.size() / cols;
         this.cols = cols;
     }
 
@@ -50,7 +48,7 @@ public class MatCLid implements Ref2Did {
         this(Context.DEFAULT, rows, cols);
     }
 
-    public MatCLid(Ref2Did values) {
+    public MatCLid(Matid values) {
         this(Context.DEFAULT, values);
     }
 
@@ -216,7 +214,7 @@ public class MatCLid implements Ref2Did {
      * Calculates matrix reduced row echelon form
      */
     public MatCLid rref () {
-        int cols = getCols();
+        int cols = cols();
         MatCLid result = clone();
 
         for (int i=0;i<rows;i++) {
@@ -268,7 +266,7 @@ public class MatCLid implements Ref2Did {
         CompdBuffer buffer = new CompdBuffer(context, 1);
 
         cl_event event = new cl_event();
-        CLBlast.CLBlastDzsum(getRows(), buffer.getId(), 0, getId(), 0, getRows() + 1, context.queue, event);
+        CLBlast.CLBlastDzsum(rows(), buffer.getId(), 0, getId(), 0, rows() + 1, context.queue, event);
 
         Query.awaitEvents(event);
         return buffer.get(0);
@@ -279,7 +277,7 @@ public class MatCLid implements Ref2Did {
             throw new ArithmeticException("Tried to calculate exponential of non-square matrix");
         }
 
-        int n = getRows();
+        int n = rows();
         int k = 1;
         double factorial = 1;
         MatCLid pow = identity(getContext(), n);
@@ -315,7 +313,7 @@ public class MatCLid implements Ref2Did {
             throw new ArithmeticException("Tried to calculate negative power of matrix");
         }
 
-        MatCLid result = identity(getRows());
+        MatCLid result = identity(rows());
         for (int i=0;i<b;i++) {
             MatCLid newResult = result.mul(this);
             result.release();
@@ -325,22 +323,22 @@ public class MatCLid implements Ref2Did {
         return result;
     }
 
-    @Override
-    public int getRows() {
+    
+    public int rows() {
         return rows;
     }
 
-    @Override
-    public int getCols() {
+    
+    public int cols() {
         return cols;
     }
 
-    @Override
+    
     public Compd get (int row, int col) {
         return this.vector.get((row * cols) + col);
     }
 
-    @Override
+    
     public VecCLid get (int row) {
         if (row < 0 || row >= rows) {
             throw new IllegalArgumentException();
@@ -354,7 +352,7 @@ public class MatCLid implements Ref2Did {
         return result;
     }
 
-    @Override
+    
     public void set(int row, int col, Compd val) {
         this.vector.set((row * cols) + col, val);
     }
@@ -367,8 +365,8 @@ public class MatCLid implements Ref2Did {
         this.vector.set(row * cols, vals);
     }
 
-    public void set (int row, Ref1Did vals) {
-        if (cols != vals.getSize()) {
+    public void set (int row, Vecid vals) {
+        if (cols != vals.size()) {
             throw new IllegalArgumentException();
         }
 
@@ -376,7 +374,7 @@ public class MatCLid implements Ref2Did {
     }
 
     public void set (int row, VecCLid vals) {
-        if (cols != vals.getSize()) {
+        if (cols != vals.size()) {
             throw new IllegalArgumentException();
         }
 
@@ -398,12 +396,12 @@ public class MatCLid implements Ref2Did {
         return result;
     }
 
-    @Override
+    
     public MatCLid T () {
         return T(new Compd(1, 0));
     }
 
-    @Override
+    
     public Compd[][] toArray() {
         Compd[] array = vector.toArray();
         Compd[][] result = new Compd[rows][cols];
@@ -415,7 +413,7 @@ public class MatCLid implements Ref2Did {
         return result;
     }
 
-    @Override
+    
     public MatCLi toFloat () {
         Compd[] values = vector.toArray();
         Comp[] casted = new Comp[values.length];
@@ -430,18 +428,18 @@ public class MatCLid implements Ref2Did {
         this.vector.release();
     }
 
-    @Override
+    
     public String toString() {
         Compd[][] array = toArray();
         StringBuilder builder = new StringBuilder();
-        for (int i=0;i<getRows();i++) {
+        for (int i = 0; i< rows(); i++) {
             builder.append(", ").append(new Vecid(array[i]).toString());
         }
 
         return "{ "+builder.substring(2)+" }";
     }
 
-    @Override
+    
     public MatCLid clone() {
         MatCLid matrix = new MatCLid(getContext(), rows, cols);
 
@@ -452,7 +450,7 @@ public class MatCLid implements Ref2Did {
         return matrix;
     }
 
-    @Override
+    
     public boolean equals (Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

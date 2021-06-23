@@ -7,11 +7,9 @@ import org.jml.GPGPU.OpenCL.Query;
 import org.jml.Complex.Double.Compd;
 import org.jml.Complex.Single.Comp;
 import org.jml.Matrix.Single.MatCLi;
-import org.jml.References.Single.Complex.Ref1Di;
 import org.jml.Vector.Double.VecCLid;
 import org.jocl.blast.CLBlast;
 import org.jocl.cl_event;
-
 import java.util.Arrays;
 
 public class VecCLi extends CompBuffer {
@@ -19,8 +17,8 @@ public class VecCLi extends CompBuffer {
         super(context, size);
     }
 
-    public VecCLi(Context context, Ref1Di values) {
-        this(context, values.getSize());
+    public VecCLi(Context context, Veci values) {
+        this(context, values.size());
         set(values.toArray());
     }
 
@@ -33,12 +31,17 @@ public class VecCLi extends CompBuffer {
         super(Context.DEFAULT, size);
     }
 
-    public VecCLi(Ref1Di values) {
+    public VecCLi(Veci values) {
         this(Context.DEFAULT, values);
     }
 
     public VecCLi(Comp... values) {
         this(Context.DEFAULT, values);
+    }
+
+    public VecCLi (CompBuffer buffer) {
+        this(buffer.getContext(), buffer.size);
+        set(buffer.size, buffer, 0, 1, 0, 1);
     }
 
     private void checkCompatibility (VecCLi b) {
@@ -261,7 +264,6 @@ public class VecCLi extends CompBuffer {
         return matrix;
     }
 
-    @Override
     public VecCLid toDouble() {
         Comp[] values = toArray();
         Compd[] casted = new Compd[values.length];
@@ -289,7 +291,7 @@ public class VecCLi extends CompBuffer {
         Comp[] vals = toArray();
         StringBuilder builder = new StringBuilder();
 
-        for (int i=0;i<getSize();i++) {
+        for (int i = 0; i< size(); i++) {
             builder.append(", ").append(vals[i]);
         }
 

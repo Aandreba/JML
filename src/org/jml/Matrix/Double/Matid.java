@@ -1,16 +1,13 @@
 package org.jml.Matrix.Double;
 
-import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Complex.Double.Compd;
 import org.jml.Mathx.TaskManager;
 import org.jml.Matrix.Single.Mati;
-import org.jml.References.Double.Complex.Ref2Did;
 import org.jml.Vector.Double.Vecid;
-
 import java.util.Arrays;
 
-public class Matid implements Ref2Did {
+public class Matid {
     final protected Vecid[] values;
 
     public Matid(int rows, int cols) {
@@ -46,12 +43,12 @@ public class Matid implements Ref2Did {
         Vecid apply (int row);
     }
 
-    public int getRows () {
+    public int rows() {
         return values.length;
     }
 
-    public int getCols () {
-        return values[0].getSize();
+    public int cols() {
+        return values[0].size();
     }
 
     public Compd get (int row, int col) {
@@ -63,12 +60,12 @@ public class Matid implements Ref2Did {
     }
 
     public Vecid getCol (int col) {
-        if (col < 0 || col >= getCols()) {
+        if (col < 0 || col >= cols()) {
             throw new ArrayIndexOutOfBoundsException();
         }
 
-        Vecid vec = new Vecid(getCols());
-        for (int i=0;i<vec.getSize();i++) {
+        Vecid vec = new Vecid(cols());
+        for (int i = 0; i<vec.size(); i++) {
             vec.set(i, get(i, col));
         }
 
@@ -80,7 +77,7 @@ public class Matid implements Ref2Did {
     }
 
     public void set (int row, Vecid value) {
-        if (value.getSize() != getCols()) {
+        if (value.size() != cols()) {
             throw new ArrayIndexOutOfBoundsException();
         }
 
@@ -88,25 +85,25 @@ public class Matid implements Ref2Did {
     }
 
     public void setCol (int col, Vecid value) {
-        if (value.getSize() != getRows()) {
+        if (value.size() != rows()) {
             throw new ArrayIndexOutOfBoundsException();
         }
 
-        for (int i=0;i<getRows();i++) {
+        for (int i = 0; i< rows(); i++) {
             set(i, col, value.get(i));
         }
     }
 
     public boolean isSquare () {
-        return getRows() == getCols();
+        return rows() == cols();
     }
 
     private int finalRows (Matid b) {
-        return Math.min(getRows(), b.getRows());
+        return Math.min(rows(), b.rows());
     }
 
     private int finalCols (Matid b) {
-        return Math.min(getCols(), b.getCols());
+        return Math.min(cols(), b.cols());
     }
 
     public Matid foreach(Matid b, Vecid.VeciForEach forEach) {
@@ -124,8 +121,8 @@ public class Matid implements Ref2Did {
     }
 
     public Matid foreach(Compd b, Vecid.VeciForEach forEach) {
-        int rows = getRows();
-        int cols = getCols();
+        int rows = rows();
+        int cols = cols();
 
         Matid matrix = new Matid(rows, cols);
         for (int i=0;i<rows;i++) {
@@ -146,7 +143,7 @@ public class Matid implements Ref2Did {
 
         for (int i=0;i<rows;i++) {
             Vecid Vecitor = forEach.apply(i);
-            if (Vecitor.getSize() > cols) {
+            if (Vecitor.size() > cols) {
                 throw new IllegalArgumentException();
             }
 
@@ -173,7 +170,7 @@ public class Matid implements Ref2Did {
     }
 
     public Matid add (Vecid b) {
-        return foreach(getRows(), getCols(), (i, j) -> get(i, j).add(b.get(j)));
+        return foreach(rows(), cols(), (i, j) -> get(i, j).add(b.get(j)));
     }
 
     public Matid add (Compd b) {
@@ -189,7 +186,7 @@ public class Matid implements Ref2Did {
     }
 
     public Matid subtr (Vecid b) {
-        return foreach(getRows(), getCols(), (i, j) -> get(i, j).subtr(b.get(j)));
+        return foreach(rows(), cols(), (i, j) -> get(i, j).subtr(b.get(j)));
     }
 
     public Matid subtr (Compd b) {
@@ -201,21 +198,21 @@ public class Matid implements Ref2Did {
     }
 
     public Matid invSubtr (Vecid b) {
-        return foreach(getRows(), getCols(), (i, j) -> b.get(j).subtr(get(i, j)));
+        return foreach(rows(), cols(), (i, j) -> b.get(j).subtr(get(i, j)));
     }
 
     public Matid invSubtr (Compd b) {
-        return foreach(getRows(), getCols(), (i, j) -> b.subtr(get(i, j)));
+        return foreach(rows(), cols(), (i, j) -> b.subtr(get(i, j)));
     }
 
     public Matid invSubtr (double b) {
-        return foreach(getRows(), getCols(), (i, j) -> get(i, j).invSubtr(b));
+        return foreach(rows(), cols(), (i, j) -> get(i, j).invSubtr(b));
     }
 
     public Matid mul (Matid b) {
-        int rows = getRows();
-        int cols = b.getCols();
-        int dig = Math.min(getCols(), b.getRows());
+        int rows = rows();
+        int cols = b.cols();
+        int dig = Math.min(cols(), b.rows());
 
         if (rows * cols <= 7500) {
             return foreach(rows, cols, (i, j) -> {
@@ -263,7 +260,7 @@ public class Matid implements Ref2Did {
     }
 
     public Matid scalMul (Vecid b) {
-        return foreach(getRows(), getCols(), (i, j) -> get(i, j).mul(b.get(j)));
+        return foreach(rows(), cols(), (i, j) -> get(i, j).mul(b.get(j)));
     }
 
     public Matid scalMul (Compd b) {
@@ -279,7 +276,7 @@ public class Matid implements Ref2Did {
     }
 
     public Matid scalDiv (Vecid b) {
-        return foreach(getRows(), getCols(), (i, j) -> get(i, j).div(b.get(j)));
+        return foreach(rows(), cols(), (i, j) -> get(i, j).div(b.get(j)));
     }
 
     public Matid scalDiv (Compd b) {
@@ -291,7 +288,7 @@ public class Matid implements Ref2Did {
     }
 
     public Matid scalInvDiv (Vecid b) {
-        return foreach(getRows(), getCols(), (i, j) -> b.get(j).div(get(i,j)));
+        return foreach(rows(), cols(), (i, j) -> b.get(j).div(get(i,j)));
     }
 
     public Matid scalInvDiv (Compd b) {
@@ -302,59 +299,48 @@ public class Matid implements Ref2Did {
         return foreach(b, (x, y) -> y.div(x));
     }
 
-    @Override
     public Matid conj() {
-        return Matid.foreach(getRows(), getCols(), (i, j) -> get(i,j).conj());
+        return Matid.foreach(rows(), cols(), (i, j) -> get(i,j).conj());
     }
 
-    public Matid inverse() {
-        int rows = getRows();
-        if (rows != getCols()) {
-            throw new ArithmeticException("Tried to invert non-square matrix");
+    public Matid inverse () {
+        int n = cols();
+        int n2 = 2 * n;
+        Matid matrix = new Matid(rows(), n2);
+
+        for (int i = 0; i< rows(); i++) {
+            Vecid vector = new Vecid(n2);
+            for (int j=0;j<n;j++) {
+                vector.set(j, get(i,j));
+            }
+
+            vector.set(n + i, Compd.ONE);
+            matrix.set(i, vector);
         }
 
-        return adj().scalMul(det().inverse());
-    }
+        Matid rref = matrix.rref();
+        Matid result = new Matid(rows(), n);
 
-    public Matid cofactor () {
-        int rows = getRows();
-        if (rows != getCols()) {
-            throw new ArithmeticException("Tried to calculate cofactor of non-square matrix");
-        }
-
-        if (rows == 2) {
-            return new Matid(new Vecid(get(1, 1), get(0, 1).mul(-1)), new Vecid(get(1, 0).mul(-1), get(0, 0)));
-        }
-
-        int rowsm1 = rows - 1;
-        Matid matrix = new Matid(rows, rows);
-
-        for (int i=0;i<rows;i++) {
-            for (int j=0;j<rows;j++) {
-                Matid det = new Matid(rowsm1, rowsm1);
-
-                for (int x=0;x<rowsm1;x++) {
-                    int X = x < i ? x : x + 1;
-                    for (int y=0;y<rowsm1;y++) {
-                        int Y = y < j ? y : y + 1;
-                        det.set(x, y, get(X, Y));
-                    }
-                }
-
-                matrix.set(i, j, ((i+j) & 1) == 1 ? det.det().mul(-1) : det.det());
+        for (int i = 0; i< rows(); i++) {
+            for (int j=0;j<n;j++) {
+                result.set(i, j, rref.get(i,n + j));
             }
         }
 
-        return matrix;
+        return result;
+    }
+
+    public Matid cofactor () {
+        return adj().T();
     }
 
     public Matid adj () {
-        return cofactor().T();
+        return inverse().scalMul(det());
     }
 
     public Compd det () {
-        int k = getRows();
-        if (k != getCols()) {
+        int k = rows();
+        if (k != cols()) {
             throw new ArithmeticException("Tried to calculate determinant of non-square matrix");
         } else if (k == 2) {
             return get(0, 0).mul(get(1, 1)).subtr(get(1, 0).mul(get(0, 1)));
@@ -387,7 +373,7 @@ public class Matid implements Ref2Did {
             throw new ArithmeticException("Tried to calculate negative power of matrix");
         }
 
-        Matid result = identity(getRows());
+        Matid result = identity(rows());
         for (int i=0;i<x;i++) {
             result = result.mul(this);
         }
@@ -400,7 +386,7 @@ public class Matid implements Ref2Did {
             throw new ArithmeticException("Tried to calculate exponential of non-square matrix");
         }
 
-        int n = getRows();
+        int n = rows();
         int k = 1;
         double factorial = 1;
         Matid pow = identity(n);
@@ -420,15 +406,35 @@ public class Matid implements Ref2Did {
         return result;
     }
 
+    public Matid rref () {
+        Matid result = clone();
+        for (int i = 0; i< rows(); i++) {
+            if (result.get(i,i).modulus() <= 1e-15) {
+                continue;
+            }
+
+            result.set(i, result.get(i).div(result.get(i,i)));
+            for (int j = 0; j< rows(); j++) {
+                if (i == j) {
+                    continue;
+                }
+
+                result.set(j, result.get(j).subtr(result.get(i).mul(result.get(j,i))));
+            }
+        }
+
+        return result;
+    }
+
     public Matid T () {
-        int rows = getCols();
-        int cols = getRows();
+        int rows = cols();
+        int cols = rows();
 
         return foreach(rows, cols, (i, j) -> get(j, i));
     }
 
     public Mati toFloat () {
-        return Mati.foreach(getRows(), getCols(), (i, j) -> get(i, j).toFloat());
+        return Mati.foreach(rows(), cols(), (i, j) -> get(i, j).toFloat());
     }
 
     public MatCUDAid toCUDA () {
@@ -443,43 +449,58 @@ public class Matid implements Ref2Did {
         return toCL(Context.DEFAULT);
     }
 
-    public Vecid toVectorRow () {
-        return Vecid.fromRef(rowMajor());
-    }
-
-    public Vecid toVectorCol () {
-        return Vecid.fromRef(colMajor());
-    }
-
     public static Matid identity (int k) {
-        return foreach(k, k, (i, j) -> i == j ? new Compd(1,0) : new Compd());
+        return foreach(k, k, (i, j) -> i == j ? Compd.ONE : Compd.ZERO);
     }
 
-    public static Matid fromRef (Ref2Did ref) {
-        return ref instanceof Matid ? (Matid) ref : foreach(ref.getRows(), ref.getCols(), (MatiForEachIndex) ref::get);
+    public Compd[] rowMajor () {
+        int n = cols();
+        int m = rows();
+        Compd[] array = new Compd[n * m];
+
+        for (int i=0;i<m;i++) {
+            for (int j=0;j<n;j++) {
+                array[(i * n) + j] = get(i, j);
+            }
+        }
+
+        return array;
     }
 
-    @Override
+    public Compd[] colMajor () {
+        int m = cols();
+        int n = rows();
+        Compd[] array = new Compd[m * n];
+
+        for (int i=0;i<n;i++) {
+            for (int j=0;j<m;j++) {
+                array[(j * n) + i] = get(i, j);
+            }
+        }
+
+        return array;
+    }
+
     public Matid clone() {
-        Matid matrix = new Matid(getRows(), getCols());
-        for (int i=0;i<getRows();i++) {
+        Matid matrix = new Matid(rows(), cols());
+        for (int i = 0; i< rows(); i++) {
             matrix.set(i, get(i).clone());
         }
 
         return matrix;
     }
 
-    @Override
+    
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        for (int i=0;i<getRows();i++) {
+        for (int i = 0; i< rows(); i++) {
             builder.append(", ").append(get(i));
         }
 
         return "{ "+builder.substring(2)+" }";
     }
 
-    @Override
+    
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -487,7 +508,7 @@ public class Matid implements Ref2Did {
         return Arrays.equals(values, ref1Dis.values);
     }
 
-    @Override
+    
     public int hashCode() {
         return Arrays.hashCode(values);
     }

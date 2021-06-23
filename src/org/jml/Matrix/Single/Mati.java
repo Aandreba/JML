@@ -5,13 +5,12 @@ import org.jml.Complex.Single.Comp;
 import org.jml.Mathx.Mathf;
 import org.jml.Mathx.TaskManager;
 import org.jml.Matrix.Double.Matid;
-import org.jml.References.Single.Complex.Ref2Di;
 import org.jml.Vector.Single.Veci;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;
 
-public class Mati implements Ref2Di {
+public class Mati {
     final protected Veci[] values;
 
     public Mati(int rows, int cols) {
@@ -48,12 +47,12 @@ public class Mati implements Ref2Di {
         Veci apply (int row);
     }
 
-    public int getRows () {
+    public int rows() {
         return values.length;
     }
 
-    public int getCols () {
-        return values[0].getSize();
+    public int cols() {
+        return values[0].size();
     }
 
     public Comp get (int row, int col) {
@@ -65,12 +64,12 @@ public class Mati implements Ref2Di {
     }
 
     public Veci getCol (int col) {
-        if (col < 0 || col >= getCols()) {
+        if (col < 0 || col >= cols()) {
             throw new ArrayIndexOutOfBoundsException();
         }
 
-        Veci vec = new Veci(getCols());
-        for (int i=0;i<getRows();i++) {
+        Veci vec = new Veci(cols());
+        for (int i = 0; i< rows(); i++) {
             vec.set(i, get(i, col));
         }
 
@@ -82,7 +81,7 @@ public class Mati implements Ref2Di {
     }
 
     public void set (int row, Veci value) {
-        if (value.getSize() != getCols()) {
+        if (value.size() != cols()) {
             throw new ArrayIndexOutOfBoundsException();
         }
 
@@ -90,25 +89,25 @@ public class Mati implements Ref2Di {
     }
 
     public void setCol (int col, Veci value) {
-        if (value.getSize() != getRows()) {
+        if (value.size() != rows()) {
             throw new ArrayIndexOutOfBoundsException();
         }
 
-        for (int i=0;i<getRows();i++) {
+        for (int i = 0; i< rows(); i++) {
             set(i, col, value.get(i));
         }
     }
 
     public boolean isSquare () {
-        return getRows() == getCols();
+        return rows() == cols();
     }
 
     private int finalRows (Mati b) {
-        return Math.min(getRows(), b.getRows());
+        return Math.min(rows(), b.rows());
     }
 
     private int finalCols (Mati b) {
-        return Math.min(getCols(), b.getCols());
+        return Math.min(cols(), b.cols());
     }
 
     public Mati foreach(Mati b, Veci.VecifForEach forEach) {
@@ -126,8 +125,8 @@ public class Mati implements Ref2Di {
     }
 
     public Mati foreach(Comp b, Veci.VecifForEach forEach) {
-        int rows = getRows();
-        int cols = getCols();
+        int rows = rows();
+        int cols = cols();
 
         Mati matrix = new Mati(rows, cols);
         for (int i=0;i<rows;i++) {
@@ -148,7 +147,7 @@ public class Mati implements Ref2Di {
 
         for (int i=0;i<rows;i++) {
             Veci Veciftor = forEach.apply(i);
-            if (Veciftor.getSize() > cols) {
+            if (Veciftor.size() > cols) {
                 throw new IllegalArgumentException();
             }
 
@@ -175,7 +174,7 @@ public class Mati implements Ref2Di {
     }
 
     public Mati add (Veci b) {
-        return foreach(getRows(), getCols(), (i, j) -> get(i, j).add(b.get(j)));
+        return foreach(rows(), cols(), (i, j) -> get(i, j).add(b.get(j)));
     }
 
     public Mati add (Comp b) {
@@ -191,7 +190,7 @@ public class Mati implements Ref2Di {
     }
 
     public Mati subtr (Veci b) {
-        return foreach(getRows(), getCols(), (i, j) -> get(i, j).subtr(b.get(j)));
+        return foreach(rows(), cols(), (i, j) -> get(i, j).subtr(b.get(j)));
     }
 
     public Mati subtr (Comp b) {
@@ -203,21 +202,21 @@ public class Mati implements Ref2Di {
     }
 
     public Mati invSubtr (Veci b) {
-        return foreach(getRows(), getCols(), (i, j) -> b.get(j).subtr(get(i, j)));
+        return foreach(rows(), cols(), (i, j) -> b.get(j).subtr(get(i, j)));
     }
 
     public Mati invSubtr (Comp b) {
-        return foreach(getRows(), getCols(), (i, j) -> b.subtr(get(i, j)));
+        return foreach(rows(), cols(), (i, j) -> b.subtr(get(i, j)));
     }
 
     public Mati invSubtr (float b) {
-        return foreach(getRows(), getCols(), (i, j) -> get(i, j).invSubtr(b));
+        return foreach(rows(), cols(), (i, j) -> get(i, j).invSubtr(b));
     }
 
     public Mati mul (Mati b) {
-        int rows = getRows();
-        int cols = b.getCols();
-        int dig = Math.min(getCols(), b.getRows());
+        int rows = rows();
+        int cols = b.cols();
+        int dig = Math.min(cols(), b.rows());
 
         if (rows * cols <= 7500) {
             return foreach(rows, cols, (i, j) -> {
@@ -265,7 +264,7 @@ public class Mati implements Ref2Di {
     }
 
     public Mati scalMul (Veci b) {
-        return foreach(getRows(), getCols(), (i, j) -> get(i, j).mul(b.get(j)));
+        return foreach(rows(), cols(), (i, j) -> get(i, j).mul(b.get(j)));
     }
 
     public Mati scalMul (Comp b) {
@@ -281,7 +280,7 @@ public class Mati implements Ref2Di {
     }
 
     public Mati scalDiv (Veci b) {
-        return foreach(getRows(), getCols(), (i, j) -> get(i, j).div(b.get(j)));
+        return foreach(rows(), cols(), (i, j) -> get(i, j).div(b.get(j)));
     }
 
     public Mati scalDiv (Comp b) {
@@ -293,7 +292,7 @@ public class Mati implements Ref2Di {
     }
 
     public Mati scalInvDiv (Veci b) {
-        return foreach(getRows(), getCols(), (i, j) -> b.get(j).div(get(i,j)));
+        return foreach(rows(), cols(), (i, j) -> b.get(j).div(get(i,j)));
     }
 
     public Mati scalInvDiv (Comp b) {
@@ -304,17 +303,17 @@ public class Mati implements Ref2Di {
         return foreach(b, (x, y) -> y.div(x));
     }
 
-    @Override
+    
     public Mati conj() {
-        return Mati.foreach(getRows(), getCols(), (i, j) -> get(i,j).conj());
+        return Mati.foreach(rows(), cols(), (i, j) -> get(i,j).conj());
     }
 
     public Mati inverse () {
-        int n = getCols();
+        int n = cols();
         int n2 = 2 * n;
-        Mati matrix = new Mati(getRows(), n2);
+        Mati matrix = new Mati(rows(), n2);
 
-        for (int i=0;i<getRows();i++) {
+        for (int i = 0; i< rows(); i++) {
             Veci vector = new Veci(n2);
             for (int j=0;j<n;j++) {
                 vector.set(j, get(i,j));
@@ -325,9 +324,9 @@ public class Mati implements Ref2Di {
         }
 
         Mati rref = matrix.rref();
-        Mati result = new Mati(getRows(), n);
+        Mati result = new Mati(rows(), n);
 
-        for (int i=0;i<getRows();i++) {
+        for (int i = 0; i< rows(); i++) {
             for (int j=0;j<n;j++) {
                 result.set(i, j, rref.get(i,n + j));
             }
@@ -350,7 +349,7 @@ public class Mati implements Ref2Di {
         }
 
         Comp sum = Comp.ZERO;
-        for (int i=0;i<getRows();i++) {
+        for (int i = 0; i< rows(); i++) {
             sum = sum.add(get(i,i));
         }
 
@@ -358,8 +357,8 @@ public class Mati implements Ref2Di {
     }
 
     public Comp det () {
-        int k = getRows();
-        if (k != getCols()) {
+        int k = rows();
+        if (k != cols()) {
             throw new ArithmeticException("Tried to calculate determinant of non-square matrix");
         } else if (k == 2) {
             return get(0, 0).mul(get(1, 1)).subtr(get(1, 0).mul(get(0, 1)));
@@ -390,7 +389,7 @@ public class Mati implements Ref2Di {
             throw new ArithmeticException("Tried to calculate exponential of non-square matrix");
         }
 
-        int n = getRows();
+        int n = rows();
         int k = 1;
         long factorial = 1;
         Mati pow = identity(n);
@@ -412,13 +411,13 @@ public class Mati implements Ref2Di {
 
     public Mati rref () {
         Mati result = clone();
-        for (int i=0;i<getRows();i++) {
+        for (int i = 0; i< rows(); i++) {
             if (result.get(i,i).modulus() <= 1e-6f) {
                 continue;
             }
 
             result.set(i, result.get(i).div(result.get(i,i)));
-            for (int j=0;j<getRows();j++) {
+            for (int j = 0; j< rows(); j++) {
                 if (i == j) {
                     continue;
                 }
@@ -437,7 +436,7 @@ public class Mati implements Ref2Di {
             throw new ArithmeticException("Tried to calculate negative power of matrix");
         }
 
-        Mati result = identity(getRows());
+        Mati result = identity(rows());
         for (int i=0;i<x;i++) {
             result = result.mul(this);
         }
@@ -447,7 +446,7 @@ public class Mati implements Ref2Di {
 
     public Mati sqrt () {
         Mati y = this;
-        Mati z = identity(getRows());
+        Mati z = identity(rows());
 
         int n = 1;
         while (n <= 1000) {
@@ -485,14 +484,14 @@ public class Mati implements Ref2Di {
     }
 
     public Mati T () {
-        int rows = getCols();
-        int cols = getRows();
+        int rows = cols();
+        int cols = rows();
 
         return foreach(rows, cols, (i, j) -> get(j, i));
     }
 
     public Matid toDouble () {
-        return Matid.foreach(getRows(), getCols(), (i, j) -> get(i, j).toDouble());
+        return Matid.foreach(rows(), cols(), (i, j) -> get(i, j).toDouble());
     }
 
     public MatCLi toCL(Context context) {
@@ -507,43 +506,58 @@ public class Mati implements Ref2Di {
         return new MatCUDAi(this);
     }
 
-    public Veci toVectorRow () {
-        return Veci.fromRef(rowMajor());
+    public Comp[] rowMajor () {
+        int n = cols();
+        int m = rows();
+        Comp[] array = new Comp[n * m];
+
+        for (int i=0;i<m;i++) {
+            for (int j=0;j<n;j++) {
+                array[(i * n) + j] = get(i, j);
+            }
+        }
+
+        return array;
     }
 
-    public Veci toVectorCol () {
-        return Veci.fromRef(colMajor());
+    public Comp[] colMajor () {
+        int m = cols();
+        int n = rows();
+        Comp[] array = new Comp[m * n];
+
+        for (int i=0;i<n;i++) {
+            for (int j=0;j<m;j++) {
+                array[(j * n) + i] = get(i, j);
+            }
+        }
+
+        return array;
     }
 
     public static Mati identity (int k) {
         return foreach(k, k, (i, j) -> i == j ? new Comp(1,0) : new Comp());
     }
-
-    public static Mati fromRef (Ref2Di ref) {
-        return ref instanceof Mati ? (Mati) ref : foreach(ref.getRows(), ref.getCols(), (MatifForEachIndex) ref::get);
-    }
-
-    @Override
+    
     public Mati clone() {
-        Mati matrix = new Mati(getRows(), getCols());
-        for (int i=0;i<getRows();i++) {
+        Mati matrix = new Mati(rows(), cols());
+        for (int i = 0; i< rows(); i++) {
             matrix.set(i, get(i).clone());
         }
 
         return matrix;
     }
 
-    @Override
+    
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        for (int i=0;i<getRows();i++) {
+        for (int i = 0; i< rows(); i++) {
             builder.append(", ").append(get(i));
         }
 
         return "{ "+builder.substring(2)+" }";
     }
 
-    @Override
+    
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -551,7 +565,7 @@ public class Mati implements Ref2Di {
         return Arrays.equals(values, ref1Difs.values);
     }
 
-    @Override
+    
     public int hashCode() {
         return Arrays.hashCode(values);
     }
@@ -560,7 +574,7 @@ public class Mati implements Ref2Di {
         final public Mati l, u;
 
         private LU () {
-            int n = getRows();
+            int n = rows();
             int nm1 = n - 1;
             this.l = identity(n);
             this.u = new Mati(n, n);
@@ -591,7 +605,7 @@ public class Mati implements Ref2Di {
             u.set(nm1, nm1, get(nm1, nm1).subtr(sum));
         }
 
-        @Override
+        
         public String toString() {
             return "LU {" +
                     "l=" + l +
@@ -607,14 +621,14 @@ public class Mati implements Ref2Di {
             final BiFunction<Veci, Veci, Veci> projFunc = (u, a) -> u.mul(u.inner(a).div(u.inner(u)));
 
             Mati a = T();
-            Veci[] u = new Veci[getCols()];
-            Veci[] e = new Veci[getCols()];
+            Veci[] u = new Veci[cols()];
+            Veci[] e = new Veci[cols()];
 
             u[0] = a.get(0);
             e[0] = u[0].unit();
 
-            for (int i=1;i<getCols();i++) {
-                Veci proj = new Veci(getCols());
+            for (int i = 1; i< cols(); i++) {
+                Veci proj = new Veci(cols());
                 for (int j=0;j<i;j++) {
                     proj = proj.add(projFunc.apply(u[j], a.get(i)));
                 }
@@ -624,10 +638,10 @@ public class Mati implements Ref2Di {
             }
 
             this.q = new Mati(e).T();
-            this.r = Mati.foreach(getRows(), getCols(), (i, j) -> j >= i ? e[i].dot(a.get(j)) : Comp.ZERO);
+            this.r = Mati.foreach(rows(), cols(), (i, j) -> j >= i ? e[i].dot(a.get(j)) : Comp.ZERO);
         }
 
-        @Override
+        
         public String toString() {
             return "QR {" +
                     "q=" + q +

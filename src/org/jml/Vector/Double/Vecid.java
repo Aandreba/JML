@@ -1,20 +1,20 @@
 package org.jml.Vector.Double;
 
+import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Complex.Double.Compd;
 import org.jml.Matrix.Double.Matid;
-import org.jml.References.Double.Complex.Ref1Did;
 import org.jml.Vector.Single.Veci;
 
 import java.util.Arrays;
 
-public class Vecid implements Ref1Did {
+public class Vecid {
     final protected Compd[] values;
 
     public Vecid(int size) {
         this.values = new Compd[size];
         for (int i=0;i<size;i++) {
-            this.values[i] = Compd.ZERO.clone();
+            this.values[i] = Compd.ZERO;
         }
     }
 
@@ -30,25 +30,21 @@ public class Vecid implements Ref1Did {
     }
 
     public Vecid(Vecid initialValues, Compd... finalValues) {
-        int vecSize = initialValues.getSize();
+        int vecSize = initialValues.size();
         this.values = new Compd[vecSize + finalValues.length];
 
         for (int i=0;i<vecSize;i++) {
             this.values[i] = initialValues.get(i);
         }
 
-        for (int i=0;i<finalValues.length;i++) {
-            this.values[vecSize + i] = finalValues[i];
-        }
+        System.arraycopy(finalValues, 0, this.values, vecSize, finalValues.length);
     }
 
     public Vecid(Compd[] initialValues, Vecid finalValues) {
-        int vecSize = finalValues.getSize();
+        int vecSize = finalValues.size();
         this.values = new Compd[initialValues.length + vecSize];
 
-        for (int i=0;i<initialValues.length;i++) {
-            this.values[i] = initialValues[i];
-        }
+        System.arraycopy(initialValues, 0, this.values, 0, initialValues.length);
 
         for (int i=0;i<vecSize;i++) {
             this.values[initialValues.length + i] = finalValues.get(i);
@@ -67,7 +63,7 @@ public class Vecid implements Ref1Did {
         Compd apply (Compd pos);
     }
 
-    public int getSize () {
+    public int size () {
         return values.length;
     }
 
@@ -75,12 +71,32 @@ public class Vecid implements Ref1Did {
         return this.values[pos];
     }
 
+    public void set (Vecid values) {
+        if (values.size() != size()) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        for (int i=0;i<size();i++) {
+            this.values[i] = values.get(i);
+        }
+    }
+
+    public void set (Compd... values) {
+        if (values.length != size()) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        for (int i=0;i<size();i++) {
+            this.values[i] = values[i];
+        }
+    }
+
     public void set (int pos, Compd value) {
         this.values[pos] = value;
     }
 
     private int finalLen (Vecid b) {
-        return Math.min(getSize(), b.getSize());
+        return Math.min(size(), b.size());
     }
 
     public Vecid foreach(Vecid b, VeciForEach forEach) {
@@ -95,7 +111,7 @@ public class Vecid implements Ref1Did {
     }
 
     public Vecid foreach(Compd b, VeciForEach forEach) {
-        int size = getSize();
+        int size = size();
         Vecid vector = new Vecid(size);
 
         for (int i=0;i<size;i++) {
@@ -110,7 +126,7 @@ public class Vecid implements Ref1Did {
     }
 
     public Vecid foreach(VeciForEachValue forEach) {
-        int size = getSize();
+        int size = size();
         Vecid vector = new Vecid(size);
 
         for (int i=0;i<size;i++) {
@@ -193,14 +209,14 @@ public class Vecid implements Ref1Did {
         return foreach(b, (x, y) -> y.div(x));
     }
 
-    @Override
+    
     public Vecid conj() {
-        return Vecid.foreach(getSize(), i -> get(i).conj());
+        return Vecid.foreach(size(), i -> get(i).conj());
     }
 
     public double magnitude2 () {
         double sum = 0;
-        for (int i=0;i<getSize();i++) {
+        for (int i = 0; i< size(); i++) {
             double mod = get(i).modulus();
             sum += mod * mod;
         }
@@ -242,7 +258,7 @@ public class Vecid implements Ref1Did {
 
     public Compd sum () {
         Compd val = new Compd();
-        for (int i=0;i<getSize();i++) {
+        for (int i = 0; i< size(); i++) {
             val = val.add(get(i));
         }
 
@@ -250,7 +266,7 @@ public class Vecid implements Ref1Did {
     }
 
     public Compd mean () {
-        return sum().div(getSize());
+        return sum().div(size());
     }
 
     public Vecid sub (int... pos) { // Subvector
@@ -262,14 +278,13 @@ public class Vecid implements Ref1Did {
         return vector;
     }
 
-    @Override
     public Compd[] toArray() {
         return values.clone();
     }
 
     public Veci toFloat () {
-        Veci vector = new Veci(getSize());
-        for (int i=0;i<getSize();i++) {
+        Veci vector = new Veci(size());
+        for (int i = 0; i< size(); i++) {
             vector.set(i, get(i).toFloat());
         }
 
@@ -296,26 +311,19 @@ public class Vecid implements Ref1Did {
         return rowMatrix().T();
     }
 
-    public static Vecid fromRef (Ref1Did ref) {
-        return ref instanceof Vecid ? (Vecid) ref : foreach(ref.getSize(), ref::get);
-    }
-
-    @Override
     public Vecid clone() {
         return new Vecid(values.clone());
     }
 
-    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        for (int i=0;i<getSize();i++) {
+        for (int i = 0; i< size(); i++) {
             builder.append(", ").append(get(i));
         }
 
         return "{ " + builder.substring(2) + " }";
     }
-
-    @Override
+    
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -323,7 +331,7 @@ public class Vecid implements Ref1Did {
         return Arrays.equals(values, compds.values);
     }
 
-    @Override
+    
     public int hashCode() {
         return Arrays.hashCode(values);
     }

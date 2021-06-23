@@ -2,15 +2,14 @@ package org.jml.GPGPU.OpenCL.Buffer;
 
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.GPGPU.OpenCL.Query;
-import org.jml.References.Single.Ref1D;
+import org.jml.Vector.Single.Vec;
 import org.jocl.*;
 import org.jocl.blast.CLBlast;
-
 import java.util.Arrays;
 
 import static org.jocl.CL.*;
 
-public class FloatBuffer extends Buffer implements Ref1D {
+public class FloatBuffer extends Buffer {
     final public int size;
 
     public FloatBuffer (Context context, int size) {
@@ -23,12 +22,10 @@ public class FloatBuffer extends Buffer implements Ref1D {
         set(values);
     }
 
-    @Override
-    public int getSize() {
+    public int size() {
         return size;
     }
 
-    @Override
     public float get (int pos) {
         if (pos < 0 || pos >= size) {
             throw new IllegalArgumentException();
@@ -67,7 +64,7 @@ public class FloatBuffer extends Buffer implements Ref1D {
         Query.awaitEvents(event);
     }
 
-    @Override
+    
     public void set (int pos, float val) {
         if (pos < 0 || pos >= size) {
             throw new IllegalArgumentException();
@@ -78,12 +75,10 @@ public class FloatBuffer extends Buffer implements Ref1D {
         Query.awaitEvents(event);
     }
 
-    @Override
-    public void set (Ref1D values) {
+    public void set (Vec values) {
         set(values.toArray());
     }
-
-    @Override
+    
     public float[] toArray() {
         float[] array = new float[size];
 
@@ -94,12 +89,10 @@ public class FloatBuffer extends Buffer implements Ref1D {
         return array;
     }
 
-    @Override
     public String toString() {
         return Arrays.toString(toArray());
     }
 
-    @Override
     public FloatBuffer clone() {
         FloatBuffer vector = new FloatBuffer(getContext(), size);
 

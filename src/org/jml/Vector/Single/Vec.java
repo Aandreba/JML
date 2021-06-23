@@ -1,14 +1,13 @@
 package org.jml.Vector.Single;
 
+import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Mathx.Mathf;
 import org.jml.Matrix.Single.Mat;
-import org.jml.References.Single.Ref1D;
 import org.jml.Vector.Double.Vecd;
-
 import java.util.Arrays;
 
-public class Vec implements Ref1D {
+public class Vec {
     final protected float[] values;
 
     public Vec(int size) {
@@ -20,7 +19,7 @@ public class Vec implements Ref1D {
     }
 
     public Vec(Vec initialValues, float... finalValues) {
-        int vecSize = initialValues.getSize();
+        int vecSize = initialValues.size();
         this.values = new float[vecSize + finalValues.length];
 
         for (int i=0;i<vecSize;i++) {
@@ -32,8 +31,8 @@ public class Vec implements Ref1D {
         }
     }
 
-    public Vec(float[] initialValues, Ref1D finalValues) {
-        int vecSize = finalValues.getSize();
+    public Vec(float[] initialValues, Vec finalValues) {
+        int vecSize = finalValues.size();
         this.values = new float[initialValues.length + vecSize];
 
         for (int i=0;i<initialValues.length;i++) {
@@ -57,7 +56,7 @@ public class Vec implements Ref1D {
         float apply (float value);
     }
 
-    public int getSize () {
+    public int size () {
         return values.length;
     }
 
@@ -65,12 +64,32 @@ public class Vec implements Ref1D {
         return this.values[pos];
     }
 
+    public void set (Vec values) {
+        if (values.size() != size()) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        for (int i=0;i<size();i++) {
+            this.values[i] = values.get(i);
+        }
+    }
+
+    public void set (float... values) {
+        if (values.length != size()) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        for (int i=0;i<size();i++) {
+            this.values[i] = values[i];
+        }
+    }
+
     public void set (int pos, float value) {
         this.values[pos] = value;
     }
 
     private int finalLen (Vec b) {
-        return Math.min(getSize(), b.getSize());
+        return Math.min(size(), b.size());
     }
 
     public Vec foreach(Vec b, VecfForEach forEach) {
@@ -85,7 +104,7 @@ public class Vec implements Ref1D {
     }
 
     public Vec foreach(float b, VecfForEach forEach) {
-        int size = getSize();
+        int size = size();
         Vec vector = new Vec(size);
 
         for (int i=0;i<size;i++) {
@@ -96,7 +115,7 @@ public class Vec implements Ref1D {
     }
 
     public Vec foreach(VecfForEachValue forEach) {
-        int size = getSize();
+        int size = size();
         Vec vector = new Vec(size);
 
         for (int i=0;i<size;i++) {
@@ -157,7 +176,7 @@ public class Vec implements Ref1D {
 
     public float magnitude2 () {
         float sum = 0;
-        for (int i=0;i<getSize();i++) {
+        for (int i = 0; i< size(); i++) {
             sum += get(i) * get(i);
         }
 
@@ -198,7 +217,7 @@ public class Vec implements Ref1D {
 
     public float sum () {
         float val = 0;
-        for (int i=0;i<getSize();i++) {
+        for (int i = 0; i< size(); i++) {
             val += get(i);
         }
 
@@ -206,16 +225,16 @@ public class Vec implements Ref1D {
     }
 
     public Vec abs () {
-        return foreach(getSize(), i -> Mathf.abs(get(i)));
+        return foreach(size(), i -> Mathf.abs(get(i)));
     }
 
     public float mean () {
-        return sum() / getSize();
+        return sum() / size();
     }
 
     public int minIndex () {
         int min = 0;
-        for (int i=0;i<getSize();i++) {
+        for (int i = 0; i< size(); i++) {
             if (i == 0 || get(i) < get(min)) {
                 min = i;
             }
@@ -226,7 +245,7 @@ public class Vec implements Ref1D {
 
     public float min () {
         float min = 0;
-        for (int i=0;i<getSize();i++) {
+        for (int i = 0; i< size(); i++) {
             if (i == 0 || get(i) < min) {
                 min = get(i);
             }
@@ -237,7 +256,7 @@ public class Vec implements Ref1D {
 
     public int maxIndex () {
         int max = 0;
-        for (int i=0;i<getSize();i++) {
+        for (int i = 0; i< size(); i++) {
             if (i == 0 || get(i) > get(max)) {
                 max = i;
             }
@@ -248,7 +267,7 @@ public class Vec implements Ref1D {
 
     public float max () {
         float max = 0;
-        for (int i=0;i<getSize();i++) {
+        for (int i = 0; i< size(); i++) {
             if (i == 0 || get(i) > max) {
                 max = get(i);
             }
@@ -266,21 +285,21 @@ public class Vec implements Ref1D {
         return vector;
     }
 
-    @Override
+    
     public float[] toArray() {
         return values.clone();
     }
 
     public Vecd toDouble () {
-        Vecd vector = new Vecd(getSize());
-        for (int i=0;i<getSize();i++) {
+        Vecd vector = new Vecd(size());
+        for (int i = 0; i< size(); i++) {
             vector.set(i, get(i));
         }
 
         return vector;
     }
 
-    @Override
+    
     public Veci toComplex() {
         return new Veci(values);
     }
@@ -305,26 +324,20 @@ public class Vec implements Ref1D {
         return rowMatrix().T();
     }
 
-    public static Vec fromRef (Ref1D ref) {
-        return ref instanceof Vec ? (Vec) ref : foreach(ref.getSize(), ref::get);
-    }
-
-    @Override
     public Vec clone() {
         return new Vec(values.clone());
     }
-
-    @Override
+    
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        for (int i=0;i<getSize();i++) {
+        for (int i = 0; i< size(); i++) {
             builder.append(", ").append(get(i));
         }
 
         return "{ " + builder.substring(2) + " }";
     }
 
-    @Override
+    
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -332,7 +345,7 @@ public class Vec implements Ref1D {
         return Arrays.equals(values, floats.values);
     }
 
-    @Override
+    
     public int hashCode() {
         return Arrays.hashCode(values);
     }

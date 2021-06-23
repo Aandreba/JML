@@ -27,9 +27,9 @@ public class Tasks {
     }
 
     public static Matd mul (Matd a, Matd b) {
-        int rows = a.getRows();
-        int cols = b.getCols();
-        int dig = Math.min(a.getCols(), b.getRows());
+        int rows = a.rows();
+        int cols = b.cols();
+        int dig = Math.min(a.cols(), b.rows());
 
         return Matd.foreach(rows, cols, (i, j) -> {
             double sum = 0;

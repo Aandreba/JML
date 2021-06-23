@@ -249,7 +249,7 @@ final public class Rand {
         float x = Rand.getFloat();
         float y = 0;
 
-        for (int i=0;i<weights.getSize();i++) {
+        for (int i = 0; i<weights.size(); i++) {
             y += weights.get(i);
             if (y >= x) {
                 return i;

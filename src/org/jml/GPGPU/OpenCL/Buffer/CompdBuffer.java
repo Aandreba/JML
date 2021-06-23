@@ -3,17 +3,17 @@ package org.jml.GPGPU.OpenCL.Buffer;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.GPGPU.OpenCL.Query;
 import org.jml.Complex.Double.Compd;
-import org.jml.References.Double.Complex.Ref1Did;
+import org.jml.Vector.Double.Vecd;
+import org.jml.Vector.Double.Vecid;
 import org.jocl.Pointer;
 import org.jocl.Sizeof;
 import org.jocl.blast.CLBlast;
 import org.jocl.cl_event;
-
 import java.util.Arrays;
 
 import static org.jocl.CL.*;
 
-public class CompdBuffer extends Buffer implements Ref1Did {
+public class CompdBuffer extends Buffer {
     final public int size;
 
     public CompdBuffer(Context context, int size) {
@@ -26,12 +26,11 @@ public class CompdBuffer extends Buffer implements Ref1Did {
         set(values);
     }
 
-    @Override
-    public int getSize() {
+    public int size () {
         return size;
     }
 
-    @Override
+    
     public Compd get (int pos) {
         if (pos < 0 || pos >= size) {
             throw new IllegalArgumentException();
@@ -41,6 +40,13 @@ public class CompdBuffer extends Buffer implements Ref1Did {
         clEnqueueReadBuffer(context.queue, this.id, CL_TRUE, Sizeof.cl_double2 * pos, Sizeof.cl_double2, Pointer.to(array), 0, null, null);
 
         return new Compd(array[0], array[1]);
+    }
+
+    public void set (int len, CompdBuffer y, int offsetY, int incY, int offsetX, int incX) {
+        cl_event event = new cl_event();
+        CLBlast.CLBlastZcopy(len, y.id, offsetY, incY, getId(), offsetX, incX, context.queue, event);
+
+        Query.awaitEvents(event);
     }
 
     public void set (int offset, Compd... vals) {
@@ -63,7 +69,7 @@ public class CompdBuffer extends Buffer implements Ref1Did {
         Query.awaitEvents(event);
     }
 
-    @Override
+    
     public void set (int pos, Compd val) {
         if (pos < 0 || pos >= size) {
             throw new IllegalArgumentException();
@@ -73,13 +79,11 @@ public class CompdBuffer extends Buffer implements Ref1Did {
         clEnqueueWriteBuffer(context.queue, this.id, CL_TRUE, Sizeof.cl_double2 * pos, Sizeof.cl_double2, Pointer.to(getDoubles(val)), 0, null, event);
         Query.awaitEvents(event);
     }
-
-    @Override
-    public void set (Ref1Did values) {
+    
+    public void set (Vecid values) {
         set(values.toArray());
     }
 
-    @Override
     public Compd[] toArray() {
         double[] array = new double[2 * size];
 
@@ -96,12 +100,12 @@ public class CompdBuffer extends Buffer implements Ref1Did {
         return values;
     }
 
-    @Override
+    
     public String toString() {
         return Arrays.toString(toArray());
     }
 
-    @Override
+    
     public CompdBuffer clone() {
         CompdBuffer vector = new CompdBuffer(getContext(), size);
 

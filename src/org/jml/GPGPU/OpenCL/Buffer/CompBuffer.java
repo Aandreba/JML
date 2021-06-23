@@ -3,17 +3,16 @@ package org.jml.GPGPU.OpenCL.Buffer;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.GPGPU.OpenCL.Query;
 import org.jml.Complex.Single.Comp;
-import org.jml.References.Single.Complex.Ref1Di;
+import org.jml.Vector.Single.Veci;
 import org.jocl.Pointer;
 import org.jocl.Sizeof;
 import org.jocl.blast.CLBlast;
 import org.jocl.cl_event;
-
 import java.util.Arrays;
 
 import static org.jocl.CL.*;
 
-public class CompBuffer extends Buffer implements Ref1Di {
+public class CompBuffer extends Buffer {
     final public int size;
 
     public CompBuffer(Context context, int size) {
@@ -26,12 +25,10 @@ public class CompBuffer extends Buffer implements Ref1Di {
         set(values);
     }
 
-    @Override
-    public int getSize() {
+    public int size () {
         return size;
     }
 
-    @Override
     public Comp get (int pos) {
         if (pos < 0 || pos >= size) {
             throw new IllegalArgumentException();
@@ -70,7 +67,7 @@ public class CompBuffer extends Buffer implements Ref1Di {
         Query.awaitEvents(event);
     }
 
-    @Override
+    
     public void set (int pos, Comp val) {
         if (pos < 0 || pos >= size) {
             throw new IllegalArgumentException();
@@ -81,12 +78,10 @@ public class CompBuffer extends Buffer implements Ref1Di {
         Query.awaitEvents(event);
     }
 
-    @Override
-    public void set (Ref1Di values) {
+    public void set (Veci values) {
         set(values.toArray());
     }
-
-    @Override
+    
     public Comp[] toArray() {
         float[] array = new float[2 * size];
 
@@ -103,12 +98,10 @@ public class CompBuffer extends Buffer implements Ref1Di {
         return values;
     }
 
-    @Override
     public String toString() {
         return Arrays.toString(toArray());
     }
-
-    @Override
+    
     public CompBuffer clone() {
         CompBuffer vector = new CompBuffer(getContext(), size);
 

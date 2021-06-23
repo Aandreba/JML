@@ -4,12 +4,11 @@ import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Complex.Single.Comp;
 import org.jml.Mathx.Mathf;
 import org.jml.Matrix.Single.Mati;
-import org.jml.References.Single.Complex.Ref1Di;
 import org.jml.Vector.Double.Vecid;
 
 import java.util.Arrays;
 
-public class Veci implements Ref1Di {
+public class Veci {
     final protected Comp[] values;
 
     public Veci(int size) {
@@ -31,25 +30,21 @@ public class Veci implements Ref1Di {
     }
 
     public Veci(Veci initialValues, Comp... finalValues) {
-        int vecSize = initialValues.getSize();
+        int vecSize = initialValues.size();
         this.values = new Comp[vecSize + finalValues.length];
 
         for (int i=0;i<vecSize;i++) {
             this.values[i] = initialValues.get(i);
         }
 
-        for (int i=0;i<finalValues.length;i++) {
-            this.values[vecSize + i] = finalValues[i];
-        }
+        System.arraycopy(finalValues, 0, this.values, vecSize, finalValues.length);
     }
 
     public Veci(Comp[] initialValues, Veci finalValues) {
-        int vecSize = finalValues.getSize();
+        int vecSize = finalValues.size();
         this.values = new Comp[initialValues.length + vecSize];
 
-        for (int i=0;i<initialValues.length;i++) {
-            this.values[i] = initialValues[i];
-        }
+        System.arraycopy(initialValues, 0, this.values, 0, initialValues.length);
 
         for (int i=0;i<vecSize;i++) {
             this.values[initialValues.length + i] = finalValues.get(i);
@@ -64,7 +59,7 @@ public class Veci implements Ref1Di {
         Comp apply (int pos);
     }
 
-    public int getSize () {
+    public int size () {
         return values.length;
     }
 
@@ -72,12 +67,32 @@ public class Veci implements Ref1Di {
         return this.values[pos];
     }
 
+    public void set (Veci values) {
+        if (values.size() != size()) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        for (int i=0;i<size();i++) {
+            this.values[i] = values.get(i);
+        }
+    }
+
+    public void set (Comp... values) {
+        if (values.length != size()) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        for (int i=0;i<size();i++) {
+            this.values[i] = values[i];
+        }
+    }
+
     public void set (int pos, Comp value) {
         this.values[pos] = value;
     }
 
     private int finalLen (Veci b) {
-        return Math.min(getSize(), b.getSize());
+        return Math.min(size(), b.size());
     }
 
     public Veci foreach(Veci b, VecifForEach forEach) {
@@ -92,7 +107,7 @@ public class Veci implements Ref1Di {
     }
 
     public Veci foreach(Comp b, VecifForEach forEach) {
-        int size = getSize();
+        int size = size();
         Veci vector = new Veci(size);
 
         for (int i=0;i<size;i++) {
@@ -179,14 +194,13 @@ public class Veci implements Ref1Di {
         return foreach(b, (x, y) -> y.div(x));
     }
 
-    @Override
     public Veci conj() {
-        return Veci.foreach(getSize(), i -> get(i).conj());
+        return Veci.foreach(size(), i -> get(i).conj());
     }
 
     public float magnitude2 () {
         float sum = 0;
-        for (int i=0;i<getSize();i++) {
+        for (int i = 0; i< size(); i++) {
             float mod = get(i).modulus();
             sum += mod * mod;
         }
@@ -232,7 +246,7 @@ public class Veci implements Ref1Di {
 
     public Comp sum () {
         Comp val = new Comp();
-        for (int i=0;i<getSize();i++) {
+        for (int i = 0; i< size(); i++) {
             val = val.add(get(i));
         }
 
@@ -240,7 +254,7 @@ public class Veci implements Ref1Di {
     }
 
     public Comp mean () {
-        return sum().div(getSize());
+        return sum().div(size());
     }
 
     public Veci sub (int... pos) {
@@ -262,12 +276,16 @@ public class Veci implements Ref1Di {
     }
 
     public Vecid toDouble () {
-        Vecid vector = new Vecid(getSize());
-        for (int i=0;i<getSize();i++) {
+        Vecid vector = new Vecid(size());
+        for (int i = 0; i< size(); i++) {
             vector.set(i, get(i).toDouble());
         }
 
         return vector;
+    }
+
+    public Comp[] toArray () {
+        return values.clone();
     }
 
     public VecCLi toCL(Context context) {
@@ -290,26 +308,20 @@ public class Veci implements Ref1Di {
         return rowMatrix().T();
     }
 
-    public static Veci fromRef (Ref1Di ref) {
-        return ref instanceof Veci ? (Veci) ref : foreach(ref.getSize(), ref::get);
-    }
-
-    @Override
     public Veci clone() {
         return new Veci(values.clone());
     }
-
-    @Override
+    
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        for (int i=0;i<getSize();i++) {
+        for (int i = 0; i< size(); i++) {
             builder.append(", ").append(get(i));
         }
 
         return "{ " + builder.substring(2) + " }";
     }
 
-    @Override
+    
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -317,7 +329,7 @@ public class Veci implements Ref1Di {
         return Arrays.equals(values, comps.values);
     }
 
-    @Override
+    
     public int hashCode() {
         return Arrays.hashCode(values);
     }

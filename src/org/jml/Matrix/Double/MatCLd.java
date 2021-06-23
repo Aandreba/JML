@@ -4,8 +4,6 @@ import org.jml.GPGPU.OpenCL.Buffer.DoubleBuffer;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.GPGPU.OpenCL.Query;
 import org.jml.Matrix.Single.MatCL;
-import org.jml.References.Double.Ref1Dd;
-import org.jml.References.Double.Ref2Dd;
 import org.jml.Vector.Double.Vecd;
 import org.jml.Vector.Double.VecCLd;
 import org.jml.Vector.Single.VecCL;
@@ -15,7 +13,7 @@ import org.jocl.blast.CLBlastTranspose;
 import org.jocl.cl_event;
 import org.jocl.cl_mem;
 
-public class MatCLd implements Ref2Dd {
+public class MatCLd {
     final VecCLd vector;
     final int rows, cols;
 
@@ -25,9 +23,9 @@ public class MatCLd implements Ref2Dd {
         this.cols = cols;
     }
 
-    public MatCLd(Context context, Ref2Dd values) {
-        this(context, values.getRows(), values.getCols());
-        this.vector.set(values.rowMajor().toArray());
+    public MatCLd(Context context, Matd values) {
+        this(context, values.rows(), values.cols());
+        this.vector.set(values.rowMajor());
     }
 
     public MatCLd(Context context, Vecd... values) {
@@ -36,11 +34,11 @@ public class MatCLd implements Ref2Dd {
 
     public MatCLd(VecCLd vector, int cols) {
         this.vector = vector;
-        this.rows = vector.getSize() / cols;
+        this.rows = vector.size() / cols;
         this.cols = cols;
     }
 
-    public MatCLd(Context context, double[][] values) {
+    public MatCLd(Context context, double[]... values) {
         this(context, new Matd(values));
     }
 
@@ -48,7 +46,7 @@ public class MatCLd implements Ref2Dd {
         this(Context.DEFAULT, rows, cols);
     }
 
-    public MatCLd(Ref2Dd values) {
+    public MatCLd(Matd values) {
         this(Context.DEFAULT, values);
     }
 
@@ -217,7 +215,7 @@ public class MatCLd implements Ref2Dd {
         Context context = getContext();
         int n = cols;
         int n2 = 2 * n;
-        MatCLd matrix = new MatCLd(context, getRows(), n2);
+        MatCLd matrix = new MatCLd(context, rows(), n2);
 
         for (int i=0;i<rows;i++) {
             int offset = i * n2;
@@ -241,7 +239,7 @@ public class MatCLd implements Ref2Dd {
      * Calculates matrix reduced row echelon form
      */
     public MatCLd rref () {
-        int cols = getCols();
+        int cols = cols();
         MatCLd result = clone();
 
         for (int i=0;i<rows;i++) {
@@ -263,7 +261,7 @@ public class MatCLd implements Ref2Dd {
             vector.release();
             vector = result.get(i);
 
-            for (int j=0;j<getRows();j++) {
+            for (int j = 0; j< rows(); j++) {
                 if (i == j) {
                     continue;
                 }
@@ -293,7 +291,7 @@ public class MatCLd implements Ref2Dd {
         DoubleBuffer buffer = new DoubleBuffer(context, 1);
 
         cl_event event = new cl_event();
-        CLBlast.CLBlastDsum(getRows(), buffer.getId(), 0, getId(), 0, getRows() + 1, context.queue, event);
+        CLBlast.CLBlastDsum(rows(), buffer.getId(), 0, getId(), 0, rows() + 1, context.queue, event);
 
         Query.awaitEvents(event);
         return buffer.get(0);
@@ -304,7 +302,7 @@ public class MatCLd implements Ref2Dd {
             throw new ArithmeticException("Tried to calculate exponential of non-square matrix");
         }
 
-        int n = getRows();
+        int n = rows();
         int k = 1;
         double factorial = 1;
         MatCLd pow = identity(getContext(), n);
@@ -340,7 +338,7 @@ public class MatCLd implements Ref2Dd {
             throw new ArithmeticException("Tried to calculate negative power of matrix");
         }
 
-        MatCLd result = identity(getRows());
+        MatCLd result = identity(rows());
         for (int i=0;i<b;i++) {
             MatCLd newResult = result.mul(this);
             result.release();
@@ -350,22 +348,18 @@ public class MatCLd implements Ref2Dd {
         return result;
     }
 
-    @Override
-    public int getRows() {
+    public int rows() {
         return rows;
     }
-
-    @Override
-    public int getCols() {
+    
+    public int cols() {
         return cols;
     }
 
-    @Override
     public double get (int row, int col) {
         return this.vector.get((row * cols) + col);
     }
 
-    @Override
     public VecCLd get (int row) {
         if (row < 0 || row >= rows) {
             throw new IllegalArgumentException();
@@ -379,7 +373,7 @@ public class MatCLd implements Ref2Dd {
         return result;
     }
 
-    @Override
+    
     public void set(int row, int col, double val) {
         this.vector.set((row * cols) + col, val);
     }
@@ -392,8 +386,8 @@ public class MatCLd implements Ref2Dd {
         this.vector.set(row * cols, vals);
     }
 
-    public void set (int row, Ref1Dd vals) {
-        if (cols != vals.getSize()) {
+    public void set (int row, Vecd vals) {
+        if (cols != vals.size()) {
             throw new IllegalArgumentException();
         }
 
@@ -401,7 +395,7 @@ public class MatCLd implements Ref2Dd {
     }
 
     public void set (int row, VecCLd vals) {
-        if (cols != vals.getSize()) {
+        if (cols != vals.size()) {
             throw new IllegalArgumentException();
         }
 
@@ -427,12 +421,12 @@ public class MatCLd implements Ref2Dd {
         return result;
     }
 
-    @Override
+    
     public MatCLd T () {
         return T(1);
     }
 
-    @Override
+    
     public double[][] toArray() {
         double[] array = vector.toArray();
         double[][] result = new double[rows][cols];
@@ -444,7 +438,7 @@ public class MatCLd implements Ref2Dd {
         return result;
     }
 
-    @Override
+    
     public MatCL toFloat() {
         double[] values = vector.toArray();
         float[] casted = new float[values.length];
@@ -459,18 +453,18 @@ public class MatCLd implements Ref2Dd {
         return new Matd(toArray());
     }
 
-    @Override
+    
     public String toString() {
         double[][] array = toArray();
         StringBuilder builder = new StringBuilder();
-        for (int i=0;i<getRows();i++) {
+        for (int i = 0; i< rows(); i++) {
             builder.append(", ").append(new Vecd(array[i]).toString());
         }
 
         return "{ "+builder.substring(2)+" }";
     }
 
-    @Override
+    
     public MatCLd clone() {
         MatCLd matrix = new MatCLd(getContext(), rows, cols);
 
@@ -481,7 +475,7 @@ public class MatCLd implements Ref2Dd {
         return matrix;
     }
 
-    @Override
+    
     public boolean equals (Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

@@ -3,14 +3,13 @@ package org.jml.Vector.Single;
 import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.CUDA.CUDA;
 import org.jml.Matrix.Single.MatCUDAi;
-import org.jml.References.Single.Complex.Ref1Di;
 import jcuda.Pointer;
 import jcuda.Sizeof;
 import jcuda.jcublas.JCublas;
 
 import java.util.Arrays;
 
-public class VecCUDAi implements Ref1Di {
+public class VecCUDAi {
     final public static int ELEMSIZE = 2 * Sizeof.FLOAT;
     static {
         CUDA.init();
@@ -191,7 +190,6 @@ public class VecCUDAi implements Ref1Di {
         JCublas.cublasFree(id);
     }
 
-    @Override
     public int getSize() {
         return size;
     }
@@ -203,7 +201,6 @@ public class VecCUDAi implements Ref1Di {
         return array;
     }
 
-    @Override
     public Comp get (int pos) {
         if (pos < 0 || pos >= size) {
             throw new IndexOutOfBoundsException();
@@ -214,8 +211,7 @@ public class VecCUDAi implements Ref1Di {
 
         return new Comp(array[j], array[j+1]);
     }
-
-    @Override
+    
     public void set (int pos, Comp val) {
         if (pos < 0 || pos >= size) {
             throw new IndexOutOfBoundsException();
@@ -228,8 +224,7 @@ public class VecCUDAi implements Ref1Di {
         array[i + 1] = val.imaginary;
         JCublas.cublasSetVector(size, ELEMSIZE, Pointer.to(array), 1, id, 1);
     }
-
-    @Override
+    
     public Comp[] toArray() {
         float[] array = toFloatArray();
         Comp[] result = new Comp[size];
@@ -253,8 +248,7 @@ public class VecCUDAi implements Ref1Di {
     public MatCUDAi colMatrix () {
         return new MatCUDAi(this, size);
     }
-
-    @Override
+    
     public String toString() {
         Comp[] vals = toArray();
         StringBuilder builder = new StringBuilder();
@@ -266,7 +260,7 @@ public class VecCUDAi implements Ref1Di {
         return "{ " + builder.substring(2) + " }";
     }
 
-    @Override
+    
     public VecCUDAi clone() {
         VecCUDAi clone = new VecCUDAi(size);
         JCublas.cublasCcopy(size, id, 1, clone.id, 1);

@@ -2,15 +2,13 @@ package org.jml.Matrix.Single;
 
 import org.jml.GPGPU.CUDA.CUDA;
 import org.jml.Matrix.Double.MatCUDAd;
-import org.jml.References.Single.Ref1D;
-import org.jml.References.Single.Ref2D;
 import org.jml.Vector.Single.VecCUDA;
 import org.jml.Vector.Single.Vec;
 import jcuda.Pointer;
 import jcuda.Sizeof;
 import jcuda.jcublas.JCublas;
 
-public class MatCUDA implements Ref2D {
+public class MatCUDA {
     static {
         CUDA.init();
     }
@@ -26,9 +24,9 @@ public class MatCUDA implements Ref2D {
         JCublas.cublasAlloc(size, Sizeof.FLOAT, id);
     }
 
-    public MatCUDA(Ref2D values) {
-        this(values.getRows(), values.getCols());
-        set(values.colMajor().toArray());
+    public MatCUDA(Mat values) {
+        this(values.rows(), values.cols());
+        set(values.colMajor());
     }
 
     public MatCUDA(VecCUDA values, int rows) {
@@ -153,25 +151,21 @@ public class MatCUDA implements Ref2D {
         JCublas.cublasFree(id);
     }
 
-    @Override
-    public int getRows () {
+    public int rows() {
         return rows;
     }
-
-    @Override
-    public int getCols () {
+    
+    public int cols() {
         return cols;
     }
-
-    @Override
+    
     public float get (int row, int col) {
         float[] array = new float[size];
         JCublas.cublasGetMatrix(rows, cols, Sizeof.FLOAT, id, rows, Pointer.to(array), rows);
 
         return array[(col * rows) + row];
     }
-
-    @Override
+    
     public VecCUDA get (int row) {
         float[] array = new float[size];
         JCublas.cublasGetMatrix(rows, cols, Sizeof.FLOAT, id, rows, Pointer.to(array), rows);
@@ -184,7 +178,7 @@ public class MatCUDA implements Ref2D {
         return new VecCUDA(result);
     }
 
-    @Override
+    
     public void set (int row, int col, float val) {
         float[] array = new float[size];
         JCublas.cublasGetMatrix(rows, cols, Sizeof.FLOAT, id, rows, Pointer.to(array), rows);
@@ -193,8 +187,8 @@ public class MatCUDA implements Ref2D {
         set(array);
     }
 
-    @Override
-    public void set(int row, Ref1D values) {
+    
+    public void set(int row, Vec values) {
         float[] array = new float[size];
         JCublas.cublasGetMatrix(rows, cols, Sizeof.FLOAT, id, rows, Pointer.to(array), rows);
 
@@ -212,7 +206,7 @@ public class MatCUDA implements Ref2D {
         JCublas.cublasSetMatrix(rows, cols, Sizeof.FLOAT, Pointer.to(values), rows, id, rows);
     }
 
-    @Override
+    
     public float[][] toArray() {
         float[] array = new float[size];
         JCublas.cublasGetMatrix(rows, cols, Sizeof.FLOAT, id, rows, Pointer.to(array), rows);
@@ -231,7 +225,7 @@ public class MatCUDA implements Ref2D {
         return new Mat(toArray());
     }
 
-    @Override
+    
     public MatCUDAd toDouble () {
         float[] array = new float[size];
         JCublas.cublasGetMatrix(rows, cols, Sizeof.FLOAT, id, rows, Pointer.to(array), rows);
@@ -246,18 +240,18 @@ public class MatCUDA implements Ref2D {
         return result;
     }
 
-    @Override
+    
     public String toString() {
         float[][] array = toArray();
         StringBuilder builder = new StringBuilder();
-        for (int i=0;i<getRows();i++) {
+        for (int i = 0; i< rows(); i++) {
             builder.append(", ").append(new Vec(array[i]).toString());
         }
 
         return "{ "+builder.substring(2)+" }";
     }
 
-    @Override
+    
     public MatCUDA clone() {
         MatCUDA clone = new MatCUDA(rows, cols);
         JCublas.cublasScopy(size, this.id, 1, clone.id, 1);

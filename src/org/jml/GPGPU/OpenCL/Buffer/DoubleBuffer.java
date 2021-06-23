@@ -2,17 +2,16 @@ package org.jml.GPGPU.OpenCL.Buffer;
 
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.GPGPU.OpenCL.Query;
-import org.jml.References.Double.Ref1Dd;
+import org.jml.Vector.Double.Vecd;
 import org.jocl.Pointer;
 import org.jocl.Sizeof;
 import org.jocl.blast.CLBlast;
 import org.jocl.cl_event;
-
 import java.util.Arrays;
 
 import static org.jocl.CL.*;
 
-public class DoubleBuffer extends Buffer implements Ref1Dd {
+public class DoubleBuffer extends Buffer {
     final public int size;
 
     public DoubleBuffer (Context context, int size) {
@@ -25,12 +24,10 @@ public class DoubleBuffer extends Buffer implements Ref1Dd {
         set(values);
     }
 
-    @Override
-    public int getSize() {
+    public int size() {
         return size;
     }
 
-    @Override
     public double get (int pos) {
         if (pos < 0 || pos >= size) {
             throw new IllegalArgumentException();
@@ -71,7 +68,7 @@ public class DoubleBuffer extends Buffer implements Ref1Dd {
         Query.awaitEvents(event);
     }
 
-    @Override
+    
     public void set (int pos, double val) {
         if (pos < 0 || pos >= size) {
             throw new IllegalArgumentException();
@@ -82,12 +79,10 @@ public class DoubleBuffer extends Buffer implements Ref1Dd {
         Query.awaitEvents(event);
     }
 
-    @Override
-    public void set (Ref1Dd values) {
+    public void set (Vecd values) {
         set(values.toArray());
     }
 
-    @Override
     public double[] toArray() {
         double[] array = new double[size];
 
@@ -97,13 +92,11 @@ public class DoubleBuffer extends Buffer implements Ref1Dd {
         Query.awaitEvents(event);
         return array;
     }
-
-    @Override
+    
     public String toString() {
         return Arrays.toString(toArray());
     }
-
-    @Override
+    
     public DoubleBuffer clone() {
         DoubleBuffer vector = new DoubleBuffer(getContext(), size);
 

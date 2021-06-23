@@ -2,14 +2,12 @@ package org.jml.Vector.Double;
 
 import org.jml.GPGPU.CUDA.CUDA;
 import org.jml.Matrix.Double.MatCUDAd;
-import org.jml.References.Double.Ref1Dd;
 import jcuda.Pointer;
 import jcuda.Sizeof;
 import jcuda.jcublas.JCublas;
-
 import java.util.Arrays;
 
-public class VecCUDAd implements Ref1Dd {
+public class VecCUDAd {
     static {
         CUDA.init();
     }
@@ -177,13 +175,11 @@ public class VecCUDAd implements Ref1Dd {
     public void release () {
         JCublas.cublasFree(id);
     }
-
-    @Override
+    
     public int getSize() {
         return size;
     }
 
-    @Override
     public double get (int pos) {
         if (pos < 0 || pos >= size) {
             throw new IndexOutOfBoundsException();
@@ -191,8 +187,7 @@ public class VecCUDAd implements Ref1Dd {
 
         return toArray()[pos];
     }
-
-    @Override
+    
     public void set (int pos, double val) {
         if (pos < 0 || pos >= size) {
             throw new IndexOutOfBoundsException();
@@ -203,7 +198,6 @@ public class VecCUDAd implements Ref1Dd {
         set(values);
     }
 
-    @Override
     public double[] toArray() {
         double[] array = new double[size];
         JCublas.cublasGetVector(size, Sizeof.DOUBLE, id, 1, Pointer.to(array), 1);
@@ -223,7 +217,7 @@ public class VecCUDAd implements Ref1Dd {
         return new MatCUDAd(this, size);
     }
 
-    @Override
+    
     public String toString() {
         double[] vals = toArray();
         StringBuilder builder = new StringBuilder();
@@ -235,7 +229,7 @@ public class VecCUDAd implements Ref1Dd {
         return "{ " + builder.substring(2) + " }";
     }
 
-    @Override
+    
     public VecCUDAd clone() {
         VecCUDAd clone = new VecCUDAd();
         JCublas.cublasDcopy(size, id, 1, clone.id, 1);

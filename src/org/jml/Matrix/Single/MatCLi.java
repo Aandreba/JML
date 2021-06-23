@@ -6,8 +6,6 @@ import org.jml.GPGPU.OpenCL.Query;
 import org.jml.Complex.Double.Compd;
 import org.jml.Complex.Single.Comp;
 import org.jml.Matrix.Double.MatCLid;
-import org.jml.References.Single.Complex.Ref1Di;
-import org.jml.References.Single.Complex.Ref2Di;
 import org.jml.Vector.Double.VecCLid;
 import org.jml.Vector.Single.VecCLi;
 import org.jml.Vector.Single.Veci;
@@ -17,7 +15,7 @@ import org.jocl.blast.CLBlastTranspose;
 import org.jocl.cl_event;
 import org.jocl.cl_mem;
 
-public class MatCLi implements Ref2Di {
+public class MatCLi {
     final VecCLi vector;
     final int rows, cols;
 
@@ -27,9 +25,9 @@ public class MatCLi implements Ref2Di {
         this.cols = cols;
     }
 
-    public MatCLi(Context context, Ref2Di values) {
-        this(context, values.getRows(), values.getCols());
-        this.vector.set(values.rowMajor().toArray());
+    public MatCLi(Context context, Mati values) {
+        this(context, values.rows(), values.cols());
+        this.vector.set(values.rowMajor());
     }
 
     public MatCLi(Context context, Veci... values) {
@@ -38,7 +36,7 @@ public class MatCLi implements Ref2Di {
 
     public MatCLi(VecCLi vector, int cols) {
         this.vector = vector;
-        this.rows = vector.getSize() / cols;
+        this.rows = vector.size() / cols;
         this.cols = cols;
     }
 
@@ -50,7 +48,7 @@ public class MatCLi implements Ref2Di {
         this(Context.DEFAULT, rows, cols);
     }
 
-    public MatCLi(Ref2Di values) {
+    public MatCLi(Mati values) {
         this(Context.DEFAULT, values);
     }
 
@@ -219,7 +217,7 @@ public class MatCLi implements Ref2Di {
         Context context = getContext();
         int n = cols;
         int n2 = 2 * n;
-        MatCLi matrix = new MatCLi(context, getRows(), n2);
+        MatCLi matrix = new MatCLi(context, rows(), n2);
 
         for (int i=0;i<rows;i++) {
             int offset = i * n2;
@@ -243,7 +241,7 @@ public class MatCLi implements Ref2Di {
      * Calculates matrix reduced row echelon form
      */
     public MatCLi rref () {
-        int cols = getCols();
+        int cols = cols();
         MatCLi result = clone();
 
         for (int i=0;i<rows;i++) {
@@ -295,7 +293,7 @@ public class MatCLi implements Ref2Di {
         CompBuffer buffer = new CompBuffer(context, 1);
 
         cl_event event = new cl_event();
-        CLBlast.CLBlastScsum(getRows(), buffer.getId(), 0, getId(), 0, getRows() + 1, context.queue, event);
+        CLBlast.CLBlastScsum(rows(), buffer.getId(), 0, getId(), 0, rows() + 1, context.queue, event);
 
         Query.awaitEvents(event);
         return buffer.get(0);
@@ -306,7 +304,7 @@ public class MatCLi implements Ref2Di {
             throw new ArithmeticException("Tried to calculate exponential of non-square matrix");
         }
 
-        int n = getRows();
+        int n = rows();
         int k = 1;
         long factorial = 1;
         MatCLi pow = identity(getContext(), n);
@@ -342,7 +340,7 @@ public class MatCLi implements Ref2Di {
             throw new ArithmeticException("Tried to calculate negative power of matrix");
         }
 
-        MatCLi result = identity(getRows());
+        MatCLi result = identity(rows());
         for (int i=0;i<b;i++) {
             MatCLi newResult = result.mul(this);
             result.release();
@@ -351,23 +349,19 @@ public class MatCLi implements Ref2Di {
 
         return result;
     }
-
-    @Override
-    public int getRows() {
+    
+    public int rows() {
         return rows;
     }
 
-    @Override
-    public int getCols() {
+    public int cols() {
         return cols;
     }
 
-    @Override
     public Comp get (int row, int col) {
         return this.vector.get((row * cols) + col);
     }
-
-    @Override
+    
     public VecCLi get (int row) {
         if (row < 0 || row >= rows) {
             throw new IllegalArgumentException();
@@ -381,7 +375,7 @@ public class MatCLi implements Ref2Di {
         return result;
     }
 
-    @Override
+    
     public void set(int row, int col, Comp val) {
         this.vector.set((row * cols) + col, val);
     }
@@ -394,8 +388,8 @@ public class MatCLi implements Ref2Di {
         this.vector.set(row * cols, vals);
     }
 
-    public void set (int row, Ref1Di vals) {
-        if (cols != vals.getSize()) {
+    public void set (int row, Veci vals) {
+        if (cols != vals.size()) {
             throw new IllegalArgumentException();
         }
 
@@ -403,7 +397,7 @@ public class MatCLi implements Ref2Di {
     }
 
     public void set (int row, VecCLi vals) {
-        if (cols != vals.getSize()) {
+        if (cols != vals.size()) {
             throw new IllegalArgumentException();
         }
 
@@ -425,12 +419,12 @@ public class MatCLi implements Ref2Di {
         return result;
     }
 
-    @Override
+    
     public MatCLi T () {
         return T(new Comp(1, 0));
     }
 
-    @Override
+    
     public Comp[][] toArray() {
         Comp[] array = vector.toArray();
         Comp[][] result = new Comp[rows][cols];
@@ -442,7 +436,7 @@ public class MatCLi implements Ref2Di {
         return result;
     }
 
-    @Override
+    
     public MatCLid toDouble () {
         Comp[] values = vector.toArray();
         Compd[] casted = new Compd[values.length];
@@ -457,18 +451,18 @@ public class MatCLi implements Ref2Di {
         this.vector.release();
     }
 
-    @Override
+    
     public String toString() {
         Comp[][] array = toArray();
         StringBuilder builder = new StringBuilder();
-        for (int i=0;i<getRows();i++) {
+        for (int i = 0; i< rows(); i++) {
             builder.append(", ").append(new Veci(array[i]).toString());
         }
 
         return "{ "+builder.substring(2)+" }";
     }
 
-    @Override
+    
     public MatCLi clone() {
         MatCLi matrix = new MatCLi(getContext(), rows, cols);
 
@@ -479,7 +473,7 @@ public class MatCLi implements Ref2Di {
         return matrix;
     }
 
-    @Override
+    
     public boolean equals (Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

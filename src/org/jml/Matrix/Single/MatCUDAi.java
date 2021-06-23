@@ -3,14 +3,12 @@ package org.jml.Matrix.Single;
 import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.CUDA.CUDA;
 import org.jml.Matrix.Double.MatCUDAid;
-import org.jml.References.Single.Complex.Ref1Di;
-import org.jml.References.Single.Complex.Ref2Di;
 import org.jml.Vector.Single.VecCUDAi;
 import org.jml.Vector.Single.Veci;
 import jcuda.Pointer;
 import jcuda.jcublas.JCublas;
 
-public class MatCUDAi implements Ref2Di {
+public class MatCUDAi {
     static {
         CUDA.init();
     }
@@ -26,9 +24,9 @@ public class MatCUDAi implements Ref2Di {
         JCublas.cublasAlloc(size, VecCUDAi.ELEMSIZE, id);
     }
 
-    public MatCUDAi(Ref2Di values) {
-        this(values.getRows(), values.getCols());
-        set(values.colMajor().toArray());
+    public MatCUDAi(Mati values) {
+        this(values.rows(), values.cols());
+        set(values.colMajor());
     }
 
     public MatCUDAi(VecCUDAi values, int rows) {
@@ -153,13 +151,11 @@ public class MatCUDAi implements Ref2Di {
         JCublas.cublasFree(id);
     }
 
-    @Override
-    public int getRows () {
+    public int rows() {
         return rows;
     }
 
-    @Override
-    public int getCols () {
+    public int cols() {
         return cols;
     }
 
@@ -169,8 +165,7 @@ public class MatCUDAi implements Ref2Di {
 
         return array;
     }
-
-    @Override
+    
     public Comp get (int row, int col) {
         float[] array = toFloatArray();
         int i = (col * rows) + row;
@@ -179,7 +174,6 @@ public class MatCUDAi implements Ref2Di {
         return new Comp(array[j], array[j+1]);
     }
 
-    @Override
     public VecCUDAi get (int row) {
         float[] array = toFloatArray();
 
@@ -192,8 +186,7 @@ public class MatCUDAi implements Ref2Di {
 
         return new VecCUDAi(result);
     }
-
-    @Override
+    
     public void set (int row, int col, Comp val) {
         float[] array = toFloatArray();
         int i = (col * rows) + row;
@@ -204,8 +197,7 @@ public class MatCUDAi implements Ref2Di {
         JCublas.cublasSetVector(size, VecCUDAi.ELEMSIZE, Pointer.to(array), 1, id, 1);
     }
 
-    @Override
-    public void set (int row, Ref1Di values) {
+    public void set (int row, Veci values) {
         float[] array = toFloatArray();
         for (int i=0;i<cols;i++) {
             int j = (i * rows) + row;
@@ -233,7 +225,7 @@ public class MatCUDAi implements Ref2Di {
         JCublas.cublasSetVector(size, VecCUDAi.ELEMSIZE, Pointer.to(cuda), 1, id, 1);
     }
 
-    @Override
+    
     public Comp[][] toArray() {
         float[] array = toFloatArray();
         Comp[][] result = new Comp[rows][cols];
@@ -253,7 +245,7 @@ public class MatCUDAi implements Ref2Di {
         return new Mati(toArray());
     }
 
-    @Override
+    
     public MatCUDAid toDouble () {
         float[] array = toFloatArray();
         double[] casted = new double[array.length];
@@ -266,18 +258,18 @@ public class MatCUDAi implements Ref2Di {
         return result;
     }
 
-    @Override
+    
     public String toString() {
         Comp[][] array = toArray();
         StringBuilder builder = new StringBuilder();
-        for (int i=0;i<getRows();i++) {
+        for (int i = 0; i< rows(); i++) {
             builder.append(", ").append(new Veci(array[i]).toString());
         }
 
         return "{ "+builder.substring(2)+" }";
     }
 
-    @Override
+    
     public MatCUDAi clone() {
         MatCUDAi clone = new MatCUDAi(rows, cols);
         JCublas.cublasCcopy(size, this.id, 1, clone.id, 1);

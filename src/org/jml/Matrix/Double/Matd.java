@@ -3,20 +3,16 @@ package org.jml.Matrix.Double;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Mathx.Extra.Intx;
 import org.jml.Mathx.Mathd;
-import org.jml.Mathx.Mathf;
 import org.jml.Mathx.TaskManager;
 import org.jml.Matrix.Single.Mat;
-import org.jml.References.Double.Ref1Dd;
-import org.jml.References.Double.Ref2Dd;
 import org.jml.Vector.Double.Vecd;
 import org.jml.Vector.Double.Vecid;
-import org.jml.Vector.Single.Vec;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class Matd implements Ref2Dd {
+public class Matd {
     final protected Vecd[] values;
 
     public Matd(int rows, int cols) {
@@ -35,9 +31,9 @@ public class Matd implements Ref2Dd {
         }
     }
 
-    public Matd(Ref1Dd... values) {
+    public Matd(Vecd... values) {
         this.values = new Vecd[values.length];
-        this.values[0] = Vecd.fromRef(values[0]);
+        this.values[0] = Vecd.foreach(values[0].size(), i -> values[0].get(i));
 
         for (int i=1;i<values.length;i++) {
             set(i, values[i]);
@@ -52,12 +48,12 @@ public class Matd implements Ref2Dd {
         Vecd apply (int row);
     }
 
-    public int getRows () {
+    public int rows() {
         return values.length;
     }
 
-    public int getCols () {
-        return values[0].getSize();
+    public int cols() {
+        return values[0].size();
     }
 
     public double get (int row, int col) {
@@ -69,12 +65,12 @@ public class Matd implements Ref2Dd {
     }
 
     public Vecd getCol (int col) {
-        if (col < 0 || col >= getCols()) {
+        if (col < 0 || col >= cols()) {
             throw new ArrayIndexOutOfBoundsException();
         }
 
-        Vecd vec = new Vecd(getCols());
-        for (int i=0;i<vec.getSize();i++) {
+        Vecd vec = new Vecd(cols());
+        for (int i = 0; i<vec.size(); i++) {
             vec.set(i, get(i, col));
         }
 
@@ -86,7 +82,7 @@ public class Matd implements Ref2Dd {
     }
 
     public void set (int row, Vecd value) {
-        if (value.getSize() != getCols()) {
+        if (value.size() != cols()) {
             throw new ArrayIndexOutOfBoundsException();
         }
 
@@ -94,30 +90,30 @@ public class Matd implements Ref2Dd {
     }
 
     public void setCol (int col, Vecd value) {
-        if (value.getSize() != getRows()) {
+        if (value.size() != rows()) {
             throw new ArrayIndexOutOfBoundsException();
         }
 
-        for (int i=0;i<getRows();i++) {
+        for (int i = 0; i< rows(); i++) {
             set(i, col, value.get(i));
         }
     }
 
     public boolean isSquare () {
-        return getRows() == getCols();
+        return rows() == cols();
     }
 
     private int finalRows (Matd b) {
-        return Math.min(getRows(), b.getRows());
+        return Math.min(rows(), b.rows());
     }
 
     private int finalCols (Matd b) {
-        return Math.min(getCols(), b.getCols());
+        return Math.min(cols(), b.cols());
     }
 
     public Matd foreachValue (Function<Double, Double> valueFunction) {
-        int rows = getRows();
-        int cols = getCols();
+        int rows = rows();
+        int cols = cols();
 
         Matd matrix = new Matd(rows, cols);
         for (int i=0;i<rows;i++) {
@@ -130,8 +126,8 @@ public class Matd implements Ref2Dd {
     }
 
     public Matd foreachVector (Function<Vecd, Vecd> vectorFunction) {
-        int rows = getRows();
-        int cols = getCols();
+        int rows = rows();
+        int cols = cols();
 
         Matd matrix = new Matd(rows, cols);
         for (int i=0;i<rows;i++) {
@@ -156,8 +152,8 @@ public class Matd implements Ref2Dd {
     }
 
     public Matd foreach(double b, Vecd.VecForEach forEach) {
-        int rows = getRows();
-        int cols = getCols();
+        int rows = rows();
+        int cols = cols();
 
         Matd matrix = new Matd(rows, cols);
         for (int i=0;i<rows;i++) {
@@ -174,7 +170,7 @@ public class Matd implements Ref2Dd {
 
         for (int i=0;i<rows;i++) {
             Vecd vector = forEach.apply(i);
-            if (vector.getSize() > cols) {
+            if (vector.size() > cols) {
                 throw new IllegalArgumentException();
             }
 
@@ -201,7 +197,7 @@ public class Matd implements Ref2Dd {
     }
 
     public Matd add (Vecd b) {
-        return foreach(getRows(), getCols(), (i, j) -> get(i, j) + b.get(j));
+        return foreach(rows(), cols(), (i, j) -> get(i, j) + b.get(j));
     }
 
     public Matd add (double b) {
@@ -213,7 +209,7 @@ public class Matd implements Ref2Dd {
     }
 
     public Matd subtr (Vecd b) {
-        return foreach(getRows(), getCols(), (i, j) -> get(i, j) - b.get(j));
+        return foreach(rows(), cols(), (i, j) -> get(i, j) - b.get(j));
     }
 
     public Matd subtr (double b) {
@@ -221,7 +217,7 @@ public class Matd implements Ref2Dd {
     }
 
     public Matd invSubtr (Vecd b) {
-        return foreach(getRows(), getCols(), (i, j) -> b.get(j) - get(i, j));
+        return foreach(rows(), cols(), (i, j) -> b.get(j) - get(i, j));
     }
 
     public Matd invSubtr (double b) {
@@ -229,9 +225,9 @@ public class Matd implements Ref2Dd {
     }
 
     public Matd mul (Matd b) {
-        int rows = getRows();
-        int cols = b.getCols();
-        int dig = Math.min(getCols(), b.getRows());
+        int rows = rows();
+        int cols = b.cols();
+        int dig = Math.min(cols(), b.rows());
 
         if (rows * cols <= 15000) {
             return foreach(rows, cols, (i, j) -> {
@@ -279,7 +275,7 @@ public class Matd implements Ref2Dd {
     }
 
     public Matd scalMul (Vecd b) {
-        return foreach(getRows(), getCols(), (i, j) -> get(i, j) * b.get(j));
+        return foreach(rows(), cols(), (i, j) -> get(i, j) * b.get(j));
     }
 
     public Matd scalMul (double b) {
@@ -291,7 +287,7 @@ public class Matd implements Ref2Dd {
     }
 
     public Matd scalDiv (Vecd b) {
-        return foreach(getRows(), getCols(), (i, j) -> get(i, j) / b.get(j));
+        return foreach(rows(), cols(), (i, j) -> get(i, j) / b.get(j));
     }
 
     public Matd scalDiv (double b) {
@@ -299,7 +295,7 @@ public class Matd implements Ref2Dd {
     }
 
     public Matd scalInvDiv (Vecd b) {
-        return foreach(getRows(), getCols(), (i, j) -> b.get(j) / get(i, j));
+        return foreach(rows(), cols(), (i, j) -> b.get(j) / get(i, j));
     }
 
     public Matd scalInvDiv (double b) {
@@ -307,11 +303,11 @@ public class Matd implements Ref2Dd {
     }
 
     public Matd inverse() {
-        int n = getCols();
+        int n = cols();
         int n2 = 2 * n;
-        Matd matrix = new Matd(getRows(), n2);
+        Matd matrix = new Matd(rows(), n2);
 
-        for (int i=0;i<getRows();i++) {
+        for (int i = 0; i< rows(); i++) {
             Vecd vector = new Vecd(n2);
             for (int j=0;j<n;j++) {
                 vector.set(j, get(i,j));
@@ -322,9 +318,9 @@ public class Matd implements Ref2Dd {
         }
 
         Matd rref = matrix.rref();
-        Matd result = new Matd(getRows(), n);
+        Matd result = new Matd(rows(), n);
 
-        for (int i=0;i<getRows();i++) {
+        for (int i = 0; i< rows(); i++) {
             for (int j=0;j<n;j++) {
                 result.set(i, j, rref.get(i,n + j));
             }
@@ -343,13 +339,13 @@ public class Matd implements Ref2Dd {
 
     public Matd rref () {
         Matd result = clone();
-        for (int i=0;i<getRows();i++) {
-            if (result.get(i).equals(new Vecd(getCols()))) {
+        for (int i = 0; i< rows(); i++) {
+            if (result.get(i).equals(new Vecd(cols()))) {
                 continue;
             }
 
             result.set(i, result.get(i).div(result.get(i,i)));
-            for (int j=0;j<getRows();j++) {
+            for (int j = 0; j< rows(); j++) {
                 if (i == j) {
                     continue;
                 }
@@ -367,7 +363,7 @@ public class Matd implements Ref2Dd {
         }
 
         double sum = 0;
-        for (int i=0;i<getRows();i++) {
+        for (int i = 0; i< rows(); i++) {
             sum += get(i,i);
         }
 
@@ -375,8 +371,8 @@ public class Matd implements Ref2Dd {
     }
 
     public double det () {
-        int k = getRows();
-        if (k != getCols()) {
+        int k = rows();
+        if (k != cols()) {
             throw new ArithmeticException("Tried to calculate determinant of non-square matrix");
         } else if (k == 2) {
             return get(0, 0) * get(1, 1) - get(1, 0) * get(0, 1);
@@ -402,7 +398,7 @@ public class Matd implements Ref2Dd {
     }
 
     public double[] fadlev () {
-        int n = getRows();
+        int n = rows();
         double[] poly = new double[n+1];
         poly[0] = 1;
 
@@ -430,7 +426,7 @@ public class Matd implements Ref2Dd {
             throw new ArithmeticException("Tried to calculate negative power of matrix");
         }
 
-        Matd result = identity(getRows());
+        Matd result = identity(rows());
         for (int i=0;i<x;i++) {
             result = result.mul(this);
         }
@@ -440,7 +436,7 @@ public class Matd implements Ref2Dd {
 
     public Matd sqrt () {
         Matd y = this;
-        Matd z = identity(getRows());
+        Matd z = identity(rows());
 
         int n = 1;
         while (n <= 1000) {
@@ -466,7 +462,7 @@ public class Matd implements Ref2Dd {
             throw new ArithmeticException("Tried to calculate exponential of non-square matrix");
         }
 
-        int n = getRows();
+        int n = rows();
         int k = 1;
         double factorial = 1;
         Matd pow = identity(n);
@@ -518,7 +514,7 @@ public class Matd implements Ref2Dd {
             throw new ArithmeticException("Tried to calculate logarithm of non-square matrix");
         }
 
-        return subtr(identity(getRows())).log1p();
+        return subtr(identity(rows())).log1p();
     }
 
     public LUd lu () {
@@ -538,20 +534,19 @@ public class Matd implements Ref2Dd {
     }
 
     public Matd T () {
-        int rows = getCols();
-        int cols = getRows();
+        int rows = cols();
+        int cols = rows();
 
         return foreach(rows, cols, (i, j) -> get(j, i));
     }
 
     public Mat toFloat () {
-        return Mat.foreach(getRows(), getCols(), (i, j) -> (float) get(i, j));
+        return Mat.foreach(rows(), cols(), (i, j) -> (float) get(i, j));
     }
-
-    @Override
+    
     public Matid toComplex() {
-        Vecid[] complex = new Vecid[getRows()];
-        for (int i=0;i<getRows();i++) {
+        Vecid[] complex = new Vecid[rows()];
+        for (int i = 0; i< rows(); i++) {
             complex[i] = get(i).toComplex();
         }
 
@@ -568,43 +563,58 @@ public class Matd implements Ref2Dd {
 
     public MatCUDAd toCUDA () { return new MatCUDAd(this); }
 
-    public Vecd toVectorRow () {
-        return Vecd.fromRef(rowMajor());
-    }
-
-    public Vecd toVectorCol () {
-        return Vecd.fromRef(colMajor());
-    }
-
     public static Matd identity (int k) {
         return foreach(k, k, (i, j) -> i == j ? 1 : 0);
     }
 
-    public static Matd fromRef (Ref2Dd ref) {
-        return ref instanceof Matd ? (Matd) ref : foreach(ref.getRows(), ref.getCols(), (MatForEachIndex) ref::get);
+    public double[] rowMajor () {
+        int n = cols();
+        int m = rows();
+        double[] array = new double[n * m];
+
+        for (int i=0;i<m;i++) {
+            for (int j=0;j<n;j++) {
+                array[(i * n) + j] = get(i, j);
+            }
+        }
+
+        return array;
     }
 
-    @Override
+    public double[] colMajor () {
+        int m = cols();
+        int n = rows();
+        double[] array = new double[m * n];
+
+        for (int i=0;i<n;i++) {
+            for (int j=0;j<m;j++) {
+                array[(j * n) + i] = get(i, j);
+            }
+        }
+
+        return array;
+    }
+    
     public Matd clone() {
-        Matd matrix = new Matd(getRows(), getCols());
-        for (int i=0;i<getRows();i++) {
+        Matd matrix = new Matd(rows(), cols());
+        for (int i = 0; i< rows(); i++) {
             matrix.set(i, get(i).clone());
         }
 
         return matrix;
     }
 
-    @Override
+    
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        for (int i=0;i<getRows();i++) {
+        for (int i = 0; i< rows(); i++) {
             builder.append(", ").append(get(i));
         }
 
         return "{ "+builder.substring(2)+" }";
     }
 
-    @Override
+    
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -612,7 +622,7 @@ public class Matd implements Ref2Dd {
         return Arrays.equals(values, ref1DS.values);
     }
 
-    @Override
+    
     public int hashCode() {
         return Arrays.hashCode(values);
     }
@@ -621,7 +631,7 @@ public class Matd implements Ref2Dd {
         final public Matd l, u;
 
         private LUd () {
-            int n = getRows();
+            int n = rows();
             int nm1 = n - 1;
             this.l = identity(n);
             this.u = new Matd(n, n);
@@ -652,7 +662,7 @@ public class Matd implements Ref2Dd {
             u.set(nm1, nm1, get(nm1, nm1) - sum);
         }
 
-        @Override
+        
         public String toString() {
             return "LU {" +
                     "l=" + l +
@@ -668,14 +678,14 @@ public class Matd implements Ref2Dd {
             final BiFunction<Vecd, Vecd, Vecd> projFunc = (u, a) -> u.mul(u.dot(a) / u.dot(u));
 
             Matd a = T();
-            Vecd[] u = new Vecd[getCols()];
-            Vecd[] e = new Vecd[getCols()];
+            Vecd[] u = new Vecd[cols()];
+            Vecd[] e = new Vecd[cols()];
 
             u[0] = a.get(0);
             e[0] = u[0].unit();
 
-            for (int i=1;i<getCols();i++) {
-                Vecd proj = new Vecd(getCols());
+            for (int i = 1; i< cols(); i++) {
+                Vecd proj = new Vecd(cols());
                 for (int j=0;j<i;j++) {
                     proj = proj.add(projFunc.apply(u[j], a.get(i)));
                 }
@@ -685,10 +695,10 @@ public class Matd implements Ref2Dd {
             }
 
             this.q = new Matd(e).T();
-            this.r = Matd.foreach(getRows(), getCols(), (i,j) -> j >= i ? e[i].dot(a.get(j)) : 0);
+            this.r = Matd.foreach(rows(), cols(), (i, j) -> j >= i ? e[i].dot(a.get(j)) : 0);
         }
 
-        @Override
+        
         public String toString() {
             return "QR {" +
                     "q=" + q +
