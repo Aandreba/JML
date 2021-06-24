@@ -4,6 +4,7 @@ import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Complex.Double.Compd;
 import org.jml.Matrix.Double.Matid;
+import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;
 
 import java.util.Arrays;
@@ -243,6 +244,10 @@ public class Vecid {
         return sum;
     }
 
+    public Compd inner (Vecid b) {
+        return rowMatrix().foreach(1, (x, y) -> x.conj()).mul(b.colMatrix()).get(0,0);
+    }
+
     public Vecid cross (Vecid b) {
         if (finalLen(b) < 3) {
             throw new ArithmeticException("Tried to do cross product with vectors of size smaller than 3");
@@ -263,6 +268,10 @@ public class Vecid {
         }
 
         return val;
+    }
+
+    public Vecd abs () {
+        return Vecd.foreach(size(), i -> get(i).modulus());
     }
 
     public Compd mean () {

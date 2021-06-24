@@ -90,7 +90,8 @@ public class Compd {
      * Divide 2 complex numbers
      */
     public Compd div (Compd b) {
-        return mul(b.inverse());
+        double div = b.real * b.real + b.imaginary * b.imaginary;
+        return new Compd((real * b.real + imaginary * b.imaginary) / div, (imaginary * b.real - real * b.imaginary) / div);
     }
 
     /**

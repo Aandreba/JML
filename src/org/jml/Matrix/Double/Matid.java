@@ -1,11 +1,18 @@
 package org.jml.Matrix.Double;
 
+import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Complex.Double.Compd;
+import org.jml.Mathx.Mathd;
+import org.jml.Mathx.Mathf;
 import org.jml.Mathx.TaskManager;
+import org.jml.Matrix.Single.Mat;
 import org.jml.Matrix.Single.Mati;
 import org.jml.Vector.Double.Vecid;
+import org.jml.Vector.Single.Veci;
+
 import java.util.Arrays;
+import java.util.function.BiFunction;
 
 public class Matid {
     final protected Vecid[] values;
@@ -426,6 +433,22 @@ public class Matid {
         return result;
     }
 
+    public LUid lu () {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate LU decomposition of non-square matrix");
+        }
+
+        return new LUid();
+    }
+
+    public QRid qr () {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate QR decomposition of non-square matrix");
+        }
+
+        return new QRid();
+    }
+
     public Matid T () {
         int rows = cols();
         int cols = rows();
@@ -511,5 +534,85 @@ public class Matid {
     
     public int hashCode() {
         return Arrays.hashCode(values);
+    }
+
+    public class LUid {
+        final public Matid l, u;
+
+        private LUid() {
+            int n = rows();
+            int nm1 = n - 1;
+            this.l = identity(n);
+            this.u = new Matid(n, n);
+
+            for (int j=0;j<n;j++) {
+                u.set(0, j, get(0, j));
+                l.set(j, 0, get(j, 0).div(u.get(0, 0)));
+            }
+
+            for (int q=1;q<nm1;q++) {
+                int k = q;
+                int im1 = q - 1;
+
+                for (int p=k+1;p<n;p++) {
+                    int m = p;
+                    Compd sumA = Mathd.summationi(0, im1, j -> l.get(k, j).mul(u.get(j, k)));
+                    u.set(k, k, get(k, k).subtr(sumA));
+
+                    Compd sumB = Mathd.summationi(0, im1, j -> l.get(k, j).mul(u.get(j, m)));
+                    u.set(k, m, get(k, m).subtr(sumB));
+
+                    Compd sumC = Mathd.summationi(0, im1, j -> l.get(m, j).mul(u.get(j, k)));
+                    l.set(m, k, (get(m, k).subtr(sumC)).div(u.get(k, k)));
+                }
+            }
+
+            Compd sum = Mathd.summationi(0, nm1, p -> l.get(nm1,p).mul(u.get(p,nm1)));
+            u.set(nm1, nm1, get(nm1, nm1).subtr(sum));
+        }
+
+
+        public String toString() {
+            return "LU {" +
+                    "l=" + l +
+                    ", u=" + u +
+                    '}';
+        }
+    }
+
+    public class QRid {
+        final public Matid q, r;
+
+        private QRid() {
+            final BiFunction<Vecid, Vecid, Vecid> projFunc = (u, a) -> u.mul(u.inner(a).div(u.inner(u)));
+
+            Matid a = T();
+            Vecid[] u = new Vecid[cols()];
+            Vecid[] e = new Vecid[cols()];
+
+            u[0] = a.get(0);
+            e[0] = u[0].unit();
+
+            for (int i = 1; i< cols(); i++) {
+                Vecid proj = new Vecid(cols());
+                for (int j=0;j<i;j++) {
+                    proj = proj.add(projFunc.apply(u[j], a.get(i)));
+                }
+
+                u[i] = a.get(i).subtr(proj);
+                e[i] = u[i].unit();
+            }
+
+            this.q = new Matid(e).T();
+            this.r = Matid.foreach(rows(), cols(), (i, j) -> j >= i ? e[i].inner(a.get(j)) : Compd.ZERO);
+        }
+
+
+        public String toString() {
+            return "QR {" +
+                    "q=" + q +
+                    ", r=" + r +
+                    '}';
+        }
     }
 }

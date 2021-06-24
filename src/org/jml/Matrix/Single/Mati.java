@@ -412,7 +412,7 @@ public class Mati {
     public Mati rref () {
         Mati result = clone();
         for (int i = 0; i< rows(); i++) {
-            if (result.get(i,i).modulus() <= 1e-6f) {
+            if (result.get(i,i).abs() <= 1e-6f) {
                 continue;
             }
 
@@ -467,20 +467,20 @@ public class Mati {
         throw new ArithmeticException("No square root found");
     }
 
-    public LU lu () {
+    public LUi lu () {
         if (!isSquare()) {
             throw new ArithmeticException("Tried to calculate LU decomposition of no-square matrix");
         }
 
-        return new LU();
+        return new LUi();
     }
 
-    public QR qr () {
+    public QRi qr () {
         if (!isSquare()) {
             throw new ArithmeticException("Tried to calculate QR decomposition of no-square matrix");
         }
 
-        return new QR();
+        return new QRi();
     }
 
     public Mati T () {
@@ -570,10 +570,10 @@ public class Mati {
         return Arrays.hashCode(values);
     }
 
-    public class LU {
+    public class LUi {
         final public Mati l, u;
 
-        private LU () {
+        private LUi() {
             int n = rows();
             int nm1 = n - 1;
             this.l = identity(n);
@@ -614,10 +614,10 @@ public class Mati {
         }
     }
 
-    public class QR {
+    public class QRi {
         final public Mati q, r;
 
-        private QR () {
+        private QRi() {
             final BiFunction<Veci, Veci, Veci> projFunc = (u, a) -> u.mul(u.inner(a).div(u.inner(u)));
 
             Mati a = T();
@@ -638,7 +638,7 @@ public class Mati {
             }
 
             this.q = new Mati(e).T();
-            this.r = Mati.foreach(rows(), cols(), (i, j) -> j >= i ? e[i].dot(a.get(j)) : Comp.ZERO);
+            this.r = Mati.foreach(rows(), cols(), (i, j) -> j >= i ? e[i].inner(a.get(j)) : Comp.ZERO);
         }
 
         

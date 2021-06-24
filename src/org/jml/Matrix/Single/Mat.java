@@ -4,8 +4,10 @@ import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Mathx.Extra.Intx;
 import org.jml.Mathx.Mathf;
+import org.jml.Mathx.Rand;
 import org.jml.Mathx.TaskManager;
 import org.jml.Matrix.Double.Matd;
+import org.jml.Matrix.Double.Matid;
 import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;
 
@@ -408,13 +410,35 @@ public class Mat {
         Vec poly = new Vec(n+1);
         poly.set(0, 1);
 
-        Mat y = Mat.this;
+        Mat y = this;
         for (int i=1;i<=n;i++) {
             poly.set(i, -(1f/i) * y.tr());
             y = mul(y).add(scalMul(poly.get(i)));
         }
 
         return poly;
+    }
+
+    /**
+     * Calculates largest eigenvalue
+     * @see <a href="https://en.wikipedia.org/wiki/Power_iteration">Power iteration</a>
+     */
+    public Comp eigval () {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate eigenvalue of non-square matrix");
+        }
+
+        Mati A = toComplex();
+        Veci b = Rand.getVeci(rows(), new Comp(Rand.getFloat(0.1f, 1), Rand.getFloat(0.1f, 1)), Comp.ONE);
+        Veci last = null;
+
+        while (!b.equals(last)) {
+            last = b;
+            b = A.mul(b).unit();
+        }
+
+        Veci eigen = A.mul(b).div(b);
+        return eigen.mean();
     }
 
     public Veci eigvals () {
@@ -425,27 +449,45 @@ public class Mat {
         return Mathf.poly(fadlev().toArray());
     }
 
+    public Veci eigvec () {
+        return eigvec(eigval());
+    }
+
+    /**
+     * Calculates eigenvector of specific eigenvalue
+     * @see <a href="https://en.wikipedia.org/wiki/Inverse_iteration">Inverse iteration</a>
+     */
     public Veci eigvec (Comp value) {
         if (!isSquare()) {
             throw new ArithmeticException("Tried to calculate eigenvector of non-square matrix");
         }
 
         int n = rows();
-        int np1 = n + 1;
         int nm1 = n - 1;
 
-        Mati A = toComplex().subtr(Mati.identity(n).scalMul(value));
-        Mati B = Mati.foreach(np1, np1, (i,j) -> (i < n && j < n) ? A.get(i,j) : Comp.ZERO);
-        B.set(n, Veci.foreach(np1, i -> (i < nm1) ? Comp.ZERO : Comp.ONE));
+        Mati M = toComplex();
+        Mati A = M.subtr(Mati.identity(n).scalMul(value));
+        Mati B = A.inverse();
 
-        System.out.println(A);
-        System.out.println();
-        System.out.println(B);
-        System.out.println();
-        System.out.println(B.rref());
+        Veci b = Rand.getVeci(n).mul(value.inverse());
+        Veci last = null;
 
-        return null;
-        //return Veci.foreach(n, i -> A.get(i, nm1).mul(-1).div(A.get(i, i)));
+        while (last == null || b.abs().subtr(last.abs()).abs().max() > 1e-7f) {
+            last = b;
+            b = B.mul(b).unit();
+        }
+
+        Veci vec = b.div(b.get(nm1));
+        if (vec.mul(value).subtr(M.mul(vec)).abs().max() <= 1e-6f) {
+            return vec;
+        }
+
+        Mati C = A.rref();
+        return Veci.foreach(n, i -> i < nm1 ? C.get(i, nm1).mul(-1) : Comp.ONE);
+    }
+
+    public Veci eigvec (int pos) {
+        return eigvec(eigvals().get(pos));
     }
 
     public Mati eigvecs (Veci values) {
@@ -453,10 +495,7 @@ public class Mat {
             throw new ArithmeticException("Tried to calculate eigenvectors of non-square matrix");
         }
 
-        int n = rows();
-        int nm1 = n - 1;
-
-        return null;
+        return Mati.foreach(rows(), rows(), i -> eigvec(values.get(i)));
     }
 
     public Mati eigvecs () {

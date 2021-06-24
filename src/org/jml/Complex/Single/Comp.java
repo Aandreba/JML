@@ -57,7 +57,8 @@ public class Comp {
     }
 
     public Comp div (Comp b) {
-        return mul(b.inverse());
+        float div = b.real * b.real + b.imaginary * b.imaginary;
+        return new Comp((real * b.real + imaginary * b.imaginary) / div, (imaginary * b.real - real * b.imaginary) / div);
     }
 
     public Comp div (float b) {
@@ -77,7 +78,7 @@ public class Comp {
         return Float.isInfinite(real) || Float.isInfinite(imaginary);
     }
 
-    public float modulus () {
+    public float abs() {
         return Mathf.hypot(real, imaginary);
     }
 
@@ -86,7 +87,7 @@ public class Comp {
     }
 
     public float polarRadius () {
-        return modulus();
+        return abs();
     }
 
     // FUNCTIONS
@@ -100,11 +101,13 @@ public class Comp {
             return sqrt(real);
         }
 
-        float modulus = modulus();
+        float modulus = abs();
         return new Comp(Mathf.sqrt(modulus + real) / Mathf.SQRT2, Mathf.signum(imaginary) * Mathf.sqrt(modulus - real) / Mathf.SQRT2);
     }
 
     public Comp cbrt () {
+        final float pi4 = 2 * Mathf.PI2;
+
         if (imaginary == 0) {
             return new Comp(Mathf.cbrt(real), 0);
         }
@@ -113,7 +116,7 @@ public class Comp {
         float radius = polarRadius();
 
         float alpha = Mathf.cbrt(radius);
-        float beta = (angle + 4*Mathf.PI) / 3;
+        float beta = (angle + pi4) / 3;
 
         return new Comp(alpha * Mathf.cos(beta), alpha * Mathf.sin(beta));
     }

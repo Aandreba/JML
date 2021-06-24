@@ -201,7 +201,7 @@ public class Veci {
     public float magnitude2 () {
         float sum = 0;
         for (int i = 0; i< size(); i++) {
-            float mod = get(i).modulus();
+            float mod = get(i).abs();
             sum += mod * mod;
         }
 
@@ -251,6 +251,10 @@ public class Veci {
         }
 
         return val;
+    }
+
+    public Vec abs () {
+        return Vec.foreach(size(), i -> get(i).abs());
     }
 
     public Comp mean () {

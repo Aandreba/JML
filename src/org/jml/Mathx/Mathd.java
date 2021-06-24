@@ -50,6 +50,15 @@ final public class Mathd {
         return sum;
     }
 
+    public static Compd summationi (int from, int to, Function<Integer, Compd> function) {
+        Compd sum = Compd.ZERO;
+        for (int i=from;i<=to;i++) {
+            sum = sum.add(function.apply(i));
+        }
+
+        return sum;
+    }
+
     public static double product (int from, int to, Function<Integer, Double> function) {
         float prod = 1;
         for (int i=from;i<=to;i++) {
@@ -57,6 +66,15 @@ final public class Mathd {
         }
 
         return prod;
+    }
+
+    public static Compd producti (int from, int to, Function<Integer, Compd> function) {
+        Compd sum = Compd.ONE;
+        for (int i=from;i<=to;i++) {
+            sum = sum.mul(function.apply(i));
+        }
+
+        return sum;
     }
 
     public static double factorial (int x) {

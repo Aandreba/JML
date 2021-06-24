@@ -217,7 +217,7 @@ final public class Mathf {
         float d0 = b2 - 3*a*c;
         float d1 = 2*b2*b - 9*a*b*c + 27*a*a*d;
 
-        Comp C = Comp.sqrt(d1*d1 - 4*d0*d0*d0).add(d1).div(2).pow(1f / 3);
+        Comp C = Comp.sqrt(d1*d1 - 4*d0*d0*d0).add(d1).div(2).cbrt();
         Comp pow = Comp.ONE;
         float k = -1 / (3 * a);
 
