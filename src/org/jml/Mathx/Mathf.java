@@ -92,6 +92,15 @@ final public class Mathf {
     public static float nextDown (float x) { return Math.nextDown(x); }
     public static float scalb (float f, int scaleFactor) { return Math.scalb(f, scaleFactor); }
 
+    public static boolean equals (Number a, Number b) {
+        if (a == null || b == null) { return false; }
+
+        Class type = a.getClass();
+        if (!type.equals(b.getClass())) { return false; }
+
+        return type.isPrimitive() ? a.doubleValue() == b.doubleValue() : a.equals(b);
+    }
+
     public static float summation (int from, int to, Function<Integer, Float> function) {
         float sum = 0;
         for (int i=from;i<=to;i++) {

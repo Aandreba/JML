@@ -3,6 +3,7 @@ package org.jml.Vector.Double;
 import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Complex.Double.Compd;
+import org.jml.Matrix.Double.Matd;
 import org.jml.Matrix.Double.Matid;
 import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;
@@ -318,6 +319,16 @@ public class Vecid {
 
     public Matid colMatrix () {
         return rowMatrix().T();
+    }
+
+    public Matid rowMajor (int cols) {
+        int rows = size() / cols;
+        return Matid.foreach(rows, cols, (i,j) -> get((i * cols) + j));
+    }
+
+    public Matid colMajor (int rows) {
+        int cols = size() / rows;
+        return Matid.foreach(rows, cols, (i,j) -> get((j * rows) + 1));
     }
 
     public Vecid clone() {

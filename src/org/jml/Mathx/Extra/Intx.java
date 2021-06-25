@@ -1,12 +1,13 @@
 package org.jml.Mathx.Extra;
 
 public class Intx {
-    public static void printBits (int value) {
+    public static String bitString (int value) {
+        StringBuilder builder = new StringBuilder();
         for (int i=31;i>=0;i--) {
-            System.out.print((value >> i) & 1);
+            builder.append((value >> i) & 1);
         }
 
-        System.out.println();
+        return builder.toString();
     }
 
     public static boolean getBit (int pos, int bits) {

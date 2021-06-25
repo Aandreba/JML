@@ -1,9 +1,9 @@
 package org.jml.Mathx.Extra;
 
-public class Bytex {
-    public static String bitString (int value) {
+public class Longx {
+    public static String bitString (long value) {
         StringBuilder builder = new StringBuilder();
-        for (int i=7;i>=0;i--) {
+        for (int i=63;i>=0;i--) {
             builder.append((value >> i) & 1);
         }
 

@@ -1,12 +1,13 @@
 package org.jml.Mathx.Extra;
 
 public class Shortx {
-    public static void printBits (short value) {
+    public static String bitString (int value) {
+        StringBuilder builder = new StringBuilder();
         for (int i=15;i>=0;i--) {
-            System.out.print((value >> i) & 1);
+            builder.append((value >> i) & 1);
         }
 
-        System.out.println();
+        return builder.toString();
     }
 
     public static boolean getBit (int pos, short bits) {

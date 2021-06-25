@@ -4,6 +4,7 @@ import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Mathx.Mathf;
 import org.jml.Matrix.Single.Mat;
+import org.jml.Matrix.Single.Mati;
 import org.jml.Vector.Double.Vecd;
 import java.util.Arrays;
 
@@ -285,7 +286,6 @@ public class Vec {
         return vector;
     }
 
-    
     public float[] toArray() {
         return values.clone();
     }
@@ -299,7 +299,6 @@ public class Vec {
         return vector;
     }
 
-    
     public Veci toComplex() {
         return new Veci(values);
     }
@@ -322,6 +321,16 @@ public class Vec {
 
     public Mat colMatrix () {
         return rowMatrix().T();
+    }
+
+    public Mat rowMajor (int cols) {
+        int rows = size() / cols;
+        return Mat.foreach(rows, cols, (i,j) -> get((i * cols) + j));
+    }
+
+    public Mat colMajor (int rows) {
+        int cols = size() / rows;
+        return Mat.foreach(rows, cols, (i,j) -> get((j * rows) + 1));
     }
 
     public Vec clone() {

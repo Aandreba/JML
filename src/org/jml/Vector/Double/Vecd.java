@@ -3,6 +3,7 @@ package org.jml.Vector.Double;
 import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Matrix.Double.Matd;
+import org.jml.Matrix.Single.Mati;
 import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;
 
@@ -270,6 +271,16 @@ public class Vecd {
 
     public Matd colMatrix () {
         return rowMatrix().T();
+    }
+
+    public Matd rowMajor (int cols) {
+        int rows = size() / cols;
+        return Matd.foreach(rows, cols, (i,j) -> get((i * cols) + j));
+    }
+
+    public Matd colMajor (int rows) {
+        int cols = size() / rows;
+        return Matd.foreach(rows, cols, (i,j) -> get((j * rows) + 1));
     }
     
     public Vecd clone() {

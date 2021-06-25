@@ -3,8 +3,8 @@ package org.jml.Mathx.Extra;
 import org.jml.Mathx.Mathf;
 
 public class Floatx {
-    public static void printBits (float value) {
-        Intx.printBits(Float.floatToIntBits(value));
+    public static String bitString (float value) {
+        return Intx.bitString(Float.floatToIntBits(value));
     }
 
     public static boolean isInteger (float x) {

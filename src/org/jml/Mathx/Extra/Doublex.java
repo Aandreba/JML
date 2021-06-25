@@ -1,13 +1,8 @@
 package org.jml.Mathx.Extra;
 
 public class Doublex {
-    public static void printBits (double value) {
-        long bits = Double.doubleToLongBits(value);
-        for (int i=63;i>=0;i--) {
-            System.out.print((bits >> i) & 1);
-        }
-
-        System.out.println();
+    public static String bitString (double value) {
+        return Longx.bitString(Double.doubleToLongBits(value));
     }
 
     public static boolean isInteger (double x) {
