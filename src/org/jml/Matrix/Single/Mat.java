@@ -7,7 +7,6 @@ import org.jml.Mathx.Mathf;
 import org.jml.Mathx.Rand;
 import org.jml.Mathx.TaskManager;
 import org.jml.Matrix.Double.Matd;
-import org.jml.Matrix.Double.Matid;
 import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;
 
@@ -36,11 +35,10 @@ public class Mat {
 
     public Mat(Vec... values) {
         this.values = new Vec[values.length];
-        this.values[0] = Vec.foreach(values[0].size(), i -> values[0].get(i));
+        this.values[0] = values[0];
 
         int n = cols();
         for (int i=1;i<values.length;i++) {
-            this.values[i] = new Vec(n);
             set(i, values[i]);
         }
     }
@@ -93,6 +91,10 @@ public class Mat {
         }
 
         values[row] = value;
+    }
+
+    public void set (int row, int offsetSrc, int offsetDest, int length, Vec value) {
+        values[row].set(offsetSrc, offsetDest, length, value);
     }
 
     public void setCol (int col, Vec value) {
@@ -345,13 +347,13 @@ public class Mat {
 
     public Mat rref () {
         Mat result = clone();
-        for (int i = 0; i< rows(); i++) {
+        for (int i = 0; i < rows(); i++) {
             if (result.get(i).equals(new Vec(cols()))) {
                 continue;
             }
 
             result.set(i, result.get(i).div(result.get(i,i)));
-            for (int j = 0; j< rows(); j++) {
+            for (int j = 0; j < rows(); j++) {
                 if (i == j) {
                     continue;
                 }
@@ -446,7 +448,8 @@ public class Mat {
             throw new ArithmeticException("Tried to calculate eigenvalues of non-square matrix");
         }
 
-        return Mathf.poly(fadlev().toArray());
+        float tr = tr();
+        return Mathf.poly(scalDiv(tr).fadlev().toArray()).mul(tr);
     }
 
     public Veci eigvec () {
@@ -623,6 +626,17 @@ public class Mat {
         return foreach(rows, cols, (i, j) -> get(j, i));
     }
 
+    public float[][] toArray () {
+        int cols = cols();
+        float[][] array = new float[rows()][cols];
+
+        for (int i=0;i<array.length;i++) {
+            System.arraycopy(get(i).toArray(), 0, array[i], 0, cols);
+        }
+
+        return array;
+    }
+
     public Matd toDouble () {
         return Matd.foreach(rows(), cols(), (Matd.MatForEachIndex) this::get);
     }
@@ -648,28 +662,28 @@ public class Mat {
         return new MatCUDA(this);
     }
 
-    public float[] rowMajor () {
+    public Vec rowMajor () {
         int n = cols();
         int m = rows();
-        float[] array = new float[n * m];
+        Vec array = new Vec(n * m);
 
         for (int i=0;i<m;i++) {
             for (int j=0;j<n;j++) {
-                array[(i * n) + j] = get(i, j);
+                array.set((i * n) + j, get(i, j));
             }
         }
 
         return array;
     }
 
-    public float[] colMajor () {
-        int m = cols();
-        int n = rows();
-        float[] array = new float[m * n];
+    public Vec colMajor () {
+        int n = cols();
+        int m = rows();
+        Vec array = new Vec(n * m);
 
-        for (int i=0;i<n;i++) {
-            for (int j=0;j<m;j++) {
-                array[(j * n) + i] = get(i, j);
+        for (int i=0;i<m;i++) {
+            for (int j=0;j<n;j++) {
+                array.set((j * n) + i, get(i, j));
             }
         }
 

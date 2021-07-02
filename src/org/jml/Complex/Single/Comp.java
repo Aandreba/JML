@@ -1,11 +1,12 @@
 package org.jml.Complex.Single;
+import org.jml.Complex.Complex;
 import org.jml.Complex.Double.Compd;
 import org.jml.Mathx.Mathf;
 import jcuda.cuComplex;
 
 import java.util.Objects;
 
-public class Comp {
+public class Comp implements Complex {
     final public static Comp ZERO = new Comp();
     final public static Comp ONE = new Comp(1,0);
     final public static Comp ONEI = new Comp(0,1);
@@ -70,6 +71,10 @@ public class Comp {
     }
 
     // PROPERTIES
+    public boolean isReal () {
+        return imaginary == 0;
+    }
+
     public boolean isNan () {
         return Float.isNaN(real) || Float.isNaN(imaginary);
     }
@@ -143,12 +148,18 @@ public class Comp {
     }
 
     public Comp pow (Comp b) {
+        if (b.isReal() && b.real == 2) {
+            return new Comp(real * real - imaginary * imaginary, 2 * real * imaginary);
+        }
+
         return log().mul(b).exp();
     }
 
     public Comp pow (float b) {
         if (imaginary == 0) {
             return new Comp(Mathf.pow(real, b), 0);
+        } else if (b == 2) {
+            return new Comp(real * real - imaginary * imaginary, 2 * real * imaginary);
         }
 
         return log().mul(b).exp();
@@ -157,6 +168,11 @@ public class Comp {
     // JAVA FUNCTIONS
     public Compd toDouble () {
         return new Compd(real, imaginary);
+    }
+
+    @Override
+    public Comp toFloat() {
+        return this;
     }
 
     public cuComplex toCUDA () {

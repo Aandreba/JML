@@ -26,7 +26,7 @@ public class MatCUDA {
 
     public MatCUDA(Mat values) {
         this(values.rows(), values.cols());
-        set(values.colMajor());
+        set(values.colMajor().toArray());
     }
 
     public MatCUDA(VecCUDA values, int rows) {

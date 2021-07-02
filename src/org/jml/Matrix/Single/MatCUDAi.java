@@ -26,7 +26,7 @@ public class MatCUDAi {
 
     public MatCUDAi(Mati values) {
         this(values.rows(), values.cols());
-        set(values.colMajor());
+        set(values.colMajor().toArray());
     }
 
     public MatCUDAi(VecCUDAi values, int rows) {

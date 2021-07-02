@@ -218,6 +218,22 @@ final public class Mathf {
         return x;
     }
 
+    public static Comp[] quadratic (Comp a, Comp b, Comp c) {
+        if (a.isReal() && b.isReal() && c.isReal()) {
+            return quadratic(a.real, b.real, c.real);
+        }
+
+        Comp[] x = new Comp[2];
+        Comp sqrt = Comp.sqrt(b.pow(2).subtr(a.mul(c).mul(2)));
+
+        Comp a2 = a.mul(2);
+        Comp negB = b.mul(-1);
+
+        x[0] = negB.add(sqrt).div(a2);
+        x[1] = negB.subtr(sqrt).div(a2);
+        return x;
+    }
+
     public static Comp[] cubic (float a, float b, float c, float d) {
         final Comp zeta = Comp.sqrt(-3).subtr(1).div(2);
         Comp[] x = new Comp[3];
@@ -253,8 +269,9 @@ final public class Mathf {
             return new Veci(cubic(c[0], c[1], c[2], c[3]));
         }
 
-        // Durand – Kerner method
-        System.arraycopy(new Vec(c).div(c[0]).toArray(), 0, c, 0, n);
+        // Durand–Kerner method
+        final Vec input = new Vec(c);
+        System.arraycopy(input.div(c[0]).toArray(), 0, c, 0, n);
         Comp[] lst = new Comp[]{Comp.ONE};
         Veci X = Veci.foreach(n - 1, i -> {
             if (i == 0) {
@@ -267,6 +284,8 @@ final public class Mathf {
 
         int p = 0;
         Veci last = null;
+        boolean isNaN = false;
+
         while (!X.equals(last) && p < 10000) {
             Veci y = Veci.foreach(n - 1, i -> {
                 Comp x = X.get(i);
@@ -289,6 +308,10 @@ final public class Mathf {
 
                 return x.subtr(f.div(div));
             });
+
+            if (X.any(z -> z.isNan() || z.isInfinite())) {
+                return Mathd.poly(input.toDouble().toArray()).toFloat();
+            }
 
             last = X.clone();
             X.set(y);

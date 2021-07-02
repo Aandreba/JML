@@ -9,8 +9,10 @@ import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.function.Function;
 
-public class Vecid {
+public class Vecid implements Iterable<Compd> {
     final protected Compd[] values;
 
     public Vecid(int size) {
@@ -277,6 +279,43 @@ public class Vecid {
 
     public Compd mean () {
         return sum().div(size());
+    }
+
+    @Override
+    public Iterator<Compd> iterator() {
+        return new Iterator<Compd>() {
+            int i = 0;
+
+            @Override
+            public boolean hasNext() {
+                return i < size();
+            }
+
+            @Override
+            public Compd next() {
+                return get(i++);
+            }
+        };
+    }
+
+    public boolean any (Function<Compd, Boolean> cond) {
+        for (Compd value: this) {
+            if (cond.apply(value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean all (Function<Compd, Boolean> cond) {
+        for (Compd value: this) {
+            if (!cond.apply(value)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public Vecid sub (int... pos) { // Subvector

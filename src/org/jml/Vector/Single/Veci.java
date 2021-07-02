@@ -8,8 +8,10 @@ import org.jml.Matrix.Single.Mati;
 import org.jml.Vector.Double.Vecid;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.function.Function;
 
-public class Veci {
+public class Veci implements Iterable<Comp> {
     final protected Comp[] values;
 
     public Veci(int size) {
@@ -262,6 +264,43 @@ public class Veci {
         return sum().div(size());
     }
 
+    @Override
+    public Iterator<Comp> iterator() {
+        return new Iterator<Comp>() {
+            int i = 0;
+
+            @Override
+            public boolean hasNext() {
+                return i < size();
+            }
+
+            @Override
+            public Comp next() {
+                return get(i++);
+            }
+        };
+    }
+
+    public boolean any (Function<Comp, Boolean> cond) {
+        for (Comp value: this) {
+            if (cond.apply(value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean all (Function<Comp, Boolean> cond) {
+        for (Comp value: this) {
+            if (!cond.apply(value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public Veci sub (int... pos) {
         Veci vector = new Veci(pos.length);
         for (int i=0;i<pos.length;i++) {
@@ -271,13 +310,11 @@ public class Veci {
         return vector;
     }
 
-    public Veci sub (int from, int length) {
-        Veci vector = new Veci(length);
-        for (int i=0;i<length;i++) {
-            vector.set(i, get(from + i));
-        }
+    public Veci sub (int offset, int length) {
+        Comp[] vals = new Comp[length];
+        System.arraycopy(values, offset, vals, 0, length);
 
-        return vector;
+        return new Veci(vals);
     }
 
     public Vecid toDouble () {

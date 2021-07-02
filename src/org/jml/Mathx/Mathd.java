@@ -126,6 +126,22 @@ final public class Mathd {
         return x;
     }
 
+    public static Compd[] quadratic (Compd a, Compd b, Compd c) {
+        if (a.isReal() && b.isReal() && c.isReal()) {
+            return quadratic(a.real, b.real, c.real);
+        }
+
+        Compd[] x = new Compd[2];
+        Compd sqrt = Compd.sqrt(b.pow(2).subtr(a.mul(c).mul(2)));
+
+        Compd a2 = a.mul(2);
+        Compd negB = b.mul(-1);
+
+        x[0] = negB.add(sqrt).div(a2);
+        x[1] = negB.subtr(sqrt).div(a2);
+        return x;
+    }
+
     public static Compd[] cubic (double a, double b, double c, double d) {
         final Compd zeta = Compd.sqrt(-3).subtr(1).div(2);
         Compd[] x = new Compd[3];

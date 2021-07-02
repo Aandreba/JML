@@ -2,14 +2,18 @@ package org.jml.Vector.Double;
 
 import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
+import org.jml.Mathx.Extra.Doublex;
+import org.jml.Mathx.Mathf;
 import org.jml.Matrix.Double.Matd;
 import org.jml.Matrix.Single.Mati;
 import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.function.Function;
 
-public class Vecd {
+public class Vecd implements Iterable<Double> {
     final protected double[] values;
 
     public Vecd(int size) {
@@ -228,6 +232,91 @@ public class Vecd {
 
     public double mean () {
         return sum() / size();
+    }
+
+    public Vecd abs () {
+        return foreach(Math::abs);
+    }
+
+    public int minIndex () {
+        int min = 0;
+        for (int i = 0; i< size(); i++) {
+            if (i == 0 || get(i) < get(min)) {
+                min = i;
+            }
+        }
+
+        return min;
+    }
+
+    public double min () {
+        double min = 0;
+        for (int i = 0; i< size(); i++) {
+            if (i == 0 || get(i) < min) {
+                min = get(i);
+            }
+        }
+
+        return min;
+    }
+
+    public int maxIndex () {
+        int max = 0;
+        for (int i = 0; i< size(); i++) {
+            if (i == 0 || get(i) > get(max)) {
+                max = i;
+            }
+        }
+
+        return max;
+    }
+
+    public double max () {
+        double max = 0;
+        for (int i = 0; i< size(); i++) {
+            if (i == 0 || get(i) > max) {
+                max = get(i);
+            }
+        }
+
+        return max;
+    }
+
+    @Override
+    public Iterator<Double> iterator() {
+        return new Iterator<Double>() {
+            int i = 0;
+
+            @Override
+            public boolean hasNext() {
+                return i < size();
+            }
+
+            @Override
+            public Double next() {
+                return get(i++);
+            }
+        };
+    }
+
+    public boolean any (Function<Double, Boolean> cond) {
+        for (double value: this) {
+            if (cond.apply(value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean all (Function<Double, Boolean> cond) {
+        for (double value: this) {
+            if (!cond.apply(value)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public Vecd sub (int... pos) { // Subvector

@@ -105,7 +105,7 @@ final public class Rand {
     }
 
     public static Quat getQuat () {
-        return new Quat(Rand.getFloat(0, Mathf.PI2), Rand.getFloat(0, Mathf.PI2), Rand.getFloat(0, Mathf.PI2));
+        return new Quat(getFloat(0, Mathf.PI2), getFloat(0, Mathf.PI2), getFloat(0, Mathf.PI2));
     }
 
     public static double getGaussian () {

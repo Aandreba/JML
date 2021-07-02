@@ -1,14 +1,15 @@
 package org.jml.Vector.Single;
-
-import org.jml.Complex.Single.Comp;
+;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Mathx.Mathf;
 import org.jml.Matrix.Single.Mat;
-import org.jml.Matrix.Single.Mati;
 import org.jml.Vector.Double.Vecd;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
-public class Vec {
+public class Vec implements Iterable<Float> {
     final protected float[] values;
 
     public Vec(int size) {
@@ -70,9 +71,7 @@ public class Vec {
             throw new ArrayIndexOutOfBoundsException();
         }
 
-        for (int i=0;i<size();i++) {
-            this.values[i] = values.get(i);
-        }
+        System.arraycopy(values.values, 0, this.values, 0, size());
     }
 
     public void set (float... values) {
@@ -80,9 +79,39 @@ public class Vec {
             throw new ArrayIndexOutOfBoundsException();
         }
 
-        for (int i=0;i<size();i++) {
-            this.values[i] = values[i];
+        System.arraycopy(values, 0, this.values, 0, size());
+    }
+
+    public void set (int offsetSrc, int offsetDest, int length, Vec values) {
+        if (offsetDest + length > size()) {
+            throw new ArrayIndexOutOfBoundsException();
         }
+
+        System.arraycopy(values.values, offsetSrc, this.values, offsetDest, length);
+    }
+
+    public void set (int offsetSrc, int offsetDest, Vec values) {
+        if (offsetDest + values.size() > size()) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        System.arraycopy(values.values, offsetSrc, this.values, offsetDest, values.size() - offsetSrc);
+    }
+
+    public void set (int offsetSrc, int offsetDest, int length, float... values) {
+        if (offsetDest + length > size()) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        System.arraycopy(values, offsetSrc, this.values, offsetDest, length);
+    }
+
+    public void set (int offsetSrc, int offsetDest, float... values) {
+        if (offsetDest + values.length > size()) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        System.arraycopy(values, offsetSrc, this.values, offsetDest, values.length - offsetSrc);
     }
 
     public void set (int pos, float value) {
@@ -277,6 +306,43 @@ public class Vec {
         return max;
     }
 
+    @Override
+    public Iterator<Float> iterator() {
+        return new Iterator<Float>() {
+            int i = 0;
+
+            @Override
+            public boolean hasNext() {
+                return i < size();
+            }
+
+            @Override
+            public Float next() {
+                return get(i++);
+            }
+        };
+    }
+
+    public boolean any (Function<Float, Boolean> cond) {
+        for (float value: this) {
+            if (cond.apply(value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean all (Function<Float, Boolean> cond) {
+        for (float value: this) {
+            if (!cond.apply(value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public Vec sub (int... pos) {
         Vec vector = new Vec(pos.length);
         for (int i=0;i<pos.length;i++) {
@@ -284,6 +350,13 @@ public class Vec {
         }
 
         return vector;
+    }
+
+    public Vec sub (int offset, int length) {
+        float[] vals = new float[length];
+        System.arraycopy(values, offset, vals, 0, length);
+
+        return new Vec(vals);
     }
 
     public float[] toArray() {

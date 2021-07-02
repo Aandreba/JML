@@ -1,14 +1,16 @@
 package org.jml.Complex.Double;
+import org.jml.Complex.Complex;
 import org.jml.Complex.Single.Comp;
 import org.jml.Mathx.Mathd;
 import jcuda.cuDoubleComplex;
+import org.jml.Mathx.Mathf;
 
 import java.util.Objects;
 
 /**
  * The type Compd is the representation of a complex number in doubles
  */
-public class Compd {
+public class Compd implements Complex {
     final public static Compd ZERO = new Compd();
     final public static Compd ONE = new Compd(1,0);
     final public static Compd ONEI = new Compd(0,1);
@@ -108,11 +110,15 @@ public class Compd {
         return inverse().mul(b);
     }
 
+    // PROPERTIES
+    public boolean isReal () {
+        return imaginary == 0;
+    }
+
     /**
      * Returns {@code true} if the specified number is a
      * Not-a-Number (NaN) value, {@code false} otherwise.
      */
-    // PROPERTIES
     public boolean isNan () {
         return Double.isNaN(real) || Double.isNaN(imaginary);
     }
@@ -200,6 +206,10 @@ public class Compd {
      * Returns the complex number powered to another complex number
      */
     public Compd pow (Compd b) {
+        if (b.isReal() && b.real == 2) {
+            return new Compd(real * real - imaginary * imaginary, 2 * real * imaginary);
+        }
+
         return log().mul(b).exp();
     }
 
@@ -210,6 +220,12 @@ public class Compd {
      * @return the compd
      */
     public Compd pow (double b) {
+        if (imaginary == 0) {
+            return new Compd(Math.pow(real, b), 0);
+        } else if (b == 2) {
+            return new Compd(real * real - imaginary * imaginary, 2 * real * imaginary);
+        }
+
         return log().mul(b).exp();
     }
 
@@ -221,6 +237,11 @@ public class Compd {
     // JAVA FUNCTIONS
     public Comp toFloat () {
         return new Comp((float) real, (float) imaginary);
+    }
+
+    @Override
+    public Compd toDouble() {
+        return this;
     }
 
     /**
@@ -239,7 +260,11 @@ public class Compd {
 
     @Override
     public String toString() {
-        if (real == 0) {
+        if (Double.isNaN(real) || Double.isNaN(imaginary)) {
+            return "NaN";
+        } else if (Double.isInfinite(real) || Double.isInfinite(imaginary)) {
+            return "Infinity";
+        } else if (real == 0) {
             return imaginary+"i";
         } else if (imaginary == 0) {
             return Double.toString(real);

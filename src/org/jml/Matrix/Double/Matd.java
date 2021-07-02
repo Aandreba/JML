@@ -1,12 +1,17 @@
 package org.jml.Matrix.Double;
 
+import org.jml.Complex.Double.Compd;
+import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Mathx.Extra.Intx;
 import org.jml.Mathx.Mathd;
+import org.jml.Mathx.Rand;
 import org.jml.Mathx.TaskManager;
 import org.jml.Matrix.Single.Mat;
+import org.jml.Matrix.Single.Mati;
 import org.jml.Vector.Double.Vecd;
 import org.jml.Vector.Double.Vecid;
+import org.jml.Vector.Single.Veci;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;
@@ -411,12 +416,83 @@ public class Matd {
         return poly;
     }
 
+    /**
+     * Calculates largest eigenvalue
+     * @see <a href="https://en.wikipedia.org/wiki/Power_iteration">Power iteration</a>
+     */
+    public Compd eigval () {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate eigenvalue of non-square matrix");
+        }
+
+        Matid A = toComplex();
+        Vecid b = Rand.getVecid(rows(), new Compd(Rand.getDouble(0.1f, 1), Rand.getDouble(0.1f, 1)), Compd.ONE);
+        Vecid last = null;
+
+        while (!b.equals(last)) {
+            last = b;
+            b = A.mul(b).unit();
+        }
+
+        Vecid eigen = A.mul(b).div(b);
+        return eigen.mean();
+    }
+
     public Vecid eigvals () {
         if (!isSquare()) {
             throw new ArithmeticException("Tried to calculate eigenvalues of non-square matrix");
         }
 
         return Mathd.poly(fadlev());
+    }
+
+    /**
+     * Calculates eigenvector of specific eigenvalue
+     * @see <a href="https://en.wikipedia.org/wiki/Inverse_iteration">Inverse iteration</a>
+     */
+    public Vecid eigvec (Compd value) {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate eigenvector of non-square matrix");
+        }
+
+        int n = rows();
+        int nm1 = n - 1;
+
+        Matid M = toComplex();
+        Matid A = M.subtr(Matid.identity(n).scalMul(value));
+        Matid B = A.inverse();
+
+        Vecid b = Rand.getVecid(n).mul(value.inverse());
+        Vecid last = null;
+
+        while (last == null || b.abs().subtr(last.abs()).abs().max() > 1e-15f) {
+            last = b;
+            b = B.mul(b).unit();
+        }
+
+        Vecid vec = b.div(b.get(nm1));
+        if (vec.mul(value).subtr(M.mul(vec)).abs().max() <= 1e-6f) {
+            return vec;
+        }
+
+        Matid C = A.rref();
+        return Vecid.foreach(n, i -> i < nm1 ? C.get(i, nm1).mul(-1) : Compd.ONE);
+    }
+
+    public Vecid eigvec (int pos) {
+        return eigvec(eigvals().get(pos));
+    }
+
+    public Matid eigvecs (Vecid values) {
+        if (!isSquare()) {
+            throw new ArithmeticException("Tried to calculate eigenvectors of non-square matrix");
+        }
+
+        return Matid.foreach(rows(), rows(), i -> eigvec(values.get(i)));
+    }
+
+    public Matid eigvecs () {
+        return eigvecs(eigvals());
     }
 
     public Matd pow (int x) {

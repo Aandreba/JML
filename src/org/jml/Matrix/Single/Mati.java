@@ -506,28 +506,28 @@ public class Mati {
         return new MatCUDAi(this);
     }
 
-    public Comp[] rowMajor () {
+    public Veci rowMajor () {
         int n = cols();
         int m = rows();
-        Comp[] array = new Comp[n * m];
+        Veci array = new Veci(n * m);
 
         for (int i=0;i<m;i++) {
             for (int j=0;j<n;j++) {
-                array[(i * n) + j] = get(i, j);
+                array.set((i * n) + j, get(i, j));
             }
         }
 
         return array;
     }
 
-    public Comp[] colMajor () {
-        int m = cols();
-        int n = rows();
-        Comp[] array = new Comp[m * n];
+    public Veci colMajor () {
+        int n = cols();
+        int m = rows();
+        Veci array = new Veci(n * m);
 
-        for (int i=0;i<n;i++) {
-            for (int j=0;j<m;j++) {
-                array[(j * n) + i] = get(i, j);
+        for (int i=0;i<m;i++) {
+            for (int j=0;j<n;j++) {
+                array.set((j * n) + i, get(i, j));
             }
         }
 
