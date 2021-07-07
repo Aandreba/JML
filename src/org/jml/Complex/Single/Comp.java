@@ -1,12 +1,11 @@
 package org.jml.Complex.Single;
-import org.jml.Complex.Complex;
 import org.jml.Complex.Double.Compd;
 import org.jml.Mathx.Mathf;
 import jcuda.cuComplex;
 
 import java.util.Objects;
 
-public class Comp implements Complex {
+public class Comp {
     final public static Comp ZERO = new Comp();
     final public static Comp ONE = new Comp(1,0);
     final public static Comp ONEI = new Comp(0,1);
@@ -170,7 +169,6 @@ public class Comp implements Complex {
         return new Compd(real, imaginary);
     }
 
-    @Override
     public Comp toFloat() {
         return this;
     }

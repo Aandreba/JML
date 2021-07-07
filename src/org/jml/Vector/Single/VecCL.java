@@ -6,7 +6,8 @@ import org.jml.GPGPU.OpenCL.Query;
 import org.jml.Matrix.Single.MatCL;
 import org.jml.Vector.Double.VecCLd;
 import org.jocl.*;
-import org.jocl.blast.CLBlast;
+import org.jocl.blast.*;
+
 import java.util.Arrays;
 
 public class VecCL extends FloatBuffer {
@@ -113,20 +114,19 @@ public class VecCL extends FloatBuffer {
     /**
      * Performs the operation y = alpha * x * y
      */
-    public VecCL mul (float alpha, VecCL y) {
-        checkCompatibility(y);
-        MatCL identity = identityLike();
-        VecCL result = identity.mul(alpha, y);
-
-        identity.release();
-        return result;
-    }
-
-    /**
-     * Performs the operation y = x * y
-     */
     public VecCL mul (VecCL y) {
-        return mul(1, y);
+        checkCompatibility(y);
+
+        MatCL identity = identityLike();
+        VecCL result = y.clone();
+
+        cl_event event = new cl_event();
+        CLBlast.CLBlastStrmv(CLBlastLayout.CLBlastLayoutRowMajor, CLBlastTriangle.CLBlastTriangleLower, CLBlastTranspose.CLBlastTransposeNo, CLBlastDiagonal.CLBlastDiagonalNonUnit, size, identity.getId(), 0, size, result.getId(), 0, 1, getContext().queue, event);
+
+        Query.awaitEvents(event);
+        identity.release();
+
+        return result;
     }
 
     /**

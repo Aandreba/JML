@@ -77,6 +77,13 @@ public class MatCUDA {
         return subtr(1, b);
     }
 
+    public MatCUDA invSubtr (float alpha) {
+        MatCUDA result = new MatCUDA(Vec.foreach(size, x -> alpha).rowMajor(cols));
+        JCublas.cublasSaxpy(size, -1, id, 1, result.id, 1);
+
+        return result;
+    }
+
     /**
      * Performs the matrix product C = alpha * A * B + beta * C
      */
@@ -145,6 +152,26 @@ public class MatCUDA {
      */
     public VecCUDA mul (VecCUDA x) {
         return mul(1, x);
+    }
+
+    public MatCUDA scalMul (MatCUDA b) {
+        checkCompatibility(b);
+
+        MatCUDA mul = new MatCUDA(size, size);
+        JCublas.cublasScopy(size, id, 1, mul.id, size + 1);
+
+        MatCUDA result = b.clone();
+        JCublas.cublasStrmv('l', 'n', 'n', size, mul.id, size, result.id, 1);
+
+        mul.release();
+        return result;
+    }
+
+    public MatCUDA scalMul (float b) {
+        MatCUDA result = new MatCUDA(rows, cols);
+        JCublas.cublasSaxpy(size, b, this.id, 1, result.id, 1);
+
+        return result;
     }
 
     public void release () {
@@ -259,10 +286,32 @@ public class MatCUDA {
         return clone;
     }
 
-    public static MatCUDA identity (int k) {
+    public static MatCUDA diagonal (int k, float value) {
         MatCUDA matrix = new MatCUDA(k, k);
-        JCublas.cublasScopy(k, Pointer.to(new float[]{1}), 0, matrix.id, k + 1);
+        JCublas.cublasScopy(k, Pointer.to(new float[]{value}), 0, matrix.id, k + 1);
 
         return matrix;
+    }
+
+    public static MatCUDA diagonal (float... values) {
+        int k = values.length;
+
+        MatCUDA matrix = new MatCUDA(k, k);
+        JCublas.cublasScopy(k, Pointer.to(values), 0, matrix.id, k + 1);
+
+        return matrix;
+    }
+
+    public static MatCUDA diagonal (VecCUDA values) {
+        int k = values.size;
+
+        MatCUDA matrix = new MatCUDA(k, k);
+        JCublas.cublasScopy(k, values.id, 0, matrix.id, k + 1);
+
+        return matrix;
+    }
+
+    public static MatCUDA identity (int k) {
+        return diagonal(k, 1);
     }
 }

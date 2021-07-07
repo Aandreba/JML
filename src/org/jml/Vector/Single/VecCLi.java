@@ -6,9 +6,10 @@ import org.jml.GPGPU.OpenCL.Context;
 import org.jml.GPGPU.OpenCL.Query;
 import org.jml.Complex.Double.Compd;
 import org.jml.Complex.Single.Comp;
+import org.jml.Matrix.Single.MatCL;
 import org.jml.Matrix.Single.MatCLi;
 import org.jml.Vector.Double.VecCLid;
-import org.jocl.blast.CLBlast;
+import org.jocl.blast.*;
 import org.jocl.cl_event;
 import java.util.Arrays;
 
@@ -117,27 +118,19 @@ public class VecCLi extends CompBuffer {
     /**
      * Performs the operation y = alpha * x * y
      */
-    public VecCLi mul (Comp alpha, VecCLi y) {
-        checkCompatibility(y);
-        MatCLi identity = identityLike();
-        VecCLi result = identity.mul(alpha, y);
-
-        identity.release();
-        return result;
-    }
-
-    /**
-     * Performs the operation y = alpha * x * y
-     */
-    public VecCLi mul (float alpha, VecCLi y) {
-        return mul(new Comp(alpha, 0), y);
-    }
-
-    /**
-     * Performs the operation y = x * y
-     */
     public VecCLi mul (VecCLi y) {
-        return mul(1, y);
+        checkCompatibility(y);
+
+        MatCLi identity = identityLike();
+        VecCLi result = y.clone();
+
+        cl_event event = new cl_event();
+        CLBlast.CLBlastCtrmv(CLBlastLayout.CLBlastLayoutRowMajor, CLBlastTriangle.CLBlastTriangleLower, CLBlastTranspose.CLBlastTransposeNo, CLBlastDiagonal.CLBlastDiagonalNonUnit, size, identity.getId(), 0, size, result.getId(), 0, 1, getContext().queue, event);
+
+        Query.awaitEvents(event);
+        identity.release();
+
+        return result;
     }
 
     /**

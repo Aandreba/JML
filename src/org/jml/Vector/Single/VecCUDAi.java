@@ -2,6 +2,7 @@ package org.jml.Vector.Single;
 
 import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.CUDA.CUDA;
+import org.jml.Matrix.Single.MatCUDA;
 import org.jml.Matrix.Single.MatCUDAi;
 import jcuda.Pointer;
 import jcuda.Sizeof;
@@ -102,16 +103,16 @@ public class VecCUDAi {
     /**
      * Performs the operation y = alpha * x * y
      */
-    public VecCUDAi mul (Comp alpha, VecCUDAi b) {
-        checkCompatibility(b);
-        return identityLike().mul(alpha, b);
-    }
-
-    /**
-     * Performs the operation y = x * y
-     */
     public VecCUDAi mul (VecCUDAi b) {
-        return mul(Comp.ONE, b);
+        checkCompatibility(b);
+
+        MatCUDAi mul = identityLike();
+        VecCUDAi result = b.clone();
+
+        JCublas.cublasCtrmv('l', 'n', 'n', size, mul.id, size, result.id, 1);
+        mul.release();
+
+        return result;
     }
 
     /**

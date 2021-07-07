@@ -5,6 +5,9 @@ import org.jml.Matrix.Double.MatCUDAd;
 import jcuda.Pointer;
 import jcuda.Sizeof;
 import jcuda.jcublas.JCublas;
+import org.jml.Matrix.Single.MatCUDA;
+import org.jml.Vector.Single.VecCUDA;
+
 import java.util.Arrays;
 
 public class VecCUDAd {
@@ -99,16 +102,16 @@ public class VecCUDAd {
     /**
      * Performs the operation y = alpha * x * y
      */
-    public VecCUDAd mul (double alpha, VecCUDAd b) {
-        checkCompatibility(b);
-        return identityLike().mul(alpha, b);
-    }
-
-    /**
-     * Performs the operation y = x * y
-     */
     public VecCUDAd mul (VecCUDAd b) {
-        return mul(1, b);
+        checkCompatibility(b);
+
+        MatCUDAd mul = identityLike();
+        VecCUDAd result = b.clone();
+
+        JCublas.cublasDtrmv('l', 'n', 'n', size, mul.id, size, result.id, 1);
+        mul.release();
+
+        return result;
     }
 
     /**
@@ -231,7 +234,7 @@ public class VecCUDAd {
 
     
     public VecCUDAd clone() {
-        VecCUDAd clone = new VecCUDAd();
+        VecCUDAd clone = new VecCUDAd(size);
         JCublas.cublasDcopy(size, id, 1, clone.id, 1);
 
         return clone;
