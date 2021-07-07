@@ -8,6 +8,9 @@ import jcuda.Pointer;
 import jcuda.Sizeof;
 import jcuda.jcublas.JCublas;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 public class MatCUDA {
     static {
         CUDA.init();
@@ -27,6 +30,11 @@ public class MatCUDA {
     public MatCUDA(Mat values) {
         this(values.rows(), values.cols());
         set(values.colMajor().toArray());
+    }
+
+    public MatCUDA(Vec values, int rows) {
+        this(rows, values.size() / rows);
+        JCublas.cublasScopy(size, Pointer.to(values.toArray()), 1, this.id, 1);
     }
 
     public MatCUDA(VecCUDA values, int rows) {
@@ -78,7 +86,10 @@ public class MatCUDA {
     }
 
     public MatCUDA invSubtr (float alpha) {
-        MatCUDA result = new MatCUDA(Vec.foreach(size, x -> alpha).rowMajor(cols));
+        float[] vals = new float[size];
+        Arrays.fill(vals, alpha);
+
+        MatCUDA result = new MatCUDA(new Vec(vals), rows);
         JCublas.cublasSaxpy(size, -1, id, 1, result.id, 1);
 
         return result;
@@ -236,7 +247,7 @@ public class MatCUDA {
     
     public float[][] toArray() {
         float[] array = new float[size];
-        JCublas.cublasGetMatrix(rows, cols, Sizeof.FLOAT, id, rows, Pointer.to(array), rows);
+        JCublas.cublasGetVector(size, Sizeof.FLOAT, id, 1, Pointer.to(array), 1);
 
         float[][] result = new float[rows][cols];
         for (int i=0;i<rows;i++) {
@@ -251,7 +262,6 @@ public class MatCUDA {
     public Mat toCPU () {
         return new Mat(toArray());
     }
-
     
     public MatCUDAd toDouble () {
         float[] array = new float[size];

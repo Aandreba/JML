@@ -22,6 +22,7 @@ public class Mat extends Link2D {
         super(rows, cols);
 
         this.values = new Vec[rows];
+
         for (int i=0;i<rows;i++) {
             this.values[i] = new Vec(cols);
         }
@@ -196,9 +197,11 @@ public class Mat extends Link2D {
     public static Mat foreach(int rows, int cols, MatfForEachIndex forEach) {
         Mat matrix = new Mat(rows, cols);
 
-        for (int i=0;i<rows;i++) {
-            for (int j=0;j<cols;j++) {
-                matrix.set(i, j, forEach.apply(i, j));
+        if (matrix.rows() * matrix.cols() <= 15000) {
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    matrix.set(i, j, forEach.apply(i, j));
+                }
             }
         }
 

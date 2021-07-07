@@ -55,7 +55,7 @@ final public class Rand {
     }
 
     public static int getInt (int from, int to) {
-        return Mathf.round(getFloat(from, to));
+        return (int) getFloat(from, to+1);
     }
 
     public static long getLong () {
@@ -63,7 +63,7 @@ final public class Rand {
     }
 
     public static long getLong (long from, long to) {
-        return Math.round(getDouble(from, to));
+        return (long) getDouble(from, to+1);
     }
 
     public static float getFloat () {

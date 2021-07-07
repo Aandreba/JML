@@ -1,13 +1,17 @@
 package org.jml.Matrix.Single;
 
+import jcuda.Sizeof;
 import jcuda.cuComplex;
 import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.CUDA.CUDA;
 import org.jml.Matrix.Double.MatCUDAid;
+import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.VecCUDAi;
 import org.jml.Vector.Single.Veci;
 import jcuda.Pointer;
 import jcuda.jcublas.JCublas;
+
+import java.util.Arrays;
 
 public class MatCUDAi {
     static {
@@ -28,6 +32,19 @@ public class MatCUDAi {
     public MatCUDAi(Mati values) {
         this(values.rows(), values.cols());
         set(values.colMajor().toArray());
+    }
+
+    public MatCUDAi(Veci values, int rows) {
+        this(rows, values.size() / rows);
+
+        float[] cuda = new float[2 * values.size()];
+        for (int i=0;i<values.size();i++) {
+            int j = 2 * i;
+            cuda[j] = values.get(i).real;
+            cuda[j+1] = values.get(i).imaginary;
+        }
+
+        JCublas.cublasCcopy(size, Pointer.to(cuda), 1, this.id, 1);
     }
 
     public MatCUDAi(VecCUDAi values, int rows) {
@@ -76,6 +93,16 @@ public class MatCUDAi {
      */
     public MatCUDAi subtr (MatCUDAi b) {
         return subtr(Comp.ONE, b);
+    }
+
+    public MatCUDAi invSubtr (Comp alpha) {
+        Comp[] vals = new Comp[size];
+        Arrays.fill(vals, alpha);
+
+        MatCUDAi result = new MatCUDAi(new Veci(vals), rows);
+        JCublas.cublasCaxpy(size, Comp.MONE.toCUDA(), id, 1, result.id, 1);
+
+        return result;
     }
 
     /**
@@ -187,11 +214,18 @@ public class MatCUDAi {
         return cols;
     }
 
-    private float[] toFloatArray () {
-        float[] array = new float[2 * size];
-        JCublas.cublasGetVector(size, VecCUDAi.ELEMSIZE, id, 1, Pointer.to(array), 1);
+    private float[] toFloatArray () { // TODO
+        cuComplex[] array = new cuComplex[size];
+        JCublas.cublasGetVector(size, id, 1, array, 0, 1);
 
-        return array;
+        float[] cuda = new float[2 * size];
+        for (int i=0;i<size;i++) {
+            int j = 2 * i;
+            cuda[j] = array[i].x;
+            cuda[j+1] = array[i].y;
+        }
+
+        return cuda;
     }
     
     public Comp get (int row, int col) {
