@@ -107,7 +107,6 @@ public class MatCLi {
 
             result.set(i, row2);
             row1.release();
-            row2.release();
         }
 
         return result;
