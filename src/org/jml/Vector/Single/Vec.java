@@ -1,6 +1,7 @@
 package org.jml.Vector.Single;
 ;
 import org.jml.GPGPU.OpenCL.Context;
+import org.jml.Link.Single.Link1D;
 import org.jml.Mathx.Mathf;
 import org.jml.Matrix.Single.Mat;
 import org.jml.Vector.Double.Vecd;
@@ -9,20 +10,24 @@ import java.util.Iterator;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class Vec implements Iterable<Float> {
+public class Vec extends Link1D {
     final protected float[] values;
 
     public Vec(int size) {
+        super(size);
         this.values = new float[size];
     }
 
     public Vec(float... values) {
+        super(values.length);
         this.values = values;
     }
 
     public Vec(Vec initialValues, float... finalValues) {
+        super(initialValues.size() + finalValues.length);
+
         int vecSize = initialValues.size();
-        this.values = new float[vecSize + finalValues.length];
+        this.values = new float[size];
 
         for (int i=0;i<vecSize;i++) {
             this.values[i] = initialValues.get(i);
@@ -34,6 +39,8 @@ public class Vec implements Iterable<Float> {
     }
 
     public Vec(float[] initialValues, Vec finalValues) {
+        super(initialValues.length + finalValues.size);
+
         int vecSize = finalValues.size();
         this.values = new float[initialValues.length + vecSize];
 
@@ -59,7 +66,7 @@ public class Vec implements Iterable<Float> {
     }
 
     public int size () {
-        return values.length;
+        return size;
     }
 
     public float get (int pos) {
@@ -409,16 +416,6 @@ public class Vec implements Iterable<Float> {
     public Vec clone() {
         return new Vec(values.clone());
     }
-    
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i< size(); i++) {
-            builder.append(", ").append(get(i));
-        }
-
-        return "{ " + builder.substring(2) + " }";
-    }
-
     
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -2,10 +2,11 @@ package org.jml.Matrix.Single;
 
 import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
+import org.jml.Link.Single.Link2D;
 import org.jml.Mathx.Extra.Intx;
 import org.jml.Mathx.Mathf;
 import org.jml.Mathx.Rand;
-import org.jml.Mathx.TaskManager;
+import org.jml.MT.TaskManager;
 import org.jml.Matrix.Double.Matd;
 import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;
@@ -14,10 +15,12 @@ import java.util.Arrays;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class Mat {
+public class Mat extends Link2D {
     final protected Vec[] values;
 
     public Mat(int rows, int cols) {
+        super(rows, cols);
+
         this.values = new Vec[rows];
         for (int i=0;i<rows;i++) {
             this.values[i] = new Vec(cols);
@@ -25,6 +28,8 @@ public class Mat {
     }
 
     public Mat(float[][] values) {
+        super(values.length, values[0].length);
+
         this.values = new Vec[values.length];
         this.values[0] = new Vec(values[0]);
 
@@ -34,10 +39,11 @@ public class Mat {
     }
 
     public Mat(Vec... values) {
+        super(values.length, values[0].size);
+
         this.values = new Vec[values.length];
         this.values[0] = values[0];
 
-        int n = cols();
         for (int i=1;i<values.length;i++) {
             set(i, values[i]);
         }
@@ -52,13 +58,12 @@ public class Mat {
     }
 
     public int rows() {
-        return values.length;
+        return rows;
     }
 
     public int cols() {
-        return values[0].size();
+        return cols;
     }
-
     
     public float get (int row, int col) {
         return values[row].get(col);
@@ -703,17 +708,6 @@ public class Mat {
         return matrix;
     }
 
-    
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i< rows(); i++) {
-            builder.append(", ").append(get(i).toString());
-        }
-
-        return "{ "+builder.substring(2)+" }";
-    }
-
-    
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

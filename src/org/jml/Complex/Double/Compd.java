@@ -372,6 +372,10 @@ public class Compd implements Complex {
         return new Compd(Math.exp(x), 0);
     }
 
+    public static Compd expi (double x) {
+        return new Compd(Math.cos(x), Math.sin(x));
+    }
+
     /**
      * Log compd.
      *

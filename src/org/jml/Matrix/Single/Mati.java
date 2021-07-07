@@ -3,7 +3,7 @@ package org.jml.Matrix.Single;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Complex.Single.Comp;
 import org.jml.Mathx.Mathf;
-import org.jml.Mathx.TaskManager;
+import org.jml.MT.TaskManager;
 import org.jml.Matrix.Double.Matid;
 import org.jml.Vector.Single.Veci;
 

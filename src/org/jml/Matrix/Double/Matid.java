@@ -1,15 +1,11 @@
 package org.jml.Matrix.Double;
 
-import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Complex.Double.Compd;
 import org.jml.Mathx.Mathd;
-import org.jml.Mathx.Mathf;
-import org.jml.Mathx.TaskManager;
-import org.jml.Matrix.Single.Mat;
+import org.jml.MT.TaskManager;
 import org.jml.Matrix.Single.Mati;
 import org.jml.Vector.Double.Vecid;
-import org.jml.Vector.Single.Veci;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;

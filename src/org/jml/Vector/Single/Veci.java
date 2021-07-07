@@ -2,6 +2,7 @@ package org.jml.Vector.Single;
 
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Complex.Single.Comp;
+import org.jml.Link.Single.Link1Di;
 import org.jml.Mathx.Mathf;
 import org.jml.Matrix.Single.Mat;
 import org.jml.Matrix.Single.Mati;
@@ -11,17 +12,20 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.Function;
 
-public class Veci implements Iterable<Comp> {
+public class Veci extends Link1Di {
     final protected Comp[] values;
 
     public Veci(int size) {
+        super(size);
         this.values = new Comp[size];
+
         for (int i=0;i<size;i++) {
             this.values[i] = Comp.ZERO.clone();
         }
     }
 
     public Veci(Comp... values) {
+        super(values.length);
         this.values = values;
     }
 
@@ -33,6 +37,7 @@ public class Veci implements Iterable<Comp> {
     }
 
     public Veci(Veci initialValues, Comp... finalValues) {
+        super(initialValues.size + finalValues.length);
         int vecSize = initialValues.size();
         this.values = new Comp[vecSize + finalValues.length];
 
@@ -44,6 +49,7 @@ public class Veci implements Iterable<Comp> {
     }
 
     public Veci(Comp[] initialValues, Veci finalValues) {
+        super(initialValues.length + finalValues.size);
         int vecSize = finalValues.size();
         this.values = new Comp[initialValues.length + vecSize];
 

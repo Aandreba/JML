@@ -3,6 +3,8 @@ package org.jml.Mathx;
 import org.jml.Complex.Double.Compd;
 import org.jml.Complex.Single.Comp;
 import org.jml.Complex.Single.Quat;
+import org.jml.Mathx.Extra.Intx;
+import org.jml.Mathx.Extra.Longx;
 import org.jml.Matrix.Double.Matd;
 import org.jml.Matrix.Double.Matid;
 import org.jml.Matrix.Single.Mat;
@@ -81,11 +83,21 @@ final public class Rand {
     }
 
     public static float getFullFloat () {
-        return Float.intBitsToFloat(random.nextInt());
+        float val;
+        do {
+            val = Float.intBitsToFloat(random.nextInt());
+        } while (Float.isNaN(val) | Float.isInfinite(val));
+
+        return val;
     }
 
     public static double getFullDouble () {
-        return Double.longBitsToDouble(random.nextLong());
+        double val;
+        do {
+            val = Double.longBitsToDouble(random.nextLong());
+        } while (Double.isNaN(val) | Double.isInfinite(val));
+
+        return val;
     }
 
     public static Compd getCompd() {

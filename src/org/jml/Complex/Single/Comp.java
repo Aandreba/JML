@@ -257,6 +257,10 @@ public class Comp implements Complex {
         return new Comp(Mathf.exp(x), 0);
     }
 
+    public static Comp expi (float x) {
+        return new Comp(Mathf.cos(x), Mathf.sin(x));
+    }
+
     public static Comp log (Comp x) {
         return x.log();
     }

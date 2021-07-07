@@ -1,6 +1,9 @@
-package org.jml.Mathx;
+package org.jml.MT;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerArray;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -14,29 +17,16 @@ public class TaskManager extends ArrayList<Runnable> implements Runnable {
     }
 
     public void run () {
-        // Assign tasks to each thread
-        int tasksPerThread = size() / AV_THREADS;
-        int rest = size() - (tasksPerThread * AV_THREADS);
-
-        Runnable[][] tasks = new Runnable[AV_THREADS][];
-        for (int i=0;i<AV_THREADS;i++) {
-            int n = i == 0 ? tasksPerThread + rest : tasksPerThread;
-            tasks[i] = new Runnable[n];
-
-            int delta = i == 0 ? 0 : rest + tasksPerThread * i;
-            for (int j=0;j<n;j++) {
-                tasks[i][j] = get(delta + j);
-            }
-        }
+        AtomicInteger pos = new AtomicInteger(0);
+        int size = size();
 
         // Initialize threads
         Thread[] threads = new Thread[AV_THREADS];
         for (int i=0;i<AV_THREADS;i++) {
-            int finalI = i;
             threads[i] = new Thread(() -> {
-                Runnable[] tsks = tasks[finalI];
-                for (Runnable tsk : tsks) {
-                    tsk.run();
+                int j;
+                while ((j = pos.incrementAndGet()) < size) {
+                    get(j).run();
                 }
             });
 

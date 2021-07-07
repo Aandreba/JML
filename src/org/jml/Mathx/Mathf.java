@@ -20,6 +20,9 @@ final public class Mathf {
     final public static float HALFPI = PI / 2;
     final public static float PI2 = 2 * PI;
 
+    final public static float INF = Float.POSITIVE_INFINITY;
+    final public static float NINF = Float.NEGATIVE_INFINITY;
+
     final public static float TO_RADIANS = PI / 180;
     final public static float TO_DEGREES = 180 / PI;
 
