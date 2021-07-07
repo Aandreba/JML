@@ -3,6 +3,7 @@ package org.jml.Matrix.Single;
 import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Link.Single.Link2D;
+import org.jml.MT.TaskIterator;
 import org.jml.Mathx.Extra.Intx;
 import org.jml.Mathx.Mathf;
 import org.jml.Mathx.Rand;
@@ -12,6 +13,9 @@ import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;
 
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -197,11 +201,9 @@ public class Mat extends Link2D {
     public static Mat foreach(int rows, int cols, MatfForEachIndex forEach) {
         Mat matrix = new Mat(rows, cols);
 
-        if (matrix.rows() * matrix.cols() <= 15000) {
-            for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < cols; j++) {
-                    matrix.set(i, j, forEach.apply(i, j));
-                }
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                matrix.set(i, j, forEach.apply(i, j));
             }
         }
 
@@ -243,18 +245,19 @@ public class Mat extends Link2D {
     public Mat mul (Mat b) {
         int rows = rows();
         int cols = b.cols();
-        int dig = Math.min(cols(), b.rows());
+        int digs = Math.min(cols(), b.rows());
 
         if (rows * cols <= 15000) {
             return foreach(rows, cols, (i, j) -> {
                 float sum = 0;
-                for (int k=0;k<dig;k++) {
+                for (int k=0;k<digs;k++) {
                     sum += get(i, k) * b.get(k, j);
                 }
 
                 return sum;
             });
         }
+
 
         TaskManager tasks = new TaskManager();
         Mat result = new Mat(rows, cols);
@@ -263,9 +266,10 @@ public class Mat extends Link2D {
             int finalI = i;
             for (int j=0;j<cols;j++) {
                 int finalJ = j;
+
                 tasks.add(() -> {
                     float sum = 0;
-                    for (int k=0;k<dig;k++) {
+                    for (int k=0;k<digs;k++) {
                         sum += get(finalI, k) * b.get(k, finalJ);
                     }
 

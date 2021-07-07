@@ -7,6 +7,7 @@ import org.jml.Complex.Double.Compd;
 import org.jml.Complex.Single.Comp;
 import org.jml.Matrix.Double.MatCLid;
 import org.jml.Vector.Double.VecCLid;
+import org.jml.Vector.Single.VecCL;
 import org.jml.Vector.Single.VecCLi;
 import org.jml.Vector.Single.Veci;
 import org.jocl.blast.CLBlast;
@@ -95,6 +96,21 @@ public class MatCLi {
      */
     public MatCLi add (MatCLi b) {
         return add(Comp.ONE, b);
+    }
+
+    public MatCLi add (VecCLi b) {
+        MatCLi result = new MatCLi(rows, cols);
+
+        for (int i=0;i<rows;i++) {
+            VecCLi row1 = get(i);
+            VecCLi row2 = row1.add(b);
+
+            result.set(i, row2);
+            row1.release();
+            row2.release();
+        }
+
+        return result;
     }
 
     /**

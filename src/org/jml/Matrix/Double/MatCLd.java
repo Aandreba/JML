@@ -95,6 +95,21 @@ public class MatCLd {
         return add(1, b);
     }
 
+    public MatCLd add (VecCLd b) {
+        MatCLd result = new MatCLd(rows, cols);
+
+        for (int i=0;i<rows;i++) {
+            VecCLd row1 = get(i);
+            VecCLd row2 = row1.add(b);
+
+            result.set(i, row2);
+            row1.release();
+            row2.release();
+        }
+
+        return result;
+    }
+
     /**
      * Performs the operation y = A - beta * B
      */

@@ -35,27 +35,4 @@ public class Mathb {
     public static BigDecimal exp (long value, MathContext context) {
         return exp(BigDecimal.valueOf(value), context);
     }
-
-    public static BigDecimal log (BigDecimal value, MathContext context) {
-        AtomicReference<BigDecimal> log = new AtomicReference<>(new BigDecimal(0, context));
-        AtomicReference<BigDecimal> last = new AtomicReference<>(null);
-
-        value.scale();
-        TaskIterator tasks = new TaskIterator(i -> {
-            boolean plus = Intx.isOdd(i);
-            BigDecimal k = BigDecimal.valueOf(i);
-
-
-        }, i -> !log.equals(last));
-
-        return log;
-    }
-
-    public static BigDecimal log (double value, MathContext context) {
-        return log(BigDecimal.valueOf(value), context);
-    }
-
-    public static BigDecimal log (long value, MathContext context) {
-        return log(BigDecimal.valueOf(value), context);
-    }
 }

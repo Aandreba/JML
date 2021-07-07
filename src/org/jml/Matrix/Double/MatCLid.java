@@ -97,6 +97,21 @@ public class MatCLid {
         return add(Compd.ONE, b);
     }
 
+    public MatCLid add (VecCLid b) {
+        MatCLid result = new MatCLid(rows, cols);
+
+        for (int i=0;i<rows;i++) {
+            VecCLid row1 = get(i);
+            VecCLid row2 = row1.add(b);
+
+            result.set(i, row2);
+            row1.release();
+            row2.release();
+        }
+
+        return result;
+    }
+
     /**
      * Performs the operation y = A - beta * B
      */

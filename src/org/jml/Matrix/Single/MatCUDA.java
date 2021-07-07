@@ -2,6 +2,7 @@ package org.jml.Matrix.Single;
 
 import org.jml.GPGPU.CUDA.CUDA;
 import org.jml.Matrix.Double.MatCUDAd;
+import org.jml.Vector.Single.VecCL;
 import org.jml.Vector.Single.VecCUDA;
 import org.jml.Vector.Single.Vec;
 import jcuda.Pointer;

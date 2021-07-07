@@ -96,6 +96,21 @@ public class MatCL {
         return add(1, b);
     }
 
+    public MatCL add (VecCL b) {
+        MatCL result = new MatCL(rows, cols);
+
+        for (int i=0;i<rows;i++) {
+            VecCL row1 = get(i);
+            VecCL row2 = row1.add(b);
+
+            result.set(i, row2);
+            row1.release();
+            row2.release();
+        }
+
+        return result;
+    }
+
     /**
      * Performs the operation y = A - beta * B
      */
