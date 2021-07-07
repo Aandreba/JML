@@ -404,7 +404,7 @@ public class MatCLid {
         MatCLid result = new MatCLid(getContext(), cols, rows);
 
         cl_event event = new cl_event();
-        CLBlast.CLBlastZomatcopy(CLBlastLayout.CLBlastLayoutRowMajor, CLBlastTranspose.CLBlastTransposeYes, cols, rows, CompdBuffer.getDoubles(alpha), getId(), 0, rows, result.getId(), 0, cols, getContext().queue, event);
+        CLBlast.CLBlastZomatcopy(CLBlastLayout.CLBlastLayoutRowMajor, CLBlastTranspose.CLBlastTransposeYes, rows, cols, CompdBuffer.getDoubles(alpha), getId(), 0, cols, result.getId(), 0, rows, getContext().queue, event);
 
         Query.awaitEvents(event);
         return result;

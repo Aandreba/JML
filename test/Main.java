@@ -8,9 +8,9 @@ import java.util.Arrays;
 
 public class Main {
     public static void main(String... args) {
-        MatCL a = Rand.getMat(2, 1).toCL();
+        MatCL a = Rand.getMat(4, 2).toCL();
 
-        System.out.println(a);
+        System.out.println(a.toCPU().T());
         System.out.println(a.T());
     }
 }

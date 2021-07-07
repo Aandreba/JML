@@ -447,7 +447,7 @@ public class MatCL {
         MatCL result = new MatCL(getContext(), cols, rows);
 
         cl_event event = new cl_event();
-        CLBlast.CLBlastSomatcopy(CLBlastLayout.CLBlastLayoutRowMajor, CLBlastTranspose.CLBlastTransposeYes, cols, rows, alpha, getId(), 0, rows, result.getId(), 0, cols, getContext().queue, event);
+        CLBlast.CLBlastSomatcopy(CLBlastLayout.CLBlastLayoutRowMajor, CLBlastTranspose.CLBlastTransposeYes, rows, cols, alpha, getId(), 0, cols, result.getId(), 0, rows, getContext().queue, event);
 
         Query.awaitEvents(event);
         return result;
