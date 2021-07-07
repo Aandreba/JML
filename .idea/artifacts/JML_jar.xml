@@ -3,7 +3,15 @@
     <output-path>$PROJECT_DIR$/out/artifacts/JML_jar</output-path>
     <root id="archive" name="JML.jar">
       <element id="module-output" name="JML" />
-      <element id="dir-copy" path="$PROJECT_DIR$/lib" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jcublas-11.1.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jcuda-11.1.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jcuda-natives-11.1.1-windows-x86_64.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jcublas-natives-11.1.1-windows-x86_64.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jocl-blast-1.5.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jocl-2.0.0.jar" path-in-jar="/" />
+      <element id="library" level="project" name="Win" />
+      <element id="library" level="project" name="OSX" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jcublas-natives-11.1.1.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

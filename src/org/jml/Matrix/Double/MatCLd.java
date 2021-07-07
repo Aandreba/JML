@@ -427,10 +427,10 @@ public class MatCLd {
      * Performs scaling and out-of-place transposition/copying of matrices according to B = alpha*op(A)
      */
     public MatCLd T (double alpha) {
-        MatCLd result = new MatCLd(getContext(), rows, cols);
+        MatCLd result = new MatCLd(getContext(), cols, rows);
 
         cl_event event = new cl_event();
-        CLBlast.CLBlastDomatcopy(CLBlastLayout.CLBlastLayoutRowMajor, CLBlastTranspose.CLBlastTransposeYes, rows, cols, alpha, getId(), 0, rows, result.getId(), 0, cols, getContext().queue, event);
+        CLBlast.CLBlastDomatcopy(CLBlastLayout.CLBlastLayoutRowMajor, CLBlastTranspose.CLBlastTransposeYes, cols, rows, alpha, getId(), 0, rows, result.getId(), 0, cols, getContext().queue, event);
 
         Query.awaitEvents(event);
         return result;

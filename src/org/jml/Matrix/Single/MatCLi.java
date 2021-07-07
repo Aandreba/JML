@@ -426,10 +426,10 @@ public class MatCLi {
      * Performs scaling and out-of-place transposition/copying of matrices according to B = alpha*op(A)
      */
     public MatCLi T (Comp alpha) {
-        MatCLi result = new MatCLi(getContext(), rows, cols);
+        MatCLi result = new MatCLi(getContext(), cols, rows);
 
         cl_event event = new cl_event();
-        CLBlast.CLBlastComatcopy(CLBlastLayout.CLBlastLayoutRowMajor, CLBlastTranspose.CLBlastTransposeYes, rows, cols, CompBuffer.getFloats(alpha), getId(), 0, rows, result.getId(), 0, cols, getContext().queue, event);
+        CLBlast.CLBlastComatcopy(CLBlastLayout.CLBlastLayoutRowMajor, CLBlastTranspose.CLBlastTransposeYes, cols, rows, CompBuffer.getFloats(alpha), getId(), 0, rows, result.getId(), 0, cols, getContext().queue, event);
 
         Query.awaitEvents(event);
         return result;

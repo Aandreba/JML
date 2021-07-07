@@ -402,10 +402,10 @@ public class MatCLid {
      * Performs scaling and out-of-place transposition/copying of matrices according to B = alpha*op(A)
      */
     public MatCLid T (Compd alpha) {
-        MatCLid result = new MatCLid(getContext(), rows, cols);
+        MatCLid result = new MatCLid(getContext(), cols, rows);
 
         cl_event event = new cl_event();
-        CLBlast.CLBlastZomatcopy(CLBlastLayout.CLBlastLayoutRowMajor, CLBlastTranspose.CLBlastTransposeYes, rows, cols, CompdBuffer.getDoubles(alpha), getId(), 0, rows, result.getId(), 0, cols, getContext().queue, event);
+        CLBlast.CLBlastZomatcopy(CLBlastLayout.CLBlastLayoutRowMajor, CLBlastTranspose.CLBlastTransposeYes, cols, rows, CompdBuffer.getDoubles(alpha), getId(), 0, rows, result.getId(), 0, cols, getContext().queue, event);
 
         Query.awaitEvents(event);
         return result;
