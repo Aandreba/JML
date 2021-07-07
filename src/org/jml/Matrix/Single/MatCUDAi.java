@@ -1,5 +1,6 @@
 package org.jml.Matrix.Single;
 
+import jcuda.cuComplex;
 import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.CUDA.CUDA;
 import org.jml.Matrix.Double.MatCUDAid;
@@ -145,6 +146,33 @@ public class MatCUDAi {
      */
     public VecCUDAi mul (VecCUDAi x) {
         return mul(Comp.ONE, x);
+    }
+
+    public MatCUDAi scalMul (MatCUDAi b) {
+        checkCompatibility(b);
+
+        MatCUDAi mul = new MatCUDAi(size, size);
+        JCublas.cublasCcopy(size, id, 1, mul.id, size + 1);
+
+        MatCUDAi result = b.clone();
+        JCublas.cublasCtrmv('l', 'n', 'n', size, mul.id, size, result.id, 1);
+
+        mul.release();
+        return result;
+    }
+
+    public MatCUDA scalMul (Comp b) {
+        MatCUDA result = new MatCUDA(rows, cols);
+        JCublas.cublasCaxpy(size, b.toCUDA(), this.id, 1, result.id, 1);
+
+        return result;
+    }
+
+    public MatCUDA scalMul (float b) {
+        MatCUDA result = new MatCUDA(rows, cols);
+        JCublas.cublasCaxpy(size, cuComplex.cuCmplx(b, 0), this.id, 1, result.id, 1);
+
+        return result;
     }
 
     public void release () {

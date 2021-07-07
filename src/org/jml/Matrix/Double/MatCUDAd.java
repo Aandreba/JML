@@ -147,6 +147,26 @@ public class MatCUDAd {
         return mul(1, x);
     }
 
+    public MatCUDAd scalMul (MatCUDAd b) {
+        checkCompatibility(b);
+
+        MatCUDAd mul = new MatCUDAd(size, size);
+        JCublas.cublasDcopy(size, id, 1, mul.id, size + 1);
+
+        MatCUDAd result = b.clone();
+        JCublas.cublasDtrmv('l', 'n', 'n', size, mul.id, size, result.id, 1);
+
+        mul.release();
+        return result;
+    }
+
+    public MatCUDAd scalMul (double b) {
+        MatCUDAd result = new MatCUDAd(rows, cols);
+        JCublas.cublasDaxpy(size, b, this.id, 1, result.id, 1);
+
+        return result;
+    }
+
     public MatCUDAd inverse () { // TODO https://github.com/jcuda/jcuda-samples/blob/66d72e3044b2c2e3df4b54f62f22bb5f10349b71/JCudaSamples/src/main/java/jcuda/jcublas/samples/JCublas2MatrixInvert.java#L103
         return null;
     }

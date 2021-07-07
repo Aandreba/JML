@@ -1,7 +1,9 @@
 package org.jml.Matrix.Double;
 
 import org.jml.Complex.Double.Compd;
+import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.CUDA.CUDA;
+import org.jml.Matrix.Single.MatCUDA;
 import org.jml.Matrix.Single.MatCUDAi;
 import org.jml.Vector.Double.VecCUDAid;
 import org.jml.Vector.Double.Vecid;
@@ -147,6 +149,33 @@ public class MatCUDAid {
      */
     public VecCUDAid mul (VecCUDAid x) {
         return mul(Compd.ONE, x);
+    }
+
+    public MatCUDAid scalMul (MatCUDAid b) {
+        checkCompatibility(b);
+
+        MatCUDAid mul = new MatCUDAid(size, size);
+        JCublas.cublasZcopy(size, id, 1, mul.id, size + 1);
+
+        MatCUDAid result = b.clone();
+        JCublas.cublasZtrmv('l', 'n', 'n', size, mul.id, size, result.id, 1);
+
+        mul.release();
+        return result;
+    }
+
+    public MatCUDAid scalMul (Compd b) {
+        MatCUDAid result = new MatCUDAid(rows, cols);
+        JCublas.cublasZaxpy(size, b.toCUDA(), this.id, 1, result.id, 1);
+
+        return result;
+    }
+
+    public MatCUDAid scalMul (double b) {
+        MatCUDAid result = new MatCUDAid(rows, cols);
+        JCublas.cublasZaxpy(size, cuDoubleComplex.cuCmplx(b, 0), this.id, 1, result.id, 1);
+
+        return result;
     }
 
     public void release () {
