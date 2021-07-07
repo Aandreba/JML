@@ -1,16 +1,14 @@
 package org.jml.Complex.Double;
-import org.jml.Complex.Complex;
 import org.jml.Complex.Single.Comp;
 import org.jml.Mathx.Mathd;
 import jcuda.cuDoubleComplex;
-import org.jml.Mathx.Mathf;
 
 import java.util.Objects;
 
 /**
  * The type Compd is the representation of a complex number in doubles
  */
-public class Compd implements Complex {
+public class Compd {
     final public static Compd ZERO = new Compd();
     final public static Compd ONE = new Compd(1,0);
     final public static Compd ONEI = new Compd(0,1);
@@ -239,7 +237,6 @@ public class Compd implements Complex {
         return new Comp((float) real, (float) imaginary);
     }
 
-    @Override
     public Compd toDouble() {
         return this;
     }
