@@ -99,16 +99,16 @@ public class VecCUDA {
     /**
      * Performs the operation y = alpha * x * y
      */
-    public VecCUDA mul (float alpha, VecCUDA b) {
-        checkCompatibility(b);
-        return identityLike().mul(alpha, b);
-    }
-
-    /**
-     * Performs the operation y = x * y
-     */
     public VecCUDA mul (VecCUDA b) {
-        return mul(1, b);
+        checkCompatibility(b);
+
+        MatCUDA mul = identityLike();
+        VecCUDA result = b.clone();
+
+        JCublas.cublasStrmv('l', 'n', 'n', size, mul.id, size, result.id, 1);
+        mul.release();
+
+        return result;
     }
 
     /**
@@ -232,7 +232,7 @@ public class VecCUDA {
 
     
     public VecCUDA clone() {
-        VecCUDA clone = new VecCUDA();
+        VecCUDA clone = new VecCUDA(size);
         JCublas.cublasScopy(size, id, 1, clone.id, 1);
 
         return clone;

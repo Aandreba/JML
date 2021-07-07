@@ -77,6 +77,13 @@ public class MatCUDA {
         return subtr(1, b);
     }
 
+    public MatCUDA invSubtr (float alpha) {
+        MatCUDA result = new MatCUDA(Vec.foreach(size, x -> alpha).rowMajor(cols));
+        JCublas.cublasSaxpy(size, -1, id, 1, result.id, 1);
+
+        return result;
+    }
+
     /**
      * Performs the matrix product C = alpha * A * B + beta * C
      */
@@ -146,6 +153,20 @@ public class MatCUDA {
     public VecCUDA mul (VecCUDA x) {
         return mul(1, x);
     }
+
+    /*public MatCUDA scalMul (MatCUDA b) {
+        MatCUDA result = b.clone();
+        JCublas.cublasSaxpy(size, 1, this.id, 1, b.id, 1);
+
+        return result;
+    }
+
+    public MatCUDA scalMul (float b) {
+        MatCUDA result = b.clone();
+        JCublas.cublasSaxpy(size, 1, this.id, 1, b.id, 1);
+
+        return result;
+    }*/
 
     public void release () {
         JCublas.cublasFree(id);

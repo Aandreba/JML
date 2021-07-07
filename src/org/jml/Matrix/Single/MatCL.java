@@ -1,5 +1,6 @@
 package org.jml.Matrix.Single;
 
+import jcuda.jcublas.JCublas;
 import org.jml.GPGPU.OpenCL.Buffer.FloatBuffer;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.GPGPU.OpenCL.Query;
@@ -107,6 +108,16 @@ public class MatCL {
      */
     public MatCL subtr (MatCL b) {
         return subtr(1, b);
+    }
+
+    public MatCL invSubtr (float alpha) {
+        VecCL result = Vec.foreach(vector.size, x -> alpha).toCL(getContext());
+
+        cl_event event = new cl_event();
+        CLBlast.CLBlastSaxpy(vector.size, -1, getId(), 0, 1, result.getId(), 0, 1, getContext().queue, event);
+
+        Query.awaitEvents(event);
+        return new MatCL(result, cols);
     }
 
     /**
