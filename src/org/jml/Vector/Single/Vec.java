@@ -16,17 +16,17 @@ public class Vec extends Link1D implements Serializable {
     final private static long serialVersionUID = -6532630924133944420L;
     final protected float[] values;
 
-    public Vec(int size) {
+    public Vec (int size) {
         super(size);
         this.values = new float[size];
     }
 
-    public Vec(float... values) {
+    public Vec (float... values) {
         super(values.length);
         this.values = values;
     }
 
-    public Vec(Vec initialValues, float... finalValues) {
+    public Vec (Vec initialValues, float... finalValues) {
         super(initialValues.size() + finalValues.length);
 
         int vecSize = initialValues.size();
@@ -41,7 +41,7 @@ public class Vec extends Link1D implements Serializable {
         }
     }
 
-    public Vec(float[] initialValues, Vec finalValues) {
+    public Vec (float[] initialValues, Vec finalValues) {
         super(initialValues.length + finalValues.size);
 
         int vecSize = finalValues.size();

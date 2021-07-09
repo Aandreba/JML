@@ -1,11 +1,14 @@
 package org.jml.Link.Single;
 
 import org.jml.Vector.Single.Vec;
+
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public abstract class Link1D implements Iterable<Float> {
+public abstract class Link1D implements Iterable<Float>, Serializable {
+    final private static long serialVersionUID = -4959958410146648569L;
     final public int size;
 
     public Link1D (int size) {

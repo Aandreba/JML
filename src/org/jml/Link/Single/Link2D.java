@@ -2,11 +2,13 @@ package org.jml.Link.Single;
 
 import org.jml.Matrix.Single.Mat;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public abstract class Link2D implements Iterable<Link1D> {
+public abstract class Link2D implements Iterable<Link1D>, Serializable {
+    final private static long serialVersionUID = -6376672913470084131L;
     final public int rows, cols;
 
     public Link2D (int rows, int cols) {

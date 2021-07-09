@@ -3,7 +3,6 @@ package org.jml.Matrix.Single;
 import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Link.Single.Link2D;
-import org.jml.MT.TaskIterator;
 import org.jml.Mathx.Extra.Intx;
 import org.jml.Mathx.Mathf;
 import org.jml.Mathx.Rand;
@@ -14,9 +13,6 @@ import org.jml.Vector.Single.Veci;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 

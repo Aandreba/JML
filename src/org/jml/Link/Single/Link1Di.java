@@ -4,11 +4,13 @@ import org.jml.Complex.Single.Comp;
 import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public abstract class Link1Di implements Iterable<Comp> {
+public abstract class Link1Di implements Iterable<Comp>, Serializable {
+    final private static long serialVersionUID = -2933899131686346431L;
     final public int size;
 
     public Link1Di(int size) {
