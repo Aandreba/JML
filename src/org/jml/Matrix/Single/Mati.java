@@ -7,10 +7,11 @@ import org.jml.MT.TaskManager;
 import org.jml.Matrix.Double.Matid;
 import org.jml.Vector.Single.Veci;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.function.BiFunction;
 
-public class Mati {
+public class Mati implements Serializable {
     final protected Veci[] values;
 
     public Mati(int rows, int cols) {

@@ -7,10 +7,11 @@ import org.jml.MT.TaskManager;
 import org.jml.Matrix.Single.Mati;
 import org.jml.Vector.Double.Vecid;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.function.BiFunction;
 
-public class Matid {
+public class Matid implements Serializable {
     final protected Vecid[] values;
 
     public Matid(int rows, int cols) {

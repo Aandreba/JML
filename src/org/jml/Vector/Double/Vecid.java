@@ -8,11 +8,12 @@ import org.jml.Matrix.Double.Matid;
 import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.Function;
 
-public class Vecid implements Iterable<Compd> {
+public class Vecid implements Iterable<Compd>, Serializable {
     final protected Compd[] values;
 
     public Vecid(int size) {

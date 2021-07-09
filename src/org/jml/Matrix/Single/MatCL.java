@@ -14,6 +14,8 @@ import org.jocl.blast.CLBlast;
 import org.jocl.blast.CLBlastLayout;
 import org.jocl.blast.CLBlastTranspose;
 
+import java.io.Serializable;
+
 public class MatCL {
     final VecCL vector;
     final int rows, cols;

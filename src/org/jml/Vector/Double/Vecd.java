@@ -9,11 +9,12 @@ import org.jml.Matrix.Single.Mati;
 import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.Function;
 
-public class Vecd implements Iterable<Double> {
+public class Vecd implements Iterable<Double>, Serializable {
     final protected double[] values;
 
     public Vecd(int size) {

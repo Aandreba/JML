@@ -8,11 +8,12 @@ import org.jml.Matrix.Single.Mat;
 import org.jml.Matrix.Single.Mati;
 import org.jml.Vector.Double.Vecid;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.Function;
 
-public class Veci extends Link1Di {
+public class Veci extends Link1Di implements Serializable {
     final protected Comp[] values;
 
     public Veci(int size) {

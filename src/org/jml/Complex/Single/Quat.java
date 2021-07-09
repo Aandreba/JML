@@ -6,9 +6,10 @@ import org.jml.Matrix.Single.Mat;
 import org.jml.Matrix.Single.Mati;
 import org.jml.Vector.Single.Vec;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Quat {
+public class Quat implements Serializable {
     final public static Quat ZERO = new Quat();
     final public static Quat ONE = new Quat(1, 0, 0, 0);
 

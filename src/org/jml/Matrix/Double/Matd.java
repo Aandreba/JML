@@ -10,11 +10,12 @@ import org.jml.Matrix.Single.Mat;
 import org.jml.Vector.Double.Vecd;
 import org.jml.Vector.Double.Vecid;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class Matd {
+public class Matd implements Serializable {
     final protected Vecd[] values;
 
     public Matd(int rows, int cols) {

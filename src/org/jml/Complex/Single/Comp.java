@@ -3,9 +3,10 @@ import org.jml.Complex.Double.Compd;
 import org.jml.Mathx.Mathf;
 import jcuda.cuComplex;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Comp {
+public class Comp implements Serializable {
     final public static Comp ZERO = new Comp();
     final public static Comp ONE = new Comp(1,0);
     final public static Comp ONEI = new Comp(0,1);

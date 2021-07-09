@@ -12,6 +12,7 @@ import org.jml.Matrix.Double.Matd;
 import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -19,7 +20,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class Mat extends Link2D {
+public class Mat extends Link2D implements Serializable {
     final protected Vec[] values;
 
     public Mat(int rows, int cols) {

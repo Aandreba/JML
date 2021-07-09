@@ -5,12 +5,14 @@ import org.jml.Link.Single.Link1D;
 import org.jml.Mathx.Mathf;
 import org.jml.Matrix.Single.Mat;
 import org.jml.Vector.Double.Vecd;
+
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class Vec extends Link1D {
+public class Vec extends Link1D implements Serializable {
     final protected float[] values;
 
     public Vec(int size) {

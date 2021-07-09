@@ -6,9 +6,10 @@ import org.jml.Matrix.Double.Matd;
 import org.jml.Matrix.Double.Matid;
 import org.jml.Vector.Double.Vecd;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Quatd {
+public class Quatd implements Serializable {
     final public static Quatd ZERO = new Quatd();
     final public static Quatd ONE = new Quatd(1, 0, 0, 0);
 
