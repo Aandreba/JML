@@ -16,6 +16,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class Matd implements Serializable {
+    final private static long serialVersionUID = 2116257607766053850L;
     final protected Vecd[] values;
 
     public Matd(int rows, int cols) {

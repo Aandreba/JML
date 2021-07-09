@@ -7,6 +7,8 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class Comp implements Serializable {
+    final private static long serialVersionUID = -4811064611324460886L;
+
     final public static Comp ZERO = new Comp();
     final public static Comp ONE = new Comp(1,0);
     final public static Comp ONEI = new Comp(0,1);

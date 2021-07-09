@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.function.Function;
 
 public class Veci extends Link1Di implements Serializable {
+    final private static long serialVersionUID = 66875375185571509L;
     final protected Comp[] values;
 
     public Veci(int size) {

@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.function.BiFunction;
 
 public class Mati implements Serializable {
+    final private static long serialVersionUID = -7364904562555322777L;
     final protected Veci[] values;
 
     public Mati(int rows, int cols) {

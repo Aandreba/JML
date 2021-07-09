@@ -10,6 +10,8 @@ import java.util.Objects;
  * The type Compd is the representation of a complex number in doubles
  */
 public class Compd implements Serializable {
+    final private static long serialVersionUID = -1317134012145987898L;
+
     final public static Compd ZERO = new Compd();
     final public static Compd ONE = new Compd(1,0);
     final public static Compd ONEI = new Compd(0,1);

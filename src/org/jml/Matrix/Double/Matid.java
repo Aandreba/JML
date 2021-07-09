@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.function.BiFunction;
 
 public class Matid implements Serializable {
+    final private static long serialVersionUID = -3703861724273532184L;
     final protected Vecid[] values;
 
     public Matid(int rows, int cols) {

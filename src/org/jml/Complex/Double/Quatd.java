@@ -10,6 +10,8 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class Quatd implements Serializable {
+    final private static long serialVersionUID = -1453349623852409651L;
+
     final public static Quatd ZERO = new Quatd();
     final public static Quatd ONE = new Quatd(1, 0, 0, 0);
 

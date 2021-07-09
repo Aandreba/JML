@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.function.Function;
 
 public class Vecid implements Iterable<Compd>, Serializable {
+    final private static long serialVersionUID = -7859103288034059657L;
     final protected Compd[] values;
 
     public Vecid(int size) {

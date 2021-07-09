@@ -13,6 +13,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class Vec extends Link1D implements Serializable {
+    final private static long serialVersionUID = -6532630924133944420L;
     final protected float[] values;
 
     public Vec(int size) {

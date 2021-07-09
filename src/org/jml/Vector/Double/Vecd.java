@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.function.Function;
 
 public class Vecd implements Iterable<Double>, Serializable {
+    final private static long serialVersionUID = -756326795819669562L;
     final protected double[] values;
 
     public Vecd(int size) {

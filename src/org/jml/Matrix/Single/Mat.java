@@ -21,6 +21,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class Mat extends Link2D implements Serializable {
+    final private static long serialVersionUID = 4991458981436962219L;
     final protected Vec[] values;
 
     public Mat(int rows, int cols) {
