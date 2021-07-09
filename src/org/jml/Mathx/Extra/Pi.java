@@ -84,7 +84,7 @@ public class Pi {
     public static BigDecimal monteCarlo (int points) {
         final MathContext context = new MathContext(points, RoundingMode.HALF_EVEN);
 
-        AtomicLong inside = new AtomicLong(0);
+        AtomicInteger inside = new AtomicInteger(0);
         TaskManager tasks = new TaskManager();
 
         for (int i=0;i<points;i++) {
@@ -100,7 +100,7 @@ public class Pi {
         }
 
         tasks.run();
-        return inside.get() == 0 ? BigDecimal.ZERO : BigDecimal.valueOf(4 * inside.get()).divide(BigDecimal.valueOf(points), context);
+        return inside.get() == 0 ? BigDecimal.ZERO : BigDecimal.valueOf(4L * inside.get()).divide(BigDecimal.valueOf(points), context);
     }
 
     public static BigDecimal ramanujan (int points) {
