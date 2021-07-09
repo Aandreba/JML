@@ -6,7 +6,7 @@ import org.jml.Calculus.Derivative.Function.Regular.Pow;
 import org.jml.Mathx.Mathf;
 
 public class Cbrt extends Func {
-    final private static double root = 2d / 3;
+    final private static Pow root = new Pow(2d / 3);
 
     protected Cbrt() {}
 
@@ -22,7 +22,7 @@ public class Cbrt extends Func {
 
     @Override
     public Func deriv (Func x) {
-        return Const.ONE.div(Const.THREE.mul(new Pow(root).applyTo(x)));
+        return Const.ONE.div(Const.THREE.mul(root.applyTo(x)));
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.jml.Calculus.Derivative;
 import org.jml.Calculus.Derivative.Comb.*;
 import org.jml.Calculus.Derivative.Function.Regular.Const;
 import org.jml.Calculus.Derivative.Function.Regular.Var;
+import org.jml.Vector.Single.Vec;
 
 public abstract class Func {
     public abstract double applyTo (double x);
@@ -22,6 +23,18 @@ public abstract class Func {
     final public Func deriv () {
         return deriv(Var.X);
     }
+    final public Func deriv (Func x, int n) {
+        Func deriv = this;
+        for (int i=0;i<n;i++) {
+            deriv = deriv.deriv(x);
+        }
+
+        return deriv;
+    }
+    final public Func deriv (int n) {
+        return deriv(Var.X, n);
+    }
+
     final public Sum add (Func beta) { return new Sum(this, beta); }
     final public Sum add (double beta) { return new Sum(this, new Const(beta)); }
     final public Subtr subtr (Func beta) { return new Subtr(this, beta); }
