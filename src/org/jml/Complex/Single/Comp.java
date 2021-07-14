@@ -138,7 +138,7 @@ public class Comp implements Serializable {
     }
 
     public Comp log () {
-        if (imaginary == 0) {
+        if (imaginary == 0 && real > 0) {
             return new Comp(Mathf.log(real), 0);
         }
 
@@ -267,6 +267,6 @@ public class Comp implements Serializable {
     }
 
     public static Comp log (float x) {
-        return new Comp(Mathf.log(x), 0);
+        return x > 0 ? new Comp(Mathf.log(x), 0) : new Comp(x, 0).log();
     }
 }

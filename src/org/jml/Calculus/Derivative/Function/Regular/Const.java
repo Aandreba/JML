@@ -2,6 +2,8 @@ package org.jml.Calculus.Derivative.Function.Regular;
 
 import org.jml.Calculus.Derivative.Func;
 
+import java.util.Objects;
+
 public class Const extends Func {
     final public static Const MONE = new Const(-1);
     final public static Const ZERO = new Const(0);
@@ -32,5 +34,18 @@ public class Const extends Func {
     @Override
     public String toString(Func x) {
         return Double.toString(alpha);
+    }
+
+    @Override
+    public boolean equals (Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Const aConst = (Const) o;
+        return Double.compare(aConst.alpha, alpha) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(alpha);
     }
 }

@@ -2,8 +2,9 @@ package org.jml.Calculus.Derivative.Comb;
 
 import org.jml.Calculus.Derivative.Func;
 import org.jml.Calculus.Derivative.Function.Regular.Const;
+import org.jml.Calculus.Derivative.Function.Regular.Var;
 
-public class Chain extends Func {
+public class Chain extends Comb {
     final public Func input, output;
 
     public Chain (Func input, Func output) {
@@ -24,6 +25,11 @@ public class Chain extends Func {
     @Override
     public Func deriv (Func x) {
         return output.deriv(input.applyTo(x)).mul(input.deriv(x));
+    }
+
+    @Override
+    public Chain replace (Var var, Const constant) {
+        return new Chain(input.equals(var) ? constant : input, output);
     }
 
     @Override

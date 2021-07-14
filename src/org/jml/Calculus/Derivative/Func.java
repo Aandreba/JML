@@ -7,33 +7,11 @@ import org.jml.Vector.Single.Vec;
 
 public abstract class Func {
     public abstract double applyTo (double x);
-    public abstract Func deriv (Func x);
-    public abstract String toString (Func x);
-
-    public float applyTo(float x) {
+    public float applyTo (float x) {
         return (float) applyTo((double) x);
     }
-    public double deriv (double x) {
-        return deriv(Var.X).applyTo(x);
-    }
-    public float deriv (float x) {
-        return deriv(Var.X).applyTo(x);
-    }
 
-    final public Func deriv () {
-        return deriv(Var.X);
-    }
-    final public Func deriv (Func x, int n) {
-        Func deriv = this;
-        for (int i=0;i<n;i++) {
-            deriv = deriv.deriv(x);
-        }
-
-        return deriv;
-    }
-    final public Func deriv (int n) {
-        return deriv(Var.X, n);
-    }
+    public abstract Func deriv (Func x);
 
     final public Sum add (Func beta) { return new Sum(this, beta); }
     final public Sum add (double beta) { return new Sum(this, new Const(beta)); }
@@ -52,8 +30,12 @@ public abstract class Func {
         return new Chain(output, this);
     }
 
-    @Override
+    public abstract String toString (Func x);
     public String toString() {
         return toString(Var.X);
+    }
+
+    interface VarValue {
+        double apply (Var var);
     }
 }

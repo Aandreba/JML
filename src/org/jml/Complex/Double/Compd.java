@@ -189,7 +189,7 @@ public class Compd implements Serializable {
      * Returns the complex number's natural logarithm
      */
     public Compd log () {
-        if (imaginary == 0) {
+        if (imaginary == 0 && real > 0) {
             return new Compd(Math.log(real), 0);
         }
 
@@ -393,6 +393,6 @@ public class Compd implements Serializable {
      * @return the compd
      */
     public static Compd log (double x) {
-        return new Compd(Math.log(x), 0);
+        return x > 0 ? new Compd(Math.log(x), 0) : new Compd(x, 0).log();
     }
 }

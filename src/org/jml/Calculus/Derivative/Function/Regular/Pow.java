@@ -12,18 +12,18 @@ public class Pow extends Func {
     }
 
     @Override
-    public double applyTo(double x) {
+    public double applyTo (double x) {
         return Math.pow(x, alpha);
     }
 
     @Override
-    public float applyTo(float x) {
+    public float applyTo (float x) {
         return Mathf.pow(x, (float) alpha);
     }
 
     @Override
     public Func deriv (Func x) {
-        return new Const(alpha).mul(new Pow(alpha - 1).applyTo(x));
+        return alpha == 2 ? Const.TWO.mul(x) : new Const(alpha).mul(new Pow(alpha - 1).applyTo(x));
     }
 
     @Override

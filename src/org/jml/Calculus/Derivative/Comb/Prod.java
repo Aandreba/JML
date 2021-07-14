@@ -2,8 +2,9 @@ package org.jml.Calculus.Derivative.Comb;
 
 import org.jml.Calculus.Derivative.Func;
 import org.jml.Calculus.Derivative.Function.Regular.Const;
+import org.jml.Calculus.Derivative.Function.Regular.Var;
 
-public class Prod extends Func {
+public class Prod extends Comb {
     final public Func alpha, beta;
 
     public Prod (Func alpha, Func beta) {
@@ -35,7 +36,19 @@ public class Prod extends Func {
     }
 
     @Override
-    public String toString(Func x) {
+    public Func replace (Var var, Const constant) {
+        Func a = alpha.equals(var) ? constant : alpha;
+        Func b = beta.equals(var) ? constant : alpha;
+
+        if (a instanceof Const && b instanceof Const) {
+            return new Const(((Const) a).alpha * ((Const) b).alpha);
+        }
+
+        return new Prod(a, b);
+    }
+
+    @Override
+    public String toString (Func x) {
         if (alpha instanceof Const && beta instanceof Const) {
             Const a = (Const) alpha;
             Const b = (Const) beta;
