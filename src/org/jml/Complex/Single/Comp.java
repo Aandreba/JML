@@ -14,6 +14,9 @@ public class Comp implements Serializable {
     final public static Comp ONEI = new Comp(0,1);
     final public static Comp MONE = new Comp(-1,0);
 
+    final public static Comp PI = new Comp(Mathf.PI, 0);
+    final public static Comp E = new Comp(Mathf.E, 0);
+
     final public float real, imaginary;
 
     public Comp(float real, float imaginary) {

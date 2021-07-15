@@ -2,6 +2,7 @@ package org.jml.Complex.Double;
 import org.jml.Complex.Single.Comp;
 import org.jml.Mathx.Mathd;
 import jcuda.cuDoubleComplex;
+import org.jml.Mathx.Mathf;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -16,6 +17,9 @@ public class Compd implements Serializable {
     final public static Compd ONE = new Compd(1,0);
     final public static Compd ONEI = new Compd(0,1);
     final public static Compd MONE = new Compd(-1,0);
+
+    final public static Compd PI = new Compd(Math.PI, 0);
+    final public static Compd E = new Compd(Math.E, 0);
 
     /**
      * The real part
