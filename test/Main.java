@@ -1,20 +1,13 @@
-import org.jml.Calculus.Derivative.Func;
-import org.jml.Calculus.Derivative.Function.Exponential.Exp;
-import org.jml.Calculus.Derivative.Function.Linear.Linear;
-import org.jml.Calculus.Derivative.Function.Regular.Const;
-import org.jml.Calculus.Derivative.Function.Regular.Pow;
-import org.jml.Calculus.Derivative.Function.Regular.Var;
-import org.jml.Mathx.Rand;
+import org.jml.Complex.Single.Comp;
+import org.jml.Mathx.FourierSeries;
+import org.jml.Vector.Single.Veci;
 
 public class Main {
     public static void main(String... args) {
-        Const mass = new Const(0.5);
-        Var speed = new Var("v");
+        Veci series = FourierSeries.calculate(10, (float t) -> t >= 0.5f ? Comp.ONE : Comp.MONE);
 
-        Func func = Const.HALF.mul(mass).mul(Pow.TWO.applyTo(speed));
-        Func deriv = func.deriv(speed);
-
-        System.out.println(func); // TODO
-        System.out.println(deriv);
+        for (float t=0;t<=1;t+=0.001f) {
+            System.out.println(t+": "+FourierSeries.compute(t, series));
+        }
     }
 }
