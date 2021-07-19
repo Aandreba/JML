@@ -41,6 +41,10 @@ final public class Mathd {
     public native static double atanh (double x);
     public native static double log2 (double x);
 
+    public static double clamp (double x, double from, double to) {
+        return x <= from ? from : Math.min(x, to);
+    }
+
     public static double summation (int from, int to, Function<Integer, Double> function) {
         double sum = 0;
         for (int i=from;i<=to;i++) {

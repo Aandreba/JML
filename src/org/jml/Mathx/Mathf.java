@@ -81,6 +81,9 @@ final public class Mathf {
         int floor = (int) x;
         return floor == x ? floor : floor + 1;
     }
+    public static float clamp (float x, float from, float to) {
+        return x <= from ? from : Math.min(x, to);
+    }
     public static int round (float x) { return Math.round(x); }
     public static float random () { return Rand.getFloat(); };
     public static float abs (float x) { return Math.abs(x); }
