@@ -1,12 +1,20 @@
 import org.jml.Complex.Single.Comp;
 import org.jml.Mathx.FourierSeries;
+import org.jml.Mathx.Mathf;
 import org.jml.Vector.Single.Veci;
+
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Path2D;
 
 public class Main {
     public static void main(String... args) {
-        Veci series = FourierSeries.calculate(10, (float t) -> t >= 0.5f ? Comp.ONE : Comp.MONE);
+        Path2D.Float triangle = new Path2D.Float();
+        triangle.moveTo(150, 0);
+        triangle.lineTo(75, 200);
+        triangle.lineTo(255, 200);
 
-        for (float t=0;t<=1;t+=0.001f) {
+        Veci series = FourierSeries.calculate(10, triangle.getPathIterator(null));
+        for (float t=0;t<=1;t+=0.01f) {
             System.out.println(t+": "+FourierSeries.compute(t, series));
         }
     }
