@@ -21,25 +21,25 @@ public class FourierSeries {
     }
 
     public static Veci calculate (int length, PathIterator path) {
-        ArrayList<Comp> pointsList = new ArrayList<>();
+        ArrayList<Comp> points = new ArrayList<>();
         float[] point = new float[2];
 
         while (!path.isDone()) {
             path.currentSegment(point);
             path.next();
-            pointsList.add(new Comp(point[0], point[1]));
+            points.add(new Comp(point[0], point[1]));
         }
 
-        Veci points = new Veci(pointsList.toArray(Comp[]::new));
-        return Veci.foreach(2 * length + 1, (int j) -> {
-            int n = j - length;
-            Veci alpha =  Veci.foreach(points.size, (int k) -> {
-                float t = (float) k / points.size;
-                return pointsList.get(k).mul(Comp.expi(-Mathf.PI2 * n * t));
-            });
+        int k = points.size() - 1;
+        Integral.ComplexFunction func = (float t) -> {
+            float n = points.size() * t;
+            int from = (int) Mathf.clamp(Mathf.floor(n), 0, k);
+            int to = (int) Mathf.clamp(Mathf.ceil(n), 0, k);
 
-            return alpha.mean();
-        });
+            return points.get(from).mul(n - from).add(points.get(to).mul(to - n));
+        };
+
+        return calculate(length, func);
     }
 
     public static Comp compute (float time, Veci rotators) {
