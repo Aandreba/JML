@@ -43,8 +43,9 @@ public class FourierSeries {
         ArrayList<float[]> points = new ArrayList<>();
         ArrayList<Integer> types = new ArrayList<>();
 
-        float[] point = new float[6];
+        float[] point;
         while (!path.isDone()) {
+            point = new float[6];
             int type = path.currentSegment(point);
             path.next();
 
