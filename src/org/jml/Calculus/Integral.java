@@ -56,8 +56,8 @@ public class Integral {
             tasks.add(() -> {
                 BigDecimal x = BigDecimal.valueOf(finalI).multiply(dx).add(A);
                 Comp y = function.apply(x.floatValue());
-                real.getAndUpdate(k -> k.add(BigDecimal.valueOf(y.real)));
-                imaginary.getAndUpdate(k -> k.add(BigDecimal.valueOf(y.imaginary)));
+                real.getAndUpdate(k -> k.add(BigDecimal.valueOf(y.re)));
+                imaginary.getAndUpdate(k -> k.add(BigDecimal.valueOf(y.im)));
             });
         }
 

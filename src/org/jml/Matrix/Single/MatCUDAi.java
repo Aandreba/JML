@@ -1,11 +1,9 @@
 package org.jml.Matrix.Single;
 
-import jcuda.Sizeof;
 import jcuda.cuComplex;
 import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.CUDA.CUDA;
 import org.jml.Matrix.Double.MatCUDAid;
-import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.VecCUDAi;
 import org.jml.Vector.Single.Veci;
 import jcuda.Pointer;
@@ -40,8 +38,8 @@ public class MatCUDAi {
         float[] cuda = new float[2 * values.size()];
         for (int i=0;i<values.size();i++) {
             int j = 2 * i;
-            cuda[j] = values.get(i).real;
-            cuda[j+1] = values.get(i).imaginary;
+            cuda[j] = values.get(i).re;
+            cuda[j+1] = values.get(i).im;
         }
 
         JCublas.cublasCcopy(size, Pointer.to(cuda), 1, this.id, 1);
@@ -254,8 +252,8 @@ public class MatCUDAi {
         int i = (col * rows) + row;
         int j = 2 * i;
 
-        array[j] = val.real;
-        array[j+1] = val.imaginary;
+        array[j] = val.re;
+        array[j+1] = val.im;
         JCublas.cublasSetVector(size, VecCUDAi.ELEMSIZE, Pointer.to(array), 1, id, 1);
     }
 
@@ -265,8 +263,8 @@ public class MatCUDAi {
             int j = (i * rows) + row;
             int k = 2 * j;
 
-            array[k] = values.get(i).real;
-            array[k+1] = values.get(i).imaginary;
+            array[k] = values.get(i).re;
+            array[k+1] = values.get(i).im;
         }
 
         JCublas.cublasSetVector(size, VecCUDAi.ELEMSIZE, Pointer.to(array), 1, id, 1);
@@ -280,8 +278,8 @@ public class MatCUDAi {
         float[] cuda = new float[2 * values.length];
         for (int i=0;i<values.length;i++) {
             int j = 2 * i;
-            cuda[j] = values[i].real;
-            cuda[j+1] = values[i].imaginary;
+            cuda[j] = values[i].re;
+            cuda[j+1] = values[i].im;
         }
 
         JCublas.cublasSetVector(size, VecCUDAi.ELEMSIZE, Pointer.to(cuda), 1, id, 1);

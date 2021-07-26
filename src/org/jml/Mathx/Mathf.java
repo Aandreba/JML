@@ -8,9 +8,6 @@ import org.jml.Vector.Single.Veci;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.function.Function;
 
 final public class Mathf {
@@ -82,6 +79,9 @@ final public class Mathf {
         return floor == x ? floor : floor + 1;
     }
     public static float clamp (float x, float from, float to) {
+        return x <= from ? from : Math.min(x, to);
+    }
+    public static int clamp (int x, int from, int to) {
         return x <= from ? from : Math.min(x, to);
     }
     public static int round (float x) { return Math.round(x); }
@@ -226,7 +226,7 @@ final public class Mathf {
 
     public static Comp[] quadratic (Comp a, Comp b, Comp c) {
         if (a.isReal() && b.isReal() && c.isReal()) {
-            return quadratic(a.real, b.real, c.real);
+            return quadratic(a.re, b.re, c.re);
         }
 
         Comp[] x = new Comp[2];

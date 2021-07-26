@@ -1,11 +1,8 @@
 package org.jml.Mathx;
 
 import org.jml.Complex.Double.Compd;
-import org.jml.Complex.Single.Comp;
 import org.jml.Vector.Double.Vecd;
 import org.jml.Vector.Double.Vecid;
-import org.jml.Vector.Single.Vec;
-import org.jml.Vector.Single.Veci;
 
 import java.io.IOException;
 import java.util.function.Function;
@@ -42,6 +39,9 @@ final public class Mathd {
     public native static double log2 (double x);
 
     public static double clamp (double x, double from, double to) {
+        return x <= from ? from : Math.min(x, to);
+    }
+    public static long clamp (long x, long from, long to) {
         return x <= from ? from : Math.min(x, to);
     }
 
@@ -132,7 +132,7 @@ final public class Mathd {
 
     public static Compd[] quadratic (Compd a, Compd b, Compd c) {
         if (a.isReal() && b.isReal() && c.isReal()) {
-            return quadratic(a.real, b.real, c.real);
+            return quadratic(a.re, b.re, c.re);
         }
 
         Compd[] x = new Compd[2];

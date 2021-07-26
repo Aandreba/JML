@@ -6,8 +6,6 @@ import org.jml.Matrix.Double.MatCUDAid;
 import jcuda.Pointer;
 import jcuda.Sizeof;
 import jcuda.jcublas.JCublas;
-import org.jml.Matrix.Single.MatCUDAi;
-import org.jml.Vector.Single.VecCUDAi;
 
 import java.util.Arrays;
 
@@ -181,8 +179,8 @@ public class VecCUDAid {
         double[] cuda = new double[2 * size];
         for (int i=0;i<size;i++) {
             int j = 2 * i;
-            cuda[j] = values[i].real;
-            cuda[j+1] = values[i].imaginary;
+            cuda[j] = values[i].re;
+            cuda[j+1] = values[i].im;
         }
 
         JCublas.cublasSetVector(size, ELEMSIZE, Pointer.to(cuda), 1, id, 1);
@@ -224,8 +222,8 @@ public class VecCUDAid {
 
         int j = 2 * pos;
         double[] array = toDoubleArray();
-        array[j] = val.real;
-        array[j+1] = val.imaginary;
+        array[j] = val.re;
+        array[j+1] = val.im;
 
         JCublas.cublasSetVector(size, ELEMSIZE, Pointer.to(array), 1, id, 1);
     }

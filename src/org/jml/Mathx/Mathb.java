@@ -98,4 +98,8 @@ public class Mathb {
     public static BigDecimal exp (long value, MathContext context) {
         return exp(BigDecimal.valueOf(value), context);
     }
+
+    public static BigDecimal hypot (BigDecimal a, BigDecimal b, MathContext context) {
+        return a.multiply(a).add(b.multiply(b)).sqrt(context);
+    }
 }

@@ -2,7 +2,6 @@ package org.jml.Complex.Double;
 import org.jml.Complex.Single.Comp;
 import org.jml.Mathx.Mathd;
 import jcuda.cuDoubleComplex;
-import org.jml.Mathx.Mathf;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -24,19 +23,19 @@ public class Compd implements Serializable {
     /**
      * The real part
      */
-    final public double real, /**
+    final public double re, /**
      * The imaginary part
      */
-    imaginary;
+    im;
 
     public Compd(double real, double imaginary) {
-        this.real = real;
-        this.imaginary = imaginary;
+        this.re = real;
+        this.im = imaginary;
     }
 
     public Compd(cuDoubleComplex cuda) {
-        this.real = cuda.x;
-        this.imaginary = cuda.y;
+        this.re = cuda.x;
+        this.im = cuda.y;
     }
 
     public Compd() {
@@ -48,57 +47,57 @@ public class Compd implements Serializable {
      */
     // OPERATIONS
     public Compd add (Compd b) {
-        return new Compd(real + b.real, imaginary + b.imaginary);
+        return new Compd(re + b.re, im + b.im);
     }
 
     /**
      * Add a real number to a complex number
      */
     public Compd add (double b) {
-        return new Compd(real + b, imaginary);
+        return new Compd(re + b, im);
     }
 
     /**
      * Subtract 2 complex numbers
      */
     public Compd subtr (Compd b) {
-        return new Compd(real - b.real, imaginary - b.imaginary);
+        return new Compd(re - b.re, im - b.im);
     }
 
     /**
      * Subtract a real number from a complex number
      */
     public Compd subtr (double b) {
-        return new Compd(real - b, imaginary);
+        return new Compd(re - b, im);
     }
 
     /**
      * Subtract a complex number from a real number
      */
     public Compd invSubtr (double b) {
-        return new Compd(b - real, imaginary);
+        return new Compd(b - re, im);
     }
 
     /**
      * Multiply 2 complex numbers
      */
     public Compd mul (Compd b) {
-        return new Compd(real * b.real - imaginary * b.imaginary, real * b.imaginary + b.real * imaginary);
+        return new Compd(re * b.re - im * b.im, re * b.im + b.re * im);
     }
 
     /**
      * Multiply a real number and a complex number
      */
     public Compd mul (double b) {
-        return new Compd(real * b, imaginary * b);
+        return new Compd(re * b, im * b);
     }
 
     /**
      * Divide 2 complex numbers
      */
     public Compd div (Compd b) {
-        double div = b.real * b.real + b.imaginary * b.imaginary;
-        return new Compd((real * b.real + imaginary * b.imaginary) / div, (imaginary * b.real - real * b.imaginary) / div);
+        double div = b.re * b.re + b.im * b.im;
+        return new Compd((re * b.re + im * b.im) / div, (im * b.re - re * b.im) / div);
     }
 
     /**
@@ -117,7 +116,7 @@ public class Compd implements Serializable {
 
     // PROPERTIES
     public boolean isReal () {
-        return imaginary == 0;
+        return im == 0;
     }
 
     /**
@@ -125,28 +124,28 @@ public class Compd implements Serializable {
      * Not-a-Number (NaN) value, {@code false} otherwise.
      */
     public boolean isNan () {
-        return Double.isNaN(real) || Double.isNaN(imaginary);
+        return Double.isNaN(re) || Double.isNaN(im);
     }
 
     /**
      * Returns {@code true} if the specified number is infinite, {@code false} otherwise.
      */
     public boolean isInfinite () {
-        return Double.isInfinite(real) || Double.isInfinite(imaginary);
+        return Double.isInfinite(re) || Double.isInfinite(im);
     }
 
     /**
      * Returns the complex number's modulus
      */
     public double modulus () {
-        return Math.hypot(real, imaginary);
+        return Math.hypot(re, im);
     }
 
     /**
      * Returns the complex number's angle in polar coordinates
      */
     public double polarAngle () {
-        return Math.atan2(imaginary, real);
+        return Math.atan2(im, re);
     }
 
     /**
@@ -161,40 +160,40 @@ public class Compd implements Serializable {
      */
     // FUNCTIONS
     public Compd inverse () {
-        double xy2 = real * real + imaginary * imaginary;
-        return new Compd(real / xy2, -imaginary / xy2);
+        double xy2 = re * re + im * im;
+        return new Compd(re / xy2, -im / xy2);
     }
 
     /**
      * Returns the square root of the complex number
      */
     public Compd sqrt () {
-        if (imaginary == 0) {
-            return sqrt(real);
+        if (im == 0) {
+            return sqrt(re);
         }
 
         double modulus = modulus();
-        return new Compd(Math.sqrt(modulus + real) / Mathd.SQRT2, Math.signum(imaginary) * Math.sqrt(modulus - real) / Mathd.SQRT2);
+        return new Compd(Math.sqrt(modulus + re) / Mathd.SQRT2, Math.signum(im) * Math.sqrt(modulus - re) / Mathd.SQRT2);
     }
 
     /**
      * Returns the complex number's exponent
      */
     public Compd exp () {
-        if (imaginary == 0) {
-            return new Compd(Math.exp(real), 0);
+        if (im == 0) {
+            return new Compd(Math.exp(re), 0);
         }
 
-        double ex = Math.exp(real);
-        return new Compd(ex * Math.cos(imaginary), ex * Math.sin(imaginary));
+        double ex = Math.exp(re);
+        return new Compd(ex * Math.cos(im), ex * Math.sin(im));
     }
 
     /**
      * Returns the complex number's natural logarithm
      */
     public Compd log () {
-        if (imaginary == 0 && real > 0) {
-            return new Compd(Math.log(real), 0);
+        if (im == 0 && re > 0) {
+            return new Compd(Math.log(re), 0);
         }
 
         return new Compd(Math.log(polarRadius()), polarAngle());
@@ -204,15 +203,15 @@ public class Compd implements Serializable {
      * Returns the complex number's conjugate
      */
     public Compd conj () {
-        return new Compd(real, -imaginary);
+        return new Compd(re, -im);
     }
 
     /**
      * Returns the complex number powered to another complex number
      */
     public Compd pow (Compd b) {
-        if (b.isReal() && b.real == 2) {
-            return new Compd(real * real - imaginary * imaginary, 2 * real * imaginary);
+        if (b.isReal() && b.re == 2) {
+            return new Compd(re * re - im * im, 2 * re * im);
         }
 
         return log().mul(b).exp();
@@ -225,10 +224,10 @@ public class Compd implements Serializable {
      * @return the compd
      */
     public Compd pow (double b) {
-        if (imaginary == 0) {
-            return new Compd(Math.pow(real, b), 0);
+        if (im == 0) {
+            return new Compd(Math.pow(re, b), 0);
         } else if (b == 2) {
-            return new Compd(real * real - imaginary * imaginary, 2 * real * imaginary);
+            return new Compd(re * re - im * im, 2 * re * im);
         }
 
         return log().mul(b).exp();
@@ -241,7 +240,7 @@ public class Compd implements Serializable {
      */
     // JAVA FUNCTIONS
     public Comp toFloat () {
-        return new Comp((float) real, (float) imaginary);
+        return new Comp((float) re, (float) im);
     }
 
     public Compd toDouble() {
@@ -254,29 +253,29 @@ public class Compd implements Serializable {
      * @return the cu double complex
      */
     public cuDoubleComplex toCUDA () {
-        return cuDoubleComplex.cuCmplx(real, imaginary);
+        return cuDoubleComplex.cuCmplx(re, im);
     }
 
     @Override
     public Compd clone() {
-        return new Compd(real, imaginary);
+        return new Compd(re, im);
     }
 
     @Override
     public String toString() {
-        if (Double.isNaN(real) || Double.isNaN(imaginary)) {
+        if (Double.isNaN(re) || Double.isNaN(im)) {
             return "NaN";
-        } else if (Double.isInfinite(real) || Double.isInfinite(imaginary)) {
+        } else if (Double.isInfinite(re) || Double.isInfinite(im)) {
             return "Infinity";
-        } else if (real == 0) {
-            return imaginary+"i";
-        } else if (imaginary == 0) {
-            return Double.toString(real);
-        } else if (imaginary >= 0) {
-            return real + " + " + imaginary + "i";
+        } else if (re == 0) {
+            return im +"i";
+        } else if (im == 0) {
+            return Double.toString(re);
+        } else if (im >= 0) {
+            return re + " + " + im + "i";
         }
 
-        return real + " - " + -imaginary + "i";
+        return re + " - " + -im + "i";
     }
 
     @Override
@@ -284,12 +283,12 @@ public class Compd implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Compd compd = (Compd) o;
-        return Double.compare(compd.real, real) == 0 && Double.compare(compd.imaginary, imaginary) == 0;
+        return Double.compare(compd.re, re) == 0 && Double.compare(compd.im, im) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(real, imaginary);
+        return Objects.hash(re, im);
     }
 
     /**

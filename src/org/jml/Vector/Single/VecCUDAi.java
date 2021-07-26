@@ -2,7 +2,6 @@ package org.jml.Vector.Single;
 
 import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.CUDA.CUDA;
-import org.jml.Matrix.Single.MatCUDA;
 import org.jml.Matrix.Single.MatCUDAi;
 import jcuda.Pointer;
 import jcuda.Sizeof;
@@ -180,8 +179,8 @@ public class VecCUDAi {
         float[] cuda = new float[2 * values.length];
         for (int i=0;i<values.length;i++) {
             int j = 2 * i;
-            cuda[j] = values[i].real;
-            cuda[j+1] = values[i].imaginary;
+            cuda[j] = values[i].re;
+            cuda[j+1] = values[i].im;
         }
 
         JCublas.cublasSetVector(size, ELEMSIZE, Pointer.to(cuda), 1, id, 1);
@@ -221,8 +220,8 @@ public class VecCUDAi {
         float[] array = toFloatArray();
         int i = 2 * pos;
 
-        array[i] = val.real;
-        array[i + 1] = val.imaginary;
+        array[i] = val.re;
+        array[i + 1] = val.im;
         JCublas.cublasSetVector(size, ELEMSIZE, Pointer.to(array), 1, id, 1);
     }
     

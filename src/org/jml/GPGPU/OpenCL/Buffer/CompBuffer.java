@@ -116,8 +116,8 @@ public class CompBuffer extends Buffer {
         float[] values = new float[vals.length * 2];
         for (int i=0;i<vals.length;i++) {
             int j = 2 * i;
-            values[j] = vals[i].real;
-            values[j + 1] = vals[i].imaginary;
+            values[j] = vals[i].re;
+            values[j + 1] = vals[i].im;
         }
 
         return values;

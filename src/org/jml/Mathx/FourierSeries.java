@@ -55,25 +55,39 @@ public class FourierSeries {
             types.add(type);
         }
 
-        float[] fst = points.get(0);
-        Comp first = new Comp(fst[0], fst[1]);
-
         return (float t) -> {
             float j = (points.size() * t);
-            int n = (int) j; // To
-            if (n == 0) {
-                return first;
-            }
+            int k = (int) j;
 
-            int k = n - 1; // From
-            float _t = j - n;
+            float _t = j - k;
             float _1mt = 1 - _t;
 
-            float[] target = points.get(n);
-            float[] prev = points.get(k);
+            float[] target = points.get(k);
+            float[] prev = k == 0 ? new float[6] : points.get(k-1);
 
-            Comp lastPos = new Comp(prev[prev.length-2], prev[prev.length-1]);
-            int type = types.get(n);
+            int type = types.get(k);
+            Comp lastPos = k == 0 ? Comp.ZERO : switch (types.get(k-1)) {
+                case PathIterator.SEG_MOVETO, PathIterator.SEG_LINETO -> new Comp(prev[0], prev[1]);
+                case PathIterator.SEG_QUADTO -> new Comp(prev[2], prev[3]);
+                case PathIterator.SEG_CUBICTO -> new Comp(prev[4], prev[5]);
+                case PathIterator.SEG_CLOSE -> {
+                    Comp lastMoveTo;
+                    int q = k;
+
+                    while (true) {
+                        q--;
+                        int qType = types.get(q);
+                        if (qType == PathIterator.SEG_MOVETO) {
+                            float[] qPoints = points.get(q);
+                            lastMoveTo = new Comp(qPoints[0], qPoints[1]);
+                            break;
+                        }
+                    }
+
+                    yield lastMoveTo;
+                }
+                default -> throw new IllegalArgumentException();
+            };
 
             return switch (type) {
                 case PathIterator.SEG_CUBICTO -> {
@@ -95,15 +109,15 @@ public class FourierSeries {
                     Comp beta = new Comp(target[2], target[3]);
 
                     yield lastPos.mul(_1mt * _1mt)
-                            .add(alpha.mul(2 * _1mt))
+                            .add(alpha.mul(2 * _1mt * _t))
                             .add(beta.mul(_t * _t));
                 }
 
                 case PathIterator.SEG_MOVETO -> new Comp(target[0], target[1]);
-                case PathIterator.SEG_LINETO -> lastPos.mul(j-k).add(new Comp(target[0], target[1]).mul(n-j));
+                case PathIterator.SEG_LINETO -> lastPos.mul(1 - _t).add(new Comp(target[0], target[1]).mul(_t));
                 case PathIterator.SEG_CLOSE -> {
                     Comp lastMoveTo;
-                    int q = n;
+                    int q = k;
 
                     while (true) {
                         q--;
@@ -115,7 +129,7 @@ public class FourierSeries {
                         }
                     }
 
-                    yield lastPos.mul(j-k).add(lastMoveTo.mul(n-j));
+                    yield lastPos.mul(1 - _t).add(lastMoveTo.mul(_t));
                 }
 
                 default -> throw new IllegalArgumentException();

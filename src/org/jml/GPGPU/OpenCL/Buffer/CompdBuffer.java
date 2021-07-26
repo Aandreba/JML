@@ -3,7 +3,6 @@ package org.jml.GPGPU.OpenCL.Buffer;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.GPGPU.OpenCL.Query;
 import org.jml.Complex.Double.Compd;
-import org.jml.Vector.Double.Vecd;
 import org.jml.Vector.Double.Vecid;
 import org.jocl.Pointer;
 import org.jocl.Sizeof;
@@ -120,8 +119,8 @@ public class CompdBuffer extends Buffer {
         double[] values = new double[vals.length * 2];
         for (int i=0;i<vals.length;i++) {
             int j = 2 * i;
-            values[j] = vals[i].real;
-            values[j + 1] = vals[i].imaginary;
+            values[j] = vals[i].re;
+            values[j + 1] = vals[i].im;
         }
 
         return values;

@@ -17,16 +17,16 @@ public class Comp implements Serializable {
     final public static Comp PI = new Comp(Mathf.PI, 0);
     final public static Comp E = new Comp(Mathf.E, 0);
 
-    final public float real, imaginary;
+    final public float re, im;
 
     public Comp(float real, float imaginary) {
-        this.real = real;
-        this.imaginary = imaginary;
+        this.re = real;
+        this.im = imaginary;
     }
 
     public Comp(cuComplex cuda) {
-        this.real = cuda.x;
-        this.imaginary = cuda.y;
+        this.re = cuda.x;
+        this.im = cuda.y;
     }
 
     public Comp() {
@@ -35,40 +35,40 @@ public class Comp implements Serializable {
 
     // OPERATIONS
     public Comp add (Comp b) {
-        return new Comp(real + b.real, imaginary + b.imaginary);
+        return new Comp(re + b.re, im + b.im);
     }
 
     public Comp add (float b) {
-        return new Comp(real + b, imaginary);
+        return new Comp(re + b, im);
     }
 
     public Comp subtr (Comp b) {
-        return new Comp(real - b.real, imaginary - b.imaginary);
+        return new Comp(re - b.re, im - b.im);
     }
 
     public Comp subtr (float b) {
-        return new Comp(real - b, imaginary);
+        return new Comp(re - b, im);
     }
 
     public Comp invSubtr (float b) {
-        return new Comp(b - real, imaginary);
+        return new Comp(b - re, im);
     }
 
     public Comp mul (Comp b) {
-        return new Comp(real * b.real - imaginary * b.imaginary, real * b.imaginary + b.real * imaginary);
+        return new Comp(re * b.re - im * b.im, re * b.im + b.re * im);
     }
 
     public Comp mul (float b) {
-        return new Comp(real * b, imaginary * b);
+        return new Comp(re * b, im * b);
     }
 
     public Comp div (Comp b) {
-        float div = b.real * b.real + b.imaginary * b.imaginary;
-        return new Comp((real * b.real + imaginary * b.imaginary) / div, (imaginary * b.real - real * b.imaginary) / div);
+        float div = b.re * b.re + b.im * b.im;
+        return new Comp((re * b.re + im * b.im) / div, (im * b.re - re * b.im) / div);
     }
 
     public Comp div (float b) {
-        return new Comp(real / b, imaginary / b);
+        return new Comp(re / b, im / b);
     }
 
     public Comp invDiv (float b) {
@@ -77,23 +77,23 @@ public class Comp implements Serializable {
 
     // PROPERTIES
     public boolean isReal () {
-        return imaginary == 0;
+        return im == 0;
     }
 
     public boolean isNan () {
-        return Float.isNaN(real) || Float.isNaN(imaginary);
+        return Float.isNaN(re) || Float.isNaN(im);
     }
 
     public boolean isInfinite () {
-        return Float.isInfinite(real) || Float.isInfinite(imaginary);
+        return Float.isInfinite(re) || Float.isInfinite(im);
     }
 
     public float abs() {
-        return Mathf.hypot(real, imaginary);
+        return Mathf.hypot(re, im);
     }
 
     public float polarAngle () {
-        return Mathf.atan2(imaginary, real);
+        return Mathf.atan2(im, re);
     }
 
     public float polarRadius () {
@@ -102,24 +102,24 @@ public class Comp implements Serializable {
 
     // FUNCTIONS
     public Comp inverse () {
-        float xy2 = real * real + imaginary * imaginary;
-        return new Comp(real / xy2, -imaginary / xy2);
+        float xy2 = re * re + im * im;
+        return new Comp(re / xy2, -im / xy2);
     }
 
     public Comp sqrt () {
-        if (imaginary == 0) {
-            return sqrt(real);
+        if (im == 0) {
+            return sqrt(re);
         }
 
         float modulus = abs();
-        return new Comp(Mathf.sqrt(modulus + real) / Mathf.SQRT2, Mathf.signum(imaginary) * Mathf.sqrt(modulus - real) / Mathf.SQRT2);
+        return new Comp(Mathf.sqrt(modulus + re) / Mathf.SQRT2, Mathf.signum(im) * Mathf.sqrt(modulus - re) / Mathf.SQRT2);
     }
 
     public Comp cbrt () {
         final float pi4 = 2 * Mathf.PI2;
 
-        if (imaginary == 0) {
-            return new Comp(Mathf.cbrt(real), 0);
+        if (im == 0) {
+            return new Comp(Mathf.cbrt(re), 0);
         }
 
         float angle = polarAngle();
@@ -132,39 +132,39 @@ public class Comp implements Serializable {
     }
 
     public Comp exp () {
-        if (imaginary == 0) {
-            return new Comp(Mathf.exp(real), 0);
+        if (im == 0) {
+            return new Comp(Mathf.exp(re), 0);
         }
 
-        float ex = Mathf.exp(real);
-        return new Comp(ex * Mathf.cos(imaginary), ex * Mathf.sin(imaginary));
+        float ex = Mathf.exp(re);
+        return new Comp(ex * Mathf.cos(im), ex * Mathf.sin(im));
     }
 
     public Comp log () {
-        if (imaginary == 0 && real > 0) {
-            return new Comp(Mathf.log(real), 0);
+        if (im == 0 && re > 0) {
+            return new Comp(Mathf.log(re), 0);
         }
 
         return new Comp(Mathf.log(polarRadius()), polarAngle());
     }
 
     public Comp conj () {
-        return new Comp(real, -imaginary);
+        return new Comp(re, -im);
     }
 
     public Comp pow (Comp b) {
-        if (b.isReal() && b.real == 2) {
-            return new Comp(real * real - imaginary * imaginary, 2 * real * imaginary);
+        if (b.isReal() && b.re == 2) {
+            return new Comp(re * re - im * im, 2 * re * im);
         }
 
         return log().mul(b).exp();
     }
 
     public Comp pow (float b) {
-        if (imaginary == 0) {
-            return new Comp(Mathf.pow(real, b), 0);
+        if (im == 0) {
+            return new Comp(Mathf.pow(re, b), 0);
         } else if (b == 2) {
-            return new Comp(real * real - imaginary * imaginary, 2 * real * imaginary);
+            return new Comp(re * re - im * im, 2 * re * im);
         }
 
         return log().mul(b).exp();
@@ -172,7 +172,7 @@ public class Comp implements Serializable {
 
     // JAVA FUNCTIONS
     public Compd toDouble () {
-        return new Compd(real, imaginary);
+        return new Compd(re, im);
     }
 
     public Comp toFloat() {
@@ -180,29 +180,29 @@ public class Comp implements Serializable {
     }
 
     public cuComplex toCUDA () {
-        return cuComplex.cuCmplx(real, imaginary);
+        return cuComplex.cuCmplx(re, im);
     }
 
     @Override
     public Comp clone() {
-        return new Comp(real, imaginary);
+        return new Comp(re, im);
     }
 
     @Override
     public String toString() {
-        if (Float.isNaN(real) || Float.isNaN(imaginary)) {
+        if (Float.isNaN(re) || Float.isNaN(im)) {
             return "NaN";
-        } else if (Float.isInfinite(real) || Float.isInfinite(imaginary)) {
+        } else if (Float.isInfinite(re) || Float.isInfinite(im)) {
             return "Infinity";
-        } else if (real == 0) {
-            return imaginary+"i";
-        } else if (imaginary == 0) {
-            return Float.toString(real);
-        } else if (imaginary >= 0) {
-            return real + " + " + imaginary + "i";
+        } else if (re == 0) {
+            return im +"i";
+        } else if (im == 0) {
+            return Float.toString(re);
+        } else if (im >= 0) {
+            return re + " + " + im + "i";
         }
 
-        return real + " - " + -imaginary + "i";
+        return re + " - " + -im + "i";
     }
 
     @Override
@@ -210,12 +210,12 @@ public class Comp implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Comp comp = (Comp) o;
-        return Float.compare(comp.real, real) == 0 && Float.compare(comp.imaginary, imaginary) == 0;
+        return Float.compare(comp.re, re) == 0 && Float.compare(comp.im, im) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(real, imaginary);
+        return Objects.hash(re, im);
     }
 
     public String polarRadString() {
