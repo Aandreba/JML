@@ -2,6 +2,8 @@ package org.jml.Mathx;
 
 import org.jml.Calculus.Integral;
 import org.jml.Complex.Single.Comp;
+import org.jml.Function.Complex.ComplexFunction;
+import org.jml.Function.Complex.SingleComplex;
 import org.jml.Matrix.Single.Mati;
 import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;
@@ -10,16 +12,17 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
+import java.io.InvalidObjectException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 
 public class FourierSeries {
-    public static Veci calculate (int length, Integral.ComplexFunction function) {
+    public static Veci calculate (int length, ComplexFunction function) {
         return Veci.foreach(2 * length + 1, (int j) -> {
             int n = j - length;
-            return Integral.integ(0, 1, (float t) -> Comp.expi(-Mathf.PI2 * n * t).mul(function.apply(t)));
+            return Integral.integ(0, 1, (SingleComplex) (float t) -> Comp.expi(-Mathf.PI2 * n * t).mul(function.apply(t)));
         });
     }
 
@@ -39,13 +42,12 @@ public class FourierSeries {
         return sum;
     }
 
-    public static Integral.ComplexFunction pathToFunction (PathIterator path) {
+    public static SingleComplex pathToFunction (PathIterator path) {
         ArrayList<float[]> points = new ArrayList<>();
         ArrayList<Integer> types = new ArrayList<>();
 
-        float[] point;
         while (!path.isDone()) {
-            point = new float[6];
+            float[] point = new float[6];
             int type = path.currentSegment(point);
             path.next();
 
@@ -86,7 +88,6 @@ public class FourierSeries {
                             .add(alpha.mul(3 * _1mt_2 * _t))
                             .add(beta.mul(3 * _1mt * _t2))
                             .add(gamma.mul(_t2 * _t));
-
                 }
 
                 case PathIterator.SEG_QUADTO -> {
@@ -99,7 +100,25 @@ public class FourierSeries {
                 }
 
                 case PathIterator.SEG_MOVETO -> new Comp(target[0], target[1]);
-                default -> lastPos.mul(j-k).add(new Comp(target[0], target[1]).mul(n-j));
+                case PathIterator.SEG_LINETO -> lastPos.mul(j-k).add(new Comp(target[0], target[1]).mul(n-j));
+                case PathIterator.SEG_CLOSE -> {
+                    Comp lastMoveTo;
+                    int q = n;
+
+                    while (true) {
+                        q--;
+                        int qType = types.get(q);
+                        if (qType == PathIterator.SEG_MOVETO) {
+                            float[] qPoints = points.get(q);
+                            lastMoveTo = new Comp(qPoints[0], qPoints[1]);
+                            break;
+                        }
+                    }
+
+                    yield lastPos.mul(j-k).add(lastMoveTo.mul(n-j));
+                }
+
+                default -> throw new IllegalArgumentException();
             };
         };
     }

@@ -107,7 +107,7 @@ final public class Mathf {
         return type.isPrimitive() ? a.doubleValue() == b.doubleValue() : a.equals(b);
     }
 
-    public static float summation (int from, int to, Function<Integer, Float> function) {
+    public static float sum (int from, int to, Function<Integer, Float> function) {
         float sum = 0;
         for (int i=from;i<=to;i++) {
             sum += function.apply(i);
@@ -116,7 +116,7 @@ final public class Mathf {
         return sum;
     }
 
-    public static Comp summationi (int from, int to, Function<Integer, Comp> function) {
+    public static Comp sumi(int from, int to, Function<Integer, Comp> function) {
         Comp sum = Comp.ZERO;
         for (int i=from;i<=to;i++) {
             sum = sum.add(function.apply(i));
@@ -125,7 +125,7 @@ final public class Mathf {
         return sum;
     }
 
-    public static float product (int from, int to, Function<Integer, Float> function) {
+    public static float prod(int from, int to, Function<Integer, Float> function) {
         float prod = 1;
         for (int i=from;i<=to;i++) {
             prod *= function.apply(i);
@@ -134,7 +134,7 @@ final public class Mathf {
         return prod;
     }
 
-    public static Comp producti (int from, int to, Function<Integer, Comp> function) {
+    public static Comp prodi(int from, int to, Function<Integer, Comp> function) {
         Comp sum = Comp.ONE;
         for (int i=from;i<=to;i++) {
             sum = sum.mul(function.apply(i));

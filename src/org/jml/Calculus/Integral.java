@@ -1,6 +1,8 @@
 package org.jml.Calculus;
 
 import org.jml.Complex.Single.Comp;
+import org.jml.Function.Complex.ComplexFunction;
+import org.jml.Function.Real.RealFunction;
 import org.jml.MT.TaskManager;
 
 import java.math.BigDecimal;
@@ -10,14 +12,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Integral {
     final private static MathContext CONTEXT = MathContext.DECIMAL128;
     final private static BigDecimal ALPHA = BigDecimal.valueOf(10).pow(5);
-
-    public interface RealFunction {
-        float apply (float x);
-    }
-
-    public interface ComplexFunction {
-        Comp apply (float x);
-    }
 
     public static float integ (float a, float b, RealFunction function) {
         BigDecimal A = BigDecimal.valueOf(a);

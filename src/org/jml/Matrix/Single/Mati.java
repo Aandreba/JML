@@ -592,18 +592,18 @@ public class Mati implements Serializable {
 
                 for (int p=k+1;p<n;p++) {
                     int m = p;
-                    Comp sumA = Mathf.summationi(0, im1, j -> l.get(k, j).mul(u.get(j, k)));
+                    Comp sumA = Mathf.sumi(0, im1, j -> l.get(k, j).mul(u.get(j, k)));
                     u.set(k, k, get(k, k).subtr(sumA));
 
-                    Comp sumB = Mathf.summationi(0, im1, j -> l.get(k, j).mul(u.get(j, m)));
+                    Comp sumB = Mathf.sumi(0, im1, j -> l.get(k, j).mul(u.get(j, m)));
                     u.set(k, m, get(k, m).subtr(sumB));
 
-                    Comp sumC = Mathf.summationi(0, im1, j -> l.get(m, j).mul(u.get(j, k)));
+                    Comp sumC = Mathf.sumi(0, im1, j -> l.get(m, j).mul(u.get(j, k)));
                     l.set(m, k, (get(m, k).subtr(sumC)).div(u.get(k, k)));
                 }
             }
 
-            Comp sum = Mathf.summationi(0, nm1, p -> l.get(nm1,p).mul(u.get(p,nm1)));
+            Comp sum = Mathf.sumi(0, nm1, p -> l.get(nm1,p).mul(u.get(p,nm1)));
             u.set(nm1, nm1, get(nm1, nm1).subtr(sum));
         }
 

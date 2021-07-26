@@ -114,19 +114,22 @@ public class VecCL extends FloatBuffer {
     /**
      * Performs the operation y = alpha * x * y
      */
-    public VecCL mul (VecCL y) {
+    public VecCL mul (float alpha, float beta, VecCL y) {
         checkCompatibility(y);
-
-        MatCL identity = identityLike();
-        VecCL result = y.clone();
+        VecCL result = new VecCL(size);
 
         cl_event event = new cl_event();
-        CLBlast.CLBlastStrmv(CLBlastLayout.CLBlastLayoutRowMajor, CLBlastTriangle.CLBlastTriangleLower, CLBlastTranspose.CLBlastTransposeNo, CLBlastDiagonal.CLBlastDiagonalNonUnit, size, identity.getId(), 0, size, result.getId(), 0, 1, getContext().queue, event);
+        CLBlast.CLBlastSsbmv(CLBlastLayout.CLBlastLayoutRowMajor, CLBlastTriangle.CLBlastTriangleLower, size, size, alpha, getId(), 0, size + 1, y.getId(), 0, 1, beta, result.getId(), 0, 1, getContext().queue, event);
 
         Query.awaitEvents(event);
-        identity.release();
-
         return result;
+    }
+
+    /**
+     * Performs the operation y = alpha * x * y
+     */
+    public VecCL mul (VecCL y) {
+        return mul(1, 0, y);
     }
 
     /**

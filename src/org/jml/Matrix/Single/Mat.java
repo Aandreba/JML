@@ -745,18 +745,18 @@ public class Mat extends Link2D implements Serializable {
 
                 for (int p=k+1;p<n;p++) {
                     int m = p;
-                    float sumA = Mathf.summation(0, im1, j -> l.get(k, j) * u.get(j, k));
+                    float sumA = Mathf.sum(0, im1, j -> l.get(k, j) * u.get(j, k));
                     u.set(k, k, get(k, k) - sumA);
 
-                    float sumB = Mathf.summation(0, im1, j -> l.get(k, j) * u.get(j, m));
+                    float sumB = Mathf.sum(0, im1, j -> l.get(k, j) * u.get(j, m));
                     u.set(k, m, get(k, m) - sumB);
 
-                    float sumC = Mathf.summation(0, im1, j -> l.get(m, j) * u.get(j, k));
+                    float sumC = Mathf.sum(0, im1, j -> l.get(m, j) * u.get(j, k));
                     l.set(m, k, (get(m, k) - sumC) / u.get(k, k));
                 }
             }
 
-            float sum = Mathf.summation(0, nm1, p -> l.get(nm1,p) * u.get(p,nm1));
+            float sum = Mathf.sum(0, nm1, p -> l.get(nm1,p) * u.get(p,nm1));
             u.set(nm1, nm1, get(nm1, nm1) - sum);
         }
 
