@@ -59,6 +59,35 @@ public class FourierSeries {
             float j = (points.size() * t);
             int k = (int) j;
 
+            if (k >= points.size()) {
+                k = points.size() - 1;
+                float[] target = points.get(k);
+                int type = types.get(k);
+
+                return switch (type) {
+                    case PathIterator.SEG_MOVETO, PathIterator.SEG_LINETO -> new Comp(target[0], target[1]);
+                    case PathIterator.SEG_QUADTO -> new Comp(target[2], target[3]);
+                    case PathIterator.SEG_CUBICTO -> new Comp(target[4], target[5]);
+                    case PathIterator.SEG_CLOSE -> {
+                        Comp lastMoveTo;
+                        int q = k;
+
+                        while (true) {
+                            q--;
+                            int qType = types.get(q);
+                            if (qType == PathIterator.SEG_MOVETO) {
+                                float[] qPoints = points.get(q);
+                                lastMoveTo = new Comp(qPoints[0], qPoints[1]);
+                                break;
+                            }
+                        }
+
+                        yield lastMoveTo;
+                    }
+                    default -> throw new IllegalArgumentException();
+                };
+            }
+
             float _t = j - k;
             float _1mt = 1 - _t;
 
