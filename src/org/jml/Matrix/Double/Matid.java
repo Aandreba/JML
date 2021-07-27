@@ -414,7 +414,7 @@ public class Matid implements Serializable {
     public Matid rref () {
         Matid result = clone();
         for (int i = 0; i< rows(); i++) {
-            if (result.get(i,i).modulus() <= 1e-15) {
+            if (result.get(i,i).abs() <= 1e-15) {
                 continue;
             }
 

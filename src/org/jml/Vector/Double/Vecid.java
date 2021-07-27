@@ -1,11 +1,8 @@
 package org.jml.Vector.Double;
 
-import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Complex.Double.Compd;
-import org.jml.Matrix.Double.Matd;
 import org.jml.Matrix.Double.Matid;
-import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;
 
 import java.io.Serializable;
@@ -223,7 +220,7 @@ public class Vecid implements Iterable<Compd>, Serializable {
     public double magnitude2 () {
         double sum = 0;
         for (int i = 0; i< size(); i++) {
-            double mod = get(i).modulus();
+            double mod = get(i).abs();
             sum += mod * mod;
         }
 
@@ -276,7 +273,7 @@ public class Vecid implements Iterable<Compd>, Serializable {
     }
 
     public Vecd abs () {
-        return Vecd.foreach(size(), i -> get(i).modulus());
+        return Vecd.foreach(size(), i -> get(i).abs());
     }
 
     public Compd mean () {

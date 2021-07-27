@@ -3,6 +3,7 @@ package org.jml.Calculus;
 import org.jml.Complex.Single.Comp;
 import org.jml.Function.Complex.ComplexFunction;
 import org.jml.Function.Real.RealFunction;
+import org.jml.MT.TaskIterator;
 import org.jml.MT.TaskManager;
 
 import java.math.BigDecimal;
@@ -21,20 +22,14 @@ public class Integral {
         BigDecimal dx = delta.sqrt(CONTEXT).divide(ALPHA, CONTEXT);
         int j = delta.divide(dx, CONTEXT).intValue();
 
-        TaskManager manager = new TaskManager();
         AtomicReference<BigDecimal> sum = new AtomicReference<>(BigDecimal.ZERO);
+        TaskIterator iter = new TaskIterator((int i) -> {
+            BigDecimal x = BigDecimal.valueOf(i).multiply(dx).add(A);
+            BigDecimal y = BigDecimal.valueOf(function.apply(x.floatValue()));
+            sum.updateAndGet(k -> k.add(y));
+        }, i -> i < j);
 
-        for (int i=0;i<j;i++) {
-            int finalI = i;
-
-            manager.add(() -> {
-                BigDecimal x = BigDecimal.valueOf(finalI).multiply(dx).add(A);
-                BigDecimal y = BigDecimal.valueOf(function.apply(x.floatValue()));
-                sum.updateAndGet(k -> k.add(y));
-            });
-        }
-
-        manager.run();
+        iter.run();
         return sum.get().multiply(dx).floatValue();
     }
 

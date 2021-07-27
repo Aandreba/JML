@@ -2,6 +2,7 @@ package org.jml.Complex.Double;
 import org.jml.Complex.Single.Comp;
 import org.jml.Mathx.Mathd;
 import jcuda.cuDoubleComplex;
+import org.jml.Mathx.Mathf;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -137,7 +138,7 @@ public class Compd implements Serializable {
     /**
      * Returns the complex number's modulus
      */
-    public double modulus () {
+    public double abs () {
         return Math.hypot(re, im);
     }
 
@@ -146,13 +147,6 @@ public class Compd implements Serializable {
      */
     public double polarAngle () {
         return Math.atan2(im, re);
-    }
-
-    /**
-     * Returns the complex number's radius in polar coordinates
-     */
-    public double polarRadius () {
-        return modulus();
     }
 
     /**
@@ -172,7 +166,7 @@ public class Compd implements Serializable {
             return sqrt(re);
         }
 
-        double modulus = modulus();
+        double modulus = abs();
         return new Compd(Math.sqrt(modulus + re) / Mathd.SQRT2, Math.signum(im) * Math.sqrt(modulus - re) / Mathd.SQRT2);
     }
 
@@ -185,7 +179,7 @@ public class Compd implements Serializable {
         }
 
         double ex = Math.exp(re);
-        return new Compd(ex * Math.cos(im), ex * Math.sin(im));
+        return Compd.expi(im).mul(ex);
     }
 
     /**
@@ -196,7 +190,7 @@ public class Compd implements Serializable {
             return new Compd(Math.log(re), 0);
         }
 
-        return new Compd(Math.log(polarRadius()), polarAngle());
+        return new Compd(Math.log(abs()), polarAngle());
     }
 
     /**
@@ -297,7 +291,7 @@ public class Compd implements Serializable {
      * @return the string
      */
     public String polarRadString() {
-        double radius = polarRadius();
+        double radius = abs();
         double angle = polarAngle();
 
         return radius+" + "+angle+" rad";
@@ -309,7 +303,7 @@ public class Compd implements Serializable {
      * @return the string
      */
     public String polarString () {
-        double radius = polarRadius();
+        double radius = abs();
         double angle = polarAngle();
 
         return radius+" + "+ Math.toDegrees(angle)+" deg";
@@ -322,7 +316,7 @@ public class Compd implements Serializable {
      * @param angle  the angle
      * @return the compd
      */
-// STATIC FUNCTIONS
+    // STATIC FUNCTIONS
     public static Compd fromPolar (double radius, double angle) {
         double tan = Math.tan(angle);
         double real = Math.sqrt(radius * radius / (1 + tan * tan));
@@ -353,6 +347,22 @@ public class Compd implements Serializable {
         }
 
         return new Compd(0, Math.sqrt(-i));
+    }
+
+    public Compd cbrt () {
+        final double pi4 = 2 * Mathd.PI2;
+
+        if (im == 0) {
+            return new Compd(Math.cbrt(re), 0);
+        }
+
+        double angle = polarAngle();
+        double radius = abs();
+
+        double alpha = Math.cbrt(radius);
+        double beta = (angle + pi4) / 3;
+
+        return Compd.expi(beta).mul(alpha);
     }
 
     /**

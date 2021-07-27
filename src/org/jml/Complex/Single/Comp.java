@@ -96,10 +96,6 @@ public class Comp implements Serializable {
         return Mathf.atan2(im, re);
     }
 
-    public float polarRadius () {
-        return abs();
-    }
-
     // FUNCTIONS
     public Comp inverse () {
         float xy2 = re * re + im * im;
@@ -123,12 +119,12 @@ public class Comp implements Serializable {
         }
 
         float angle = polarAngle();
-        float radius = polarRadius();
+        float radius = abs();
 
         float alpha = Mathf.cbrt(radius);
         float beta = (angle + pi4) / 3;
 
-        return new Comp(alpha * Mathf.cos(beta), alpha * Mathf.sin(beta));
+        return Comp.expi(beta).mul(alpha);
     }
 
     public Comp exp () {
@@ -137,7 +133,7 @@ public class Comp implements Serializable {
         }
 
         float ex = Mathf.exp(re);
-        return new Comp(ex * Mathf.cos(im), ex * Mathf.sin(im));
+        return Comp.expi(im).mul(ex);
     }
 
     public Comp log () {
@@ -145,7 +141,7 @@ public class Comp implements Serializable {
             return new Comp(Mathf.log(re), 0);
         }
 
-        return new Comp(Mathf.log(polarRadius()), polarAngle());
+        return new Comp(Mathf.log(abs()), polarAngle());
     }
 
     public Comp conj () {
@@ -219,14 +215,14 @@ public class Comp implements Serializable {
     }
 
     public String polarRadString() {
-        float radius = polarRadius();
+        float radius = abs();
         float angle = polarAngle();
 
         return radius+" + "+angle+" rad";
     }
 
     public String polarDegString() {
-        float radius = polarRadius();
+        float radius = abs();
         float angle = polarAngle();
 
         return radius+" + "+Mathf.toDegrees(angle)+" deg";

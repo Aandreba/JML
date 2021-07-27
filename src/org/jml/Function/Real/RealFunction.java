@@ -4,11 +4,12 @@ import org.jml.Calculus.Derivative;
 import org.jml.Mathx.Mathb;
 import org.jml.Mathx.Mathf;
 
+import java.lang.annotation.Native;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
 public interface RealFunction {
-    public static RealFunction EXP = new RealFunction() {
+    @Native RealFunction EXP = new RealFunction() {
         @Override
         public float apply (float x) {
             return Mathf.exp(x);
@@ -41,15 +42,22 @@ public interface RealFunction {
         return Derivative.deriv(x, context, this);
     }
 
-    default SingleReal singleDeriv () {
-        return this::deriv;
-    }
+    default RealFunction deriv () {
+        return new RealFunction() {
+            @Override
+            public float apply(float x) {
+                return RealFunction.this.deriv(x);
+            }
 
-    default DoubleReal doubleDeriv () {
-        return this::deriv;
-    }
+            @Override
+            public double apply(double x) {
+                return RealFunction.this.deriv(x);
+            }
 
-    default BigReal bigDeriv (MathContext context) {
-        return this::deriv;
+            @Override
+            public BigDecimal apply(BigDecimal x, MathContext context) {
+                return RealFunction.this.deriv(x, context);
+            }
+        };
     }
 }

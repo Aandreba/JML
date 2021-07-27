@@ -14,6 +14,9 @@ import org.jml.Vector.Double.Vecid;
 import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.MathContext;
 import java.util.List;
 import java.util.Random;
 
@@ -98,6 +101,10 @@ final public class Rand {
         } while (Double.isNaN(val) | Double.isInfinite(val));
 
         return val;
+    }
+
+    public static BigInteger getBigInteger (int bits) {
+        return new BigInteger(bits, random);
     }
 
     public static Compd getCompd() {

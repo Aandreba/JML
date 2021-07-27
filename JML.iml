@@ -6,7 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/src/org/jml/Calculus/Derivative/Function/Trigo/Hyper" />
-      <excludeFolder url="file://$MODULE_DIR$/src/org/jml/Complex/Big" />
+      <excludeFolder url="file://$MODULE_DIR$/src/org/jml/Calculus/TODO" />
       <excludeFolder url="file://$MODULE_DIR$/src/org/jml/Complex/Half" />
     </content>
     <orderEntry type="inheritedJdk" />

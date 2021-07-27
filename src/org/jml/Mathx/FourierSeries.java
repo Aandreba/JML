@@ -4,6 +4,7 @@ import org.jml.Calculus.Integral;
 import org.jml.Complex.Single.Comp;
 import org.jml.Function.Complex.ComplexFunction;
 import org.jml.Function.Complex.SingleComplex;
+import org.jml.Mathx.Mathf;
 import org.jml.Matrix.Single.Mati;
 import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;

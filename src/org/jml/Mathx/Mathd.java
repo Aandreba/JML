@@ -225,4 +225,16 @@ final public class Mathd {
 
         return X;
     }
+
+    public static double agm (double alpha, double beta) {
+        double a = alpha;
+        double b = beta;
+
+        while (a != b) {
+            a = 0.5 * (a + b);
+            b = Math.sqrt(a * b);
+        }
+
+        return a;
+    }
 }

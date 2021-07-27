@@ -262,6 +262,28 @@ final public class Mathf {
         return x;
     }
 
+    public static Comp[] cubic (Comp a, Comp b, Comp c, Comp d) {
+        final Comp zeta = Comp.sqrt(-3).subtr(1).div(2);
+        Comp[] x = new Comp[3];
+
+        Comp b2 = b.mul(b);
+        Comp d0 = b2.subtr(a.mul(c).mul(3));
+        Comp d1 = b2.mul(b).mul(2).subtr(a.mul(b).mul(c).mul(9)).add(a.mul(a).mul(d).mul(27));
+
+        Comp C = Comp.sqrt(d1.mul(d1).subtr(d0.mul(d0).mul(d0).mul(4))).add(d1).div(2).cbrt();
+        Comp pow = Comp.ONE;
+        Comp k = Comp.MONE.div(a.mul(3));
+
+        for (int i=0;i<3;i++) {
+            pow = pow.mul(zeta);
+            Comp u = pow.mul(C);
+
+            x[i] = u.add(b).add(d0.div(u)).mul(k);
+        }
+
+        return x;
+    }
+
     public static Veci poly (float... c) {
         int n = c.length;
 
@@ -325,6 +347,18 @@ final public class Mathf {
         }
 
         return X;
+    }
+
+    public static float agm (float alpha, float beta) {
+        float a = alpha;
+        float b = beta;
+
+        while (a != b) {
+            a = 0.5f * (a + b);
+            b = Mathf.sqrt(a * b);
+        }
+
+        return alpha;
     }
 
     public static class Plot2D {

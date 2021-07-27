@@ -1,5 +1,6 @@
 package org.jml.Calculus;
 
+import org.jml.Calculus.Integral;
 import org.jml.Complex.Single.Comp;
 import org.jml.Function.Complex.SingleComplex;
 import org.jml.Function.Real.RealFunction;
