@@ -2,6 +2,7 @@ package org.jml.Complex.Big;
 
 import jcuda.cuComplex;
 import org.jml.Complex.Double.Compd;
+import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Mathx.Mathb;
 import org.jml.Mathx.Mathf;
@@ -14,10 +15,10 @@ import java.util.Objects;
 public class Compb implements Serializable {
     final private static long serialVersionUID = -7388043871083482711L;
 
-    final public static Compb ZERO = new Compb();
-    final public static Compb ONE = new Compb(Mathb.ONE, Mathb.ZERO);
-    final public static Compb ONEI = new Compb(Mathb.ZERO, Mathb.ONE);
-    final public static Compb MONE = new Compb(Mathb.ONE.negate(), Mathb.ZERO);
+    final public static Compb ZERO = new Compb(Mathb.ZERO, Mathb.ZERO, MathContext.UNLIMITED);
+    final public static Compb ONE = new Compb(Mathb.ONE, Mathb.ZERO, MathContext.UNLIMITED);
+    final public static Compb ONEI = new Compb(Mathb.ZERO, Mathb.ONE, MathContext.UNLIMITED);
+    final public static Compb MONE = new Compb(Mathb.ONE.negate(), Mathb.ZERO, MathContext.UNLIMITED);
 
     final public BigDecimal re, im;
     final public MathContext context;
@@ -26,16 +27,6 @@ public class Compb implements Serializable {
         this.re = real;
         this.im = imaginary;
         this.context = context;
-    }
-
-    public Compb (BigDecimal real, BigDecimal imaginary) {
-        this.re = real;
-        this.im = imaginary;
-        this.context = MathContext.DECIMAL128;
-    }
-
-    public Compb() {
-        this(Mathb.ZERO, Mathb.ZERO);
     }
 
     // OPERATIONS
@@ -73,7 +64,7 @@ public class Compb implements Serializable {
 
     public Compb div (Compb b, MathContext ctx) {
         BigDecimal div = b.re.multiply(b.re).add(b.im.multiply(b.im));
-        return new Compb(re.multiply(b.re).add(im.multiply(b.im)).divide(div, ctx), im.multiply(b.re).subtract(re.multiply(b.im)).divide(div, ctx));
+        return new Compb(re.multiply(b.re).add(im.multiply(b.im)).divide(div, ctx), im.multiply(b.re).subtract(re.multiply(b.im)).divide(div, ctx), ctx);
     }
 
     public Compb div (Compb b) {
@@ -81,7 +72,7 @@ public class Compb implements Serializable {
     }
 
     public Compb div (BigDecimal b, MathContext ctx) {
-        return new Compb(re.divide(b, ctx), im.divide(b, ctx));
+        return new Compb(re.divide(b, ctx), im.divide(b, ctx), ctx);
     }
 
     public Compb div (BigDecimal b) {
@@ -114,7 +105,7 @@ public class Compb implements Serializable {
     // FUNCTIONS
     public Compb inverse (MathContext ctx) {
         BigDecimal xy2 = re.multiply(re).add(im.multiply(im));
-        return new Compb(re.divide(xy2, ctx), im.negate().divide(xy2, ctx));
+        return new Compb(re.divide(xy2, ctx), im.negate().divide(xy2, ctx), ctx);
     }
 
     public Compb inverse () { return inverse(context); }
@@ -126,7 +117,7 @@ public class Compb implements Serializable {
 
         BigDecimal modulus = abs(ctx);
         BigDecimal sqrt2 = Mathb.TWO.sqrt(ctx);
-        return new Compb(modulus.add(re).sqrt(ctx).divide(sqrt2, ctx), BigDecimal.valueOf(im.signum()).multiply(modulus.subtract(re).sqrt(ctx).divide(sqrt2, ctx)));
+        return new Compb(modulus.add(re).sqrt(ctx).divide(sqrt2, ctx), BigDecimal.valueOf(im.signum()).multiply(modulus.subtract(re).sqrt(ctx).divide(sqrt2, ctx)), ctx);
     }
 
     public Compb sqrt () {
@@ -168,10 +159,10 @@ public class Compb implements Serializable {
 
     public Compb log (MathContext ctx) {
         if (isReal() && Mathb.greaterThan(re, Mathb.ZERO)) {
-            return new Compb(Mathb.log(re, ctx), BigDecimal.ZERO);
+            return new Compb(Mathb.log(re, ctx), BigDecimal.ZERO, ctx);
         }
 
-        return new Compb(Mathb.log(abs(), ctx), polarAngle(ctx));
+        return new Compb(Mathb.log(abs(), ctx), polarAngle(ctx), ctx);
     }
 
     public Compb log () { return log(context); }
@@ -192,55 +183,52 @@ public class Compb implements Serializable {
 
     public Compb pow (BigDecimal b, MathContext ctx) {
         if (isReal()) {
-            return new Compb(Mathb.pow(re, b), Mathb.ZERO);
-        } else if (b == 2) {
-            return new Compb(re * re - im * im, 2 * re * im);
+            return new Compb(Mathb.pow(re, b, ctx), Mathb.ZERO, ctx);
+        } else if (b.equals(Mathb.TWO)) {
+            return new Compb(re.multiply(re).subtract(im.multiply(im)), Mathb.TWO.multiply(re).multiply(im), ctx);
         }
 
-        return log().mul(b).exp();
+        return log(ctx).mul(b).exp(ctx);
+    }
+
+    public Compb pow (BigDecimal b) {
+        return pow(b, context);
     }
 
     // JAVA FUNCTIONS
     public Compd toDouble () {
-        return new Compd(re, im);
+        return new Compd(re.doubleValue(), im.doubleValue());
     }
 
-    public Compb toFloat() {
-        return this;
-    }
-
-    public cuComplex toCUDA () {
-        return cuComplex.cuCmplx(re, im);
+    public Comp toFloat() {
+        return new Comp(re.floatValue(), im.floatValue());
     }
 
     @Override
     public Compb clone() {
-        return new Compb(re, im);
+        return new Compb(re, im, context);
     }
 
     @Override
     public String toString() {
-        if (Float.isNaN(re) || Float.isNaN(im)) {
-            return "NaN";
-        } else if (Float.isInfinite(re) || Float.isInfinite(im)) {
-            return "Infinity";
-        } else if (re == 0) {
+        if (re.equals(Mathb.ZERO)) {
             return im +"i";
-        } else if (im == 0) {
-            return Float.toString(re);
-        } else if (im >= 0) {
+        } else if (isReal()) {
+            return re.toString();
+        } else if (Mathb.greaterOrEqual(im, Mathb.ZERO)) {
             return re + " + " + im + "i";
         }
 
-        return re + " - " + -im + "i";
+        return re + " - " + im.negate() + "i";
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Compb comp = (Compb) o;
-        return Float.compare(comp.re, re) == 0 && Float.compare(comp.im, im) == 0;
+        Compb compb = (Compb) o;
+        return re.equals(compb.re) &&
+                im.equals(compb.im);
     }
 
     @Override
@@ -249,57 +237,69 @@ public class Compb implements Serializable {
     }
 
     public String polarRadString() {
-        float radius = polarRadius();
-        float angle = polarAngle();
+        BigDecimal radius = abs();
+        BigDecimal angle = polarAngle();
 
         return radius+" + "+angle+" rad";
     }
 
     public String polarDegString() {
-        float radius = polarRadius();
-        float angle = polarAngle();
+        BigDecimal radius = abs();
+        BigDecimal angle = polarAngle();
 
-        return radius+" + "+Mathf.toDegrees(angle)+" deg";
+        return radius+" + "+Mathb.toDegrees(angle, context)+" deg";
     }
 
     // STATIC FUNCTIONS
-    public static Compb fromPolar (float radius, float angle) {
-        float tan = Mathf.tan(angle);
-        float real = Mathf.sqrt(radius * radius / (1 + tan * tan));
-        float i = tan * real;
+    public static Compb fromPolar (BigDecimal radius, BigDecimal angle, MathContext ctx) {
+        BigDecimal tan = Mathb.tan(angle, ctx);
+        BigDecimal real = Mathb.sqrt(radius.multiply(radius).divide(Mathb.ONE.add(tan.multiply(tan)), ctx), ctx);
+        BigDecimal i = tan.multiply(real);
 
-        return new Compb(real, i);
+        return new Compb(real, i, ctx);
     }
 
-    public static Compb sqrt (Compb x) {
-        return x.sqrt();
+    public static Compb sqrt (Compb i, MathContext ctx) {
+        return i.sqrt(ctx);
     }
 
-    public static Compb sqrt (float i) {
-        if (i >= 0) {
-            return new Compb(Mathf.sqrt(i), 0);
+    public static Compb sqrt (Compb i) {
+        return i.sqrt(i.context);
+    }
+
+    public static Compb sqrt (BigDecimal i, MathContext ctx) {
+        if (Mathb.greaterOrEqual(i, Mathb.ZERO)) {
+            return new Compb(Mathb.sqrt(i, ctx), Mathb.ZERO, ctx);
         }
 
-        return new Compb(0, Mathf.sqrt(-i));
+        return new Compb(Mathb.ZERO, Mathb.sqrt(i.negate(), ctx), ctx);
+    }
+
+    public static Compb exp (Compb x, MathContext ctx) {
+        return x.exp(ctx);
     }
 
     public static Compb exp (Compb x) {
         return x.exp();
     }
 
-    public static Compb exp (float x) {
-        return new Compb(Mathf.exp(x), 0);
+    public static Compb exp (BigDecimal x, MathContext ctx) {
+        return new Compb(Mathb.exp(x, ctx), Mathb.ZERO, ctx);
     }
 
     public static Compb expi (BigDecimal x, MathContext ctx) {
-        return new Compb(Mathb.cos(x, ctx), Mathb.sin(x, ctx));
+        return new Compb(Mathb.cos(x, ctx), Mathb.sin(x, ctx), ctx);
+    }
+
+    public static Compb log (Compb x, MathContext ctx) {
+        return x.log(ctx);
     }
 
     public static Compb log (Compb x) {
         return x.log();
     }
 
-    public static Compb log (float x) {
-        return x > 0 ? new Compb(Mathf.log(x), 0) : new Compb(x, 0).log();
+    public static Compb log (BigDecimal x, MathContext ctx) {
+        return Mathb.greaterThan(x, Mathb.ZERO) ? new Compb(Mathb.log(x, ctx), Mathb.ZERO, ctx) : new Compb(x, Mathb.ZERO, ctx).log();
     }
 }

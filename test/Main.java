@@ -1,14 +1,23 @@
-import org.jml.Calculus.Integral;
-import org.jml.Function.Real.SingleReal;
+import org.jml.Complex.Big.Compb;
 import org.jml.Mathx.Mathb;
 import org.jml.Mathx.Mathf;
 
-import java.io.IOException;
-import java.math.BigDecimal;
 import java.math.MathContext;
 
 public class Main {
-    public static void main (String... args) throws IOException {
-        System.out.println(Mathb.log(Mathb.FIVE, MathContext.DECIMAL128));
+    public static void main (String... args) {
+        float x = Mathf.sqrt(2) / 2;
+        float last = 0;
+
+        boolean sum = false;
+        while (x != last) {
+            float alpha = x * Mathf.sqrt(x + 2) / 2;
+
+            last = x;
+            x = sum ? x + alpha : x - alpha;
+            sum = !sum;
+        }
+
+        System.out.println(x);
     }
 }

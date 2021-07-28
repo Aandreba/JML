@@ -1,5 +1,6 @@
 package org.jml.Mathx.Extra;
 
+import org.jml.Mathx.Mathb;
 import org.jml.Mathx.Mathf;
 import org.jml.Mathx.Rand;
 import org.jml.MT.TaskManager;
@@ -41,18 +42,21 @@ public class Pi {
         return a.add(b).divide(TWO, context);
     }
 
-    public static BigDecimal viete (int points) {
-        final MathContext context = new MathContext(points, RoundingMode.HALF_EVEN);
+    public static BigDecimal viete (MathContext context) {
+        MathContext superCtx = new MathContext(context.getPrecision() * 2, context.getRoundingMode());
 
-        BigDecimal sqrt = TWO.sqrt(context);
-        BigDecimal pi = TWO.divide(sqrt, context);
+        BigDecimal sqrt = TWO.sqrt(superCtx);
+        BigDecimal pi = TWO.divide(sqrt, superCtx);
+        BigDecimal last = null;
 
-        for (int i=0;i<points;i++) {
-            sqrt = sqrt.add(TWO).sqrt(context);
-            pi = pi.multiply(TWO.divide(sqrt, context));
+        while (last == null || !pi.round(context).equals(last.round(context))) {
+            sqrt = sqrt.add(TWO).sqrt(superCtx);
+
+            last = pi;
+            pi = pi.multiply(TWO.divide(sqrt, superCtx), superCtx);
         }
 
-        return pi.multiply(TWO);
+        return pi.multiply(TWO, context);
     }
 
     public static BigDecimal leibniz (int points) {
@@ -81,6 +85,40 @@ public class Pi {
         return pi.get().multiply(FOUR);
     }
 
+    public static BigDecimal ramanujan (MathContext context) {
+        final MathContext superCtx = new MathContext(context.getPrecision() * 2, context.getRoundingMode());
+        final BigDecimal alpha = R9801.divide(TWO.multiply(TWO.sqrt(superCtx)), superCtx);
+
+        BigDecimal sum = BigDecimal.ZERO;
+        BigDecimal last = null;
+
+        BigDecimal fact4k = BigDecimal.ONE;
+        BigDecimal factk = BigDecimal.ONE;
+
+        int i = 0;
+        while (last == null || !sum.round(context).equals(last.round(context))) {
+            int k4 = 4 * i;
+            BigDecimal k = BigDecimal.valueOf(i);
+
+            if (i > 0) {
+                factk = factk.multiply(k);
+                for (int j = 0; j <= 4; j++) {
+                    fact4k = fact4k.multiply(k.add(BigDecimal.valueOf(j)));
+                }
+            }
+
+            BigDecimal beta = fact4k.divide(factk.pow(4), superCtx);
+            BigDecimal gamma = R26390.multiply(k).add(R1103).divide(R396.pow(k4), superCtx);
+
+            last = sum;
+            sum = sum.add(beta.multiply(gamma));
+            i++;
+        }
+
+        sum = BigDecimal.ONE.divide(sum, context);
+        return alpha.multiply(sum, context);
+    }
+
     public static BigDecimal monteCarlo (int points) {
         final MathContext context = new MathContext(points, RoundingMode.HALF_EVEN);
 
@@ -101,34 +139,5 @@ public class Pi {
 
         tasks.run();
         return inside.get() == 0 ? BigDecimal.ZERO : BigDecimal.valueOf(4L * inside.get()).divide(BigDecimal.valueOf(points), context);
-    }
-
-    public static BigDecimal ramanujan (int points) {
-        final MathContext context = new MathContext(points, RoundingMode.HALF_EVEN);
-        final BigDecimal alpha = R9801.divide(TWO.multiply(TWO.sqrt(context)), context);
-
-        BigDecimal sum = BigDecimal.ZERO;
-        BigDecimal fact4k = BigDecimal.ONE;
-        BigDecimal factk = BigDecimal.ONE;
-
-        for (int i=0;i<points;i++) {
-            int k4 = 4 * i;
-            BigDecimal k = BigDecimal.valueOf(i);
-
-            if (i > 0) {
-                factk = factk.multiply(k);
-                for (int j = 0; j <= 4; j++) {
-                    fact4k = fact4k.multiply(k.add(BigDecimal.valueOf(j)));
-                }
-            }
-
-            BigDecimal beta = fact4k.divide(factk.pow(4), context);
-            BigDecimal gamma = R26390.multiply(k).add(R1103).divide(R396.pow(k4), context);
-
-            sum = sum.add(beta.multiply(gamma));
-        }
-
-        sum = BigDecimal.ONE.divide(sum, context);
-        return alpha.multiply(sum);
     }
 }
