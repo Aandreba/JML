@@ -1,16 +1,14 @@
 package org.jml.Mathx;
 
-import org.jml.Calculus.Integral;
-import org.jml.MT.TaskIterator;
-import org.jml.Mathx.Extra.Intx;
-import org.jml.Mathx.Extra.Pi;
-import org.jml.Matrix.Single.Mat;
+import org.jml.Complex.Decimal.Compb;
+import org.jml.Extra.Intx;
+import org.jml.Extra.Pi;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 public class Mathb {
     final public static BigInteger INT_ZERO = BigInteger.ZERO;
@@ -38,6 +36,7 @@ public class Mathb {
     final public static BigDecimal TEN = BigDecimal.TEN;
 
     final public static BigDecimal HALF = ONE.divide(TWO);
+    final private static BigDecimal C27 = BigDecimal.valueOf(27);
     final private static BigDecimal PI180 = BigDecimal.valueOf(180);
 
     final private static HashMap<MathContext, BigDecimal> PI = new HashMap<>();
@@ -321,12 +320,38 @@ public class Mathb {
         return asin(a.divide(a.multiply(a).add(ONE).sqrt(context), context), context);
     }
 
-    public static BigDecimal atan2 (BigDecimal a, BigDecimal b, MathContext context) {
-        return asin(b.divide(a.multiply(b.multiply(b).divide(a.multiply(a), context).add(ONE).sqrt(context)), context), context);
+    public static BigDecimal atan2 (BigDecimal b, BigDecimal a, MathContext context) {
+        MathContext superCtx = new MathContext(context.getPrecision() * 2, context.getRoundingMode());
+
+        if (!a.equals(ZERO)) {
+            BigDecimal atan = atan(b.divide(a, superCtx), superCtx);
+            if (greaterThan(a, ZERO)) {
+                return atan;
+            } else if (greaterOrEqual(b, ZERO)) {
+                return atan.add(pi(context), context);
+            } else {
+                return atan.subtract(pi(context), context);
+            }
+        } else if (greaterThan(b, ZERO)) {
+            return pi(context).divide(TWO, context);
+        } else if (lesserThan(b, ZERO)) {
+            return pi(context).divide(TWO, context).negate();
+        }
+
+        throw new ArithmeticException("Division by zero");
     }
 
     public static BigDecimal hypot (BigDecimal a, BigDecimal b, MathContext context) {
         return a.multiply(a).add(b.multiply(b)).sqrt(context);
+    }
+
+    public static BigDecimal sum (int from, int to, Function<Integer, BigDecimal> function) {
+        BigDecimal sum = ZERO;
+        for (int i=from;i<=to;i++) {
+            sum = sum.add(function.apply(i));
+        }
+
+        return sum;
     }
 
     public static BigInteger factorial (BigInteger x) {
@@ -360,6 +385,40 @@ public class Mathb {
 
     public static BigDecimal binomial (BigDecimal n, BigDecimal k, MathContext context) {
         return factorial(n, context).divide(factorial(k, context).multiply(factorial(n.subtract(k), context)), context);
+    }
+
+    public static Compb[] quadratic (BigDecimal a, BigDecimal b, BigDecimal c, MathContext context) {
+        Compb[] x = new Compb[2];
+        Compb sqrt = Compb.sqrt(b.pow(2).subtract(FOUR.multiply(a).multiply(c)), context);
+
+        BigDecimal a2 = TWO.multiply(a);
+        BigDecimal nb = b.negate();
+
+        x[0] = sqrt.add(nb).div(a2);
+        x[1] = sqrt.invSubtr(nb).div(a2);
+        return x;
+    }
+
+    public static Compb[] cubic (BigDecimal a, BigDecimal b, BigDecimal c, BigDecimal d, MathContext context) {
+        final Compb zeta = Compb.sqrt(THREE.negate(), context).subtr(ONE).div(TWO);
+        Compb[] x = new Compb[3];
+
+        BigDecimal b2 = b.pow(2);
+        BigDecimal d0 = b2.subtract(THREE.multiply(a).multiply(c));
+        BigDecimal d1 = TWO.multiply(b2).multiply(b).subtract(NINE.multiply(a).multiply(b).multiply(c)).add(C27.multiply(a.pow(2)).multiply(d));
+
+        Compb C = Compb.sqrt(d1.pow(2).subtract(FOUR.multiply(d0.pow(3))), context).add(d1).div(TWO).cbrt();
+        Compb pow = Compb.ONE.toContext(context);
+        BigDecimal k = ONE.negate().divide(THREE.multiply(a), context);
+
+        for (int i=0;i<3;i++) {
+            pow = pow.mul(zeta);
+            Compb u = pow.mul(C);
+
+            x[i] = u.add(b).add(u.invDiv(d0)).mul(k);
+        }
+
+        return x;
     }
 
     public static BigDecimal agm (BigDecimal alpha, BigDecimal beta, MathContext context) {

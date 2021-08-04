@@ -5,12 +5,16 @@ import org.jml.Vector.Double.Vecd;
 import org.jml.Vector.Double.Vecid;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.function.Function;
 
 final public class Mathd {
     final public static double SQRT2 = Math.sqrt(2);
     final public static double HALFPI = Math.PI / 2;
     final public static double PI2 = 2 * Math.PI;
+
+    final public static double LN2 = Math.log(2);
+    final public static double LN10 = Math.log(10);
 
     final public static double TO_RADIANS = Math.PI / 180;
     final public static double TO_DEGREES = 180 / Math.PI;
@@ -38,6 +42,10 @@ final public class Mathd {
     public native static double atanh (double x);
     public native static double log2 (double x);
 
+    public static BigInteger pow (long a, int b) {
+        return BigInteger.valueOf(a).pow(b);
+    }
+
     public static double clamp (double x, double from, double to) {
         return x <= from ? from : Math.min(x, to);
     }
@@ -45,7 +53,7 @@ final public class Mathd {
         return x <= from ? from : Math.min(x, to);
     }
 
-    public static double summation (int from, int to, Function<Integer, Double> function) {
+    public static double sum(int from, int to, Function<Integer, Double> function) {
         double sum = 0;
         for (int i=from;i<=to;i++) {
             sum += function.apply(i);
@@ -54,7 +62,7 @@ final public class Mathd {
         return sum;
     }
 
-    public static Compd summationi (int from, int to, Function<Integer, Compd> function) {
+    public static Compd sumi(int from, int to, Function<Integer, Compd> function) {
         Compd sum = Compd.ZERO;
         for (int i=from;i<=to;i++) {
             sum = sum.add(function.apply(i));
@@ -63,7 +71,7 @@ final public class Mathd {
         return sum;
     }
 
-    public static double product (int from, int to, Function<Integer, Double> function) {
+    public static double prod(int from, int to, Function<Integer, Double> function) {
         float prod = 1;
         for (int i=from;i<=to;i++) {
             prod *= function.apply(i);
@@ -72,13 +80,27 @@ final public class Mathd {
         return prod;
     }
 
-    public static Compd producti (int from, int to, Function<Integer, Compd> function) {
+    public static Compd prodi(int from, int to, Function<Integer, Compd> function) {
         Compd sum = Compd.ONE;
         for (int i=from;i<=to;i++) {
             sum = sum.mul(function.apply(i));
         }
 
         return sum;
+    }
+
+    public static long gcd (long a, long b) {
+        boolean isMax = a >= b;
+        long alpha = isMax ? a : b;
+        long beta = isMax ? b : a;
+
+        while (beta != 0) {
+            long temp = beta;
+            beta = alpha % beta;
+            alpha = temp;
+        }
+
+        return Math.max(alpha, -alpha);
     }
 
     public static double factorial (int x) {

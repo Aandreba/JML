@@ -1,10 +1,13 @@
 package org.jml.Complex.Double;
+import org.jml.Complex.Decimal.Compb;
 import org.jml.Complex.Single.Comp;
 import org.jml.Mathx.Mathd;
 import jcuda.cuDoubleComplex;
 import org.jml.Mathx.Mathf;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.Objects;
 
 /**
@@ -237,8 +240,8 @@ public class Compd implements Serializable {
         return new Comp((float) re, (float) im);
     }
 
-    public Compd toDouble() {
-        return this;
+    public Compb toDecimal(MathContext ctx) {
+        return new Compb(BigDecimal.valueOf(re).round(ctx), BigDecimal.valueOf(im).round(ctx), ctx);
     }
 
     /**

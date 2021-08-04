@@ -1,9 +1,12 @@
 package org.jml.Complex.Single;
+import org.jml.Complex.Decimal.Compb;
 import org.jml.Complex.Double.Compd;
 import org.jml.Mathx.Mathf;
 import jcuda.cuComplex;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.Objects;
 
 public class Comp implements Serializable {
@@ -171,8 +174,8 @@ public class Comp implements Serializable {
         return new Compd(re, im);
     }
 
-    public Comp toFloat() {
-        return this;
+    public Compb toDecimal (MathContext ctx) {
+        return new Compb(BigDecimal.valueOf(re).round(ctx), BigDecimal.valueOf(im).round(ctx), ctx);
     }
 
     public cuComplex toCUDA () {

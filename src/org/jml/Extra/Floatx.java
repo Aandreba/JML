@@ -1,4 +1,4 @@
-package org.jml.Mathx.Extra;
+package org.jml.Extra;
 
 import org.jml.Mathx.Mathf;
 

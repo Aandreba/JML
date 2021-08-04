@@ -3,7 +3,7 @@ package org.jml.Matrix.Single;
 import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Link.Single.Link2D;
-import org.jml.Mathx.Extra.Intx;
+import org.jml.Extra.Intx;
 import org.jml.Mathx.Mathf;
 import org.jml.Mathx.Rand;
 import org.jml.MT.TaskManager;

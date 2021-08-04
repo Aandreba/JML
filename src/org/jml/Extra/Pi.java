@@ -1,6 +1,5 @@
-package org.jml.Mathx.Extra;
+package org.jml.Extra;
 
-import org.jml.Mathx.Mathb;
 import org.jml.Mathx.Mathf;
 import org.jml.Mathx.Rand;
 import org.jml.MT.TaskManager;
@@ -9,7 +8,6 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Pi {

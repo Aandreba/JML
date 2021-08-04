@@ -1,13 +1,9 @@
 package org.jml.Vector.Double;
 
-import org.jml.Complex.Single.Comp;
 import org.jml.GPGPU.OpenCL.Context;
-import org.jml.Mathx.Extra.Doublex;
-import org.jml.Mathx.Mathf;
+import org.jml.Extra.Doublex;
 import org.jml.Matrix.Double.Matd;
-import org.jml.Matrix.Single.Mati;
 import org.jml.Vector.Single.Vec;
-import org.jml.Vector.Single.Veci;
 
 import java.io.Serializable;
 import java.util.Arrays;

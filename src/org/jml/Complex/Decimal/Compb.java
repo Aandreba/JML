@@ -1,11 +1,8 @@
-package org.jml.Complex.Big;
+package org.jml.Complex.Decimal;
 
-import jcuda.cuComplex;
 import org.jml.Complex.Double.Compd;
 import org.jml.Complex.Single.Comp;
-import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Mathx.Mathb;
-import org.jml.Mathx.Mathf;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -34,32 +31,60 @@ public class Compb implements Serializable {
         return context.getPrecision() >= b.context.getPrecision() ? context : b.context;
     }
 
+    public Compb add (Compb b, MathContext ctx) {
+        return new Compb(re.add(b.re, ctx), im.add(b.im, ctx), ctx);
+    }
+
     public Compb add (Compb b) {
-        return new Compb(re.add(b.re), im.add(b.im), operationCtx(b));
+        return add(b, operationCtx(b));
+    }
+
+    public Compb add (BigDecimal b, MathContext ctx) {
+        return new Compb(re.add(b, ctx), im.round(ctx), ctx);
     }
 
     public Compb add (BigDecimal b) {
-        return new Compb(re.add(b), im, context);
+        return add(b, context);
+    }
+
+    public Compb subtr (Compb b, MathContext ctx) {
+        return new Compb(re.subtract(b.re, ctx), im.subtract(b.im, ctx), ctx);
     }
 
     public Compb subtr (Compb b) {
-        return new Compb(re.subtract(b.re), im.subtract(b.im), operationCtx(b));
+        return subtr(b, operationCtx(b));
+    }
+
+    public Compb subtr (BigDecimal b, MathContext ctx) {
+        return new Compb(re.subtract(b, ctx), im.round(ctx), ctx);
     }
 
     public Compb subtr (BigDecimal b) {
-        return new Compb(re.subtract(b), im, context);
+        return subtr(b, context);
+    }
+
+    public Compb invSubtr (BigDecimal b, MathContext ctx) {
+        return new Compb(b.subtract(re, ctx), im.round(ctx), ctx);
     }
 
     public Compb invSubtr (BigDecimal b) {
-        return new Compb(b.subtract(re), im, context);
+        return invSubtr(b, context);
+    }
+
+    public Compb mul (Compb b, MathContext ctx) {
+        return new Compb(re.multiply(b.re).subtract(im.multiply(b.im), ctx), re.multiply(b.im).add(b.re.multiply(im), ctx), ctx);
     }
 
     public Compb mul (Compb b) {
-        return new Compb(re.multiply(b.re).subtract(im.multiply(b.im)), re.multiply(b.im).add(b.re.multiply(im)), operationCtx(b));
+        return mul(b, operationCtx(b));
+    }
+
+    public Compb mul (BigDecimal b, MathContext ctx) {
+        return new Compb(re.multiply(b, ctx), im.multiply(b, ctx), ctx);
     }
 
     public Compb mul (BigDecimal b) {
-        return new Compb(re.multiply(b), im.multiply(b), context);
+        return mul(b, context);
     }
 
     public Compb div (Compb b, MathContext ctx) {
@@ -196,6 +221,10 @@ public class Compb implements Serializable {
     }
 
     // JAVA FUNCTIONS
+    public Compb toContext (MathContext ctx) {
+        return new Compb(re.round(ctx), im.round(ctx), ctx);
+    }
+
     public Compd toDouble () {
         return new Compd(re.doubleValue(), im.doubleValue());
     }

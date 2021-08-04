@@ -1,4 +1,4 @@
-package org.jml.Mathx.Extra;
+package org.jml.Extra;
 
 public class Intx {
     public static String bitString (int value) {

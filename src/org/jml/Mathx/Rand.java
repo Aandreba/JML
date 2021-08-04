@@ -3,8 +3,8 @@ package org.jml.Mathx;
 import org.jml.Complex.Double.Compd;
 import org.jml.Complex.Single.Comp;
 import org.jml.Complex.Single.Quat;
-import org.jml.Mathx.Extra.Intx;
-import org.jml.Mathx.Extra.Longx;
+import org.jml.Extra.Intx;
+import org.jml.Extra.Longx;
 import org.jml.Matrix.Double.Matd;
 import org.jml.Matrix.Double.Matid;
 import org.jml.Matrix.Single.Mat;
@@ -103,8 +103,13 @@ final public class Rand {
         return val;
     }
 
-    public static BigInteger getBigInteger (int bits) {
-        return new BigInteger(bits, random);
+    public static BigInteger getBigInteger (int precision) {
+        return new BigInteger(Mathf.round(precision * Mathf.LN10 / Mathf.LN2), random);
+    }
+
+    public static BigDecimal getDecimal (MathContext context) {
+        BigInteger integer = getBigInteger(context.getPrecision());
+        return new BigDecimal(integer, context.getPrecision(), context);
     }
 
     public static Compd getCompd() {

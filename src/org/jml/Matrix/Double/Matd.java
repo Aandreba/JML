@@ -2,7 +2,7 @@ package org.jml.Matrix.Double;
 
 import org.jml.Complex.Double.Compd;
 import org.jml.GPGPU.OpenCL.Context;
-import org.jml.Mathx.Extra.Intx;
+import org.jml.Extra.Intx;
 import org.jml.Mathx.Mathd;
 import org.jml.Mathx.Rand;
 import org.jml.MT.TaskManager;
@@ -722,18 +722,18 @@ public class Matd implements Serializable {
 
                 for (int p=k+1;p<n;p++) {
                     int m = p;
-                    double sumA = Mathd.summation(0, im1, j -> l.get(k, j) * u.get(j, k));
+                    double sumA = Mathd.sum(0, im1, j -> l.get(k, j) * u.get(j, k));
                     u.set(k, k, get(k, k) - sumA);
 
-                    double sumB = Mathd.summation(0, im1, j -> l.get(k, j) * u.get(j, m));
+                    double sumB = Mathd.sum(0, im1, j -> l.get(k, j) * u.get(j, m));
                     u.set(k, m, get(k, m) - sumB);
 
-                    double sumC = Mathd.summation(0, im1, j -> l.get(m, j) * u.get(j, k));
+                    double sumC = Mathd.sum(0, im1, j -> l.get(m, j) * u.get(j, k));
                     l.set(m, k, (get(m, k) - sumC) / u.get(k, k));
                 }
             }
 
-            double sum = Mathd.summation(0, nm1, p -> l.get(nm1,p) * u.get(p,nm1));
+            double sum = Mathd.sum(0, nm1, p -> l.get(nm1,p) * u.get(p,nm1));
             u.set(nm1, nm1, get(nm1, nm1) - sum);
         }
 

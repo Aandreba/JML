@@ -1,4 +1,4 @@
-package org.jml.Mathx.Extra;
+package org.jml.Extra;
 
 public class Doublex {
     public static String bitString (double value) {

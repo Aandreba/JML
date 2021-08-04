@@ -554,18 +554,18 @@ public class Matid implements Serializable {
 
                 for (int p=k+1;p<n;p++) {
                     int m = p;
-                    Compd sumA = Mathd.summationi(0, im1, j -> l.get(k, j).mul(u.get(j, k)));
+                    Compd sumA = Mathd.sumi(0, im1, j -> l.get(k, j).mul(u.get(j, k)));
                     u.set(k, k, get(k, k).subtr(sumA));
 
-                    Compd sumB = Mathd.summationi(0, im1, j -> l.get(k, j).mul(u.get(j, m)));
+                    Compd sumB = Mathd.sumi(0, im1, j -> l.get(k, j).mul(u.get(j, m)));
                     u.set(k, m, get(k, m).subtr(sumB));
 
-                    Compd sumC = Mathd.summationi(0, im1, j -> l.get(m, j).mul(u.get(j, k)));
+                    Compd sumC = Mathd.sumi(0, im1, j -> l.get(m, j).mul(u.get(j, k)));
                     l.set(m, k, (get(m, k).subtr(sumC)).div(u.get(k, k)));
                 }
             }
 
-            Compd sum = Mathd.summationi(0, nm1, p -> l.get(nm1,p).mul(u.get(p,nm1)));
+            Compd sum = Mathd.sumi(0, nm1, p -> l.get(nm1,p).mul(u.get(p,nm1)));
             u.set(nm1, nm1, get(nm1, nm1).subtr(sum));
         }
 

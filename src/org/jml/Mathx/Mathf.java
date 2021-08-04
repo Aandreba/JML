@@ -1,13 +1,14 @@
 package org.jml.Mathx;
 
 import org.jml.Complex.Single.Comp;
-import org.jml.Mathx.Extra.Intx;
+import org.jml.Extra.Intx;
 import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.function.Function;
 
 final public class Mathf {
@@ -16,6 +17,9 @@ final public class Mathf {
     final public static float SQRT2 = (float) Math.sqrt(2);
     final public static float HALFPI = PI / 2;
     final public static float PI2 = 2 * PI;
+
+    final public static float LN2 = (float) Mathd.LN2;
+    final public static float LN10 = (float) Mathd.LN10;
 
     final public static float INF = Float.POSITIVE_INFINITY;
     final public static float NINF = Float.NEGATIVE_INFINITY;
@@ -143,6 +147,20 @@ final public class Mathf {
         return sum;
     }
 
+    public static int gcd (int a, int b) {
+        boolean isMax = a >= b;
+        int alpha = isMax ? a : b;
+        int beta = isMax ? b : a;
+
+        while (beta != 0) {
+            int temp = beta;
+            beta = alpha % beta;
+            alpha = temp;
+        }
+
+        return Math.max(alpha, -alpha);
+    }
+
     public static float factorial (int x) {
         if (x < 0) {
             return factorial((float) x);
@@ -172,28 +190,6 @@ final public class Mathf {
 
     public static float gamma (float x) {
         return factorial(x - 1);
-    }
-
-    public static float polygamma (int n, float x) {
-        if (n <= 0) {
-            throw new ArithmeticException("Variable n can't be below zero");
-        }
-
-        float sign = Intx.isOdd(n) ? 1 : -1;
-        float fact = factorial(n);
-
-        float sum = 0;
-        float last = -1;
-
-        int np1 = n + 1;
-        int k = 0;
-        while (sum != last) {
-            last = sum;
-            sum += 1 / Mathf.pow(x + k, np1);
-            k++;
-        }
-
-        return sign * fact * sum;
     }
 
     public static float stirling (float x) {
