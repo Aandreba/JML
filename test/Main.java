@@ -1,14 +1,12 @@
-import org.jml.Fraction.Frac;
-import org.jml.Fraction.Fracb;
+import org.jml.Function.Real.DecimalReal;
+import org.jml.Function.Real.RealFunction;
 import org.jml.Mathx.Mathb;
 import org.jml.Mathx.Mathf;
 
-import java.math.MathContext;
+import java.math.BigDecimal;
 
 public class Main {
     public static void main (String... args) {
-        Fracb pi = new Fracb(Mathb.pi(MathContext.DECIMAL128));
-        System.out.println(pi);
-        System.out.println(pi.doubleValue());
+        System.out.println(RealFunction.SQRT.integ(0, 1));
     }
 }

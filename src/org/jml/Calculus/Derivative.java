@@ -14,10 +14,10 @@ public class Derivative {
 
     public static float deriv (float a, RealFunction function) {
         BigDecimal x = BigDecimal.valueOf(a);
-        BigDecimal alpha = function.apply(x.add(FLOAT_DX), FLOAT_CTX);
         BigDecimal beta = function.apply(x, FLOAT_CTX);
+        BigDecimal gamma = function.apply(x.add(FLOAT_DX), FLOAT_CTX);
 
-        return alpha.subtract(beta).divide(FLOAT_DX, MathContext.DECIMAL32).floatValue();
+        return gamma.subtract(beta).divide(FLOAT_DX, MathContext.DECIMAL32).floatValue();
     }
 
     public static double deriv (double a, RealFunction function) {

@@ -1,25 +1,22 @@
 package org.jml.MT;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 
 public class TaskIterator implements Runnable {
     public interface Condition {
         boolean apply (int epoch);
     }
 
-    public interface Run {
+    public interface Runner {
         void apply (int epoch);
     }
 
-    final public Run run;
+    final public Runner runner;
     public Condition condition;
 
-    public TaskIterator (Run run, Condition cond) {
+    public TaskIterator (Runner runner, Condition cond) {
         super();
-        this.run = run;
+        this.runner = runner;
         this.condition = cond;
     }
 
@@ -36,7 +33,7 @@ public class TaskIterator implements Runnable {
             threads[i] = new Thread(() -> {
                 int j;
                 while (condition.apply(j = epochs.incrementAndGet())) {
-                    run.apply(j);
+                    runner.apply(j);
                 }
             });
 
