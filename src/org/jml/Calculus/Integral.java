@@ -31,6 +31,7 @@ public class Integral {
         BigDecimal N = Mathb.EIGHT.divide(BigDecimal.valueOf(945, context.getPrecision()), context);
         N = N.multiply(alpha).multiply(delta.pow(7));
         N = Mathb.sqrt(N, context);
+        N = Mathb.max(N, Mathb.TWO);
 
         BigInteger n = N.toBigInteger();
         BigInteger nm1 = n.subtract(BigInteger.ONE);
