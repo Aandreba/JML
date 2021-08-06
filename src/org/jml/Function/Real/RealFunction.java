@@ -74,6 +74,14 @@ public interface RealFunction {
             }
         };
     }
+    default RealFunction deriv (int nth) {
+        RealFunction deriv = this;
+        for (int i=0;i<nth;i++) {
+            deriv = deriv.deriv();
+        }
+
+        return deriv;
+    }
 
     default float integ (float a, float b) { return Integral.integ(a, b, this); }
     default double integ (double a, double b) { return Integral.integ(a, b, this); }

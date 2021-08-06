@@ -10,8 +10,10 @@ import java.util.function.Function;
 
 final public class Mathd {
     final public static double SQRT2 = Math.sqrt(2);
+
     final public static double HALFPI = Math.PI / 2;
     final public static double PI2 = 2 * Math.PI;
+    final public static double SQRT_PI = Math.sqrt(Math.PI);
 
     final public static double LN2 = Math.log(2);
     final public static double LN10 = Math.log(10);

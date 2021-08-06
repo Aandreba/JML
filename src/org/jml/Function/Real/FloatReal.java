@@ -3,7 +3,7 @@ package org.jml.Function.Real;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
-public interface SingleReal extends RealFunction {
+public interface FloatReal extends RealFunction {
     default double apply (double x) {
         return apply ((float) x);
     }

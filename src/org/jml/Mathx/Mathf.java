@@ -1,7 +1,9 @@
 package org.jml.Mathx;
 
+import org.jml.Calculus.Integral;
 import org.jml.Complex.Single.Comp;
 import org.jml.Extra.Intx;
+import org.jml.Function.Real.DoubleReal;
 import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;
 
@@ -14,9 +16,12 @@ import java.util.function.Function;
 final public class Mathf {
     final public static float PI = (float) StrictMath.PI;
     final public static float E = (float) StrictMath.E;
-    final public static float SQRT2 = (float) Math.sqrt(2);
+
     final public static float HALFPI = PI / 2;
     final public static float PI2 = 2 * PI;
+    final public static float SQRT_PI = (float) Mathd.SQRT_PI;
+
+    final public static float SQRT2 = (float) Math.sqrt(2);
 
     final public static float LN2 = (float) Mathd.LN2;
     final public static float LN10 = (float) Mathd.LN10;
@@ -159,6 +164,11 @@ final public class Mathf {
         }
 
         return Math.max(alpha, -alpha);
+    }
+
+    public static float erf (float x) {
+        float integ = Integral.integ(0, x, (DoubleReal) t -> Math.exp(-t * t));
+        return 2 * integ / SQRT_PI;
     }
 
     public static float factorial (int x) {

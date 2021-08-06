@@ -1,10 +1,8 @@
 package org.jml.Calculus;
 
-import org.jml.Calculus.Integral;
 import org.jml.Complex.Single.Comp;
 import org.jml.Function.Complex.SingleComplex;
 import org.jml.Function.Real.RealFunction;
-import org.jml.Function.Real.SingleReal;
 import org.jml.Mathx.Mathf;
 import org.jml.MT.TaskManager;
 import org.jml.Vector.Single.Vec;

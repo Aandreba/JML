@@ -79,6 +79,14 @@ public class Mathb {
         return a.compareTo(b) <= 0;
     }
 
+    public static BigDecimal min (BigDecimal a, BigDecimal b) {
+        return lesserOrEqual(a, b) ? a : b;
+    }
+
+    public static BigDecimal max (BigDecimal a, BigDecimal b) {
+        return greaterOrEqual(a, b) ? a : b;
+    }
+
     public static boolean isOdd (BigInteger a) {
         return a.testBit(0);
     }
@@ -217,7 +225,8 @@ public class Mathb {
             return a.pow(b.intValue());
         }
 
-        return exp(b.multiply(log(a, context)), context);
+        BigDecimal log = Mathb.log(a, context);
+        return Mathb.exp(b.multiply(log), context);
     }
 
     public static BigDecimal sin (BigDecimal a, MathContext context) {
