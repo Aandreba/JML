@@ -3,6 +3,7 @@ package org.jml.Mathx;
 import org.jml.Calculus.Integral;
 import org.jml.Complex.Single.Comp;
 import org.jml.Extra.Intx;
+import org.jml.Function.Real.DecimalReal;
 import org.jml.Function.Real.DoubleReal;
 import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;
@@ -10,7 +11,9 @@ import org.jml.Vector.Single.Veci;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 import java.util.function.Function;
 
 final public class Mathf {
@@ -167,7 +170,7 @@ final public class Mathf {
     }
 
     public static float erf (float x) {
-        float integ = Integral.integ(0, x, (DoubleReal) t -> Math.exp(-t * t));
+        float integ = Integral.integ(0, x, (DecimalReal) (t,c) -> Mathb.exp(t.pow(2).negate(), c));
         return 2 * integ / SQRT_PI;
     }
 

@@ -12,7 +12,6 @@ public class Main {
         DecimalReal func = (x,c) -> Mathb.ONE.divide(x.pow(2), c);
         MathContext context = MathContext.DECIMAL32;
 
-        //System.out.println(func.integ(Mathb.ZERO, Mathb.ONE, context));
-        System.out.println(Integral.integ(Mathb.ONE, Mathb.TEN, func, context));
+        System.out.println(Mathf.erf(1));
     }
 }

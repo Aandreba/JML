@@ -1,5 +1,6 @@
 package org.jml.Mathx;
 
+import org.jml.Calculus.Integral;
 import org.jml.Complex.Decimal.Compb;
 import org.jml.Extra.Intx;
 import org.jml.Extra.Pi;
@@ -46,6 +47,9 @@ public class Mathb {
 
     final private static HashMap<MathContext, BigDecimal> TO_RADIANS = new HashMap<>();
     final private static HashMap<MathContext, BigDecimal> TO_DEGREES = new HashMap<>();
+
+    final private static BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
+    final private static BigInteger MAX_LONG = BigInteger.valueOf(Long.MAX_VALUE);
 
     public static boolean greaterThan (BigDecimal a, BigDecimal b) {
         return a.compareTo(b) > 0;
