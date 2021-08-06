@@ -9,9 +9,9 @@ import java.math.MathContext;
 
 public class Main {
     public static void main (String... args) {
-        DecimalReal func = (x,c) -> Mathb.ONE.divide(x.pow(2), c);
+        DoubleReal func = x -> 2 * Math.exp(-Math.pow(x - 0.5, 2) / 0.08);
         MathContext context = MathContext.DECIMAL32;
 
-        System.out.println(Mathf.erf(1));
+        System.out.println(func.integ(0, 0.5f));
     }
 }

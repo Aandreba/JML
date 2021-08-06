@@ -26,7 +26,7 @@ public class Integral {
     public static BigDecimal integ (BigDecimal a, BigDecimal b, RealFunction func, MathContext context) {
         BigDecimal delta = b.subtract(a);
         BigDecimal alpha = func.deriv(6).apply(delta.divide(Mathb.TWO), context).abs();
-        alpha = Mathb.max(alpha, BigDecimal.valueOf(1, context.getPrecision()));
+        alpha = Mathb.max(alpha, Mathb.ONE);
 
         BigDecimal N = Mathb.EIGHT.divide(BigDecimal.valueOf(945, context.getPrecision()), context);
         N = N.multiply(alpha).multiply(delta.pow(7));
