@@ -1,7 +1,7 @@
 package org.jml.Calculus;
 
 import org.jml.Complex.Single.Comp;
-import org.jml.Function.Complex.SingleComplex;
+import org.jml.Function.Complex.FloatComplex;
 import org.jml.Function.Real.RealFunction;
 import org.jml.Mathx.Mathf;
 import org.jml.MT.TaskManager;
@@ -71,11 +71,11 @@ public class Fourier {
 
     public static Comp transf (float a, float b, float freq, RealFunction func) {
         float beta = ALPHA * freq;
-        return Integral.integ(a, b, (SingleComplex) (float x) -> Comp.expi(beta * x).mul(func.apply(x)));
+        return Integral.integ(a, b, (FloatComplex) (float x) -> Comp.expi(beta * x).mul(func.apply(x)));
     }
 
     public static Comp transf (float a, float b, RealFunction func) {
-        return Integral.integ(a, b, (SingleComplex) (float x) -> Comp.expi(ALPHA * x).mul(func.apply(x)));
+        return Integral.integ(a, b, (FloatComplex) (float x) -> Comp.expi(ALPHA * x).mul(func.apply(x)));
     }
 
     private static int bitReverse (int n, int bits) {

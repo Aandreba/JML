@@ -3,27 +3,19 @@ package org.jml.Mathx;
 import org.jml.Calculus.Integral;
 import org.jml.Complex.Single.Comp;
 import org.jml.Function.Complex.ComplexFunction;
-import org.jml.Function.Complex.SingleComplex;
-import org.jml.Mathx.Mathf;
-import org.jml.Matrix.Single.Mati;
-import org.jml.Vector.Single.Vec;
+import org.jml.Function.Complex.FloatComplex;
 import org.jml.Vector.Single.Veci;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
-import java.io.InvalidObjectException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiFunction;
 
 public class FourierSeries {
     public static Veci calculate (int length, ComplexFunction function) {
         return Veci.foreach(2 * length + 1, (int j) -> {
             int n = j - length;
-            return Integral.integ(0, 1, (SingleComplex) (float t) -> Comp.expi(-Mathf.PI2 * n * t).mul(function.apply(t)));
+            return Integral.integ(0, 1, (FloatComplex) (float t) -> Comp.expi(-Mathf.PI2 * n * t).mul(function.apply(t)));
         });
     }
 
@@ -43,7 +35,11 @@ public class FourierSeries {
         return sum;
     }
 
-    public static SingleComplex pathToFunction (PathIterator path) {
+    public static FloatComplex shapeToFunction (Shape shape, AffineTransform transform) {
+        return pathToFunction(shape.getPathIterator(transform));
+    }
+
+    public static FloatComplex pathToFunction (PathIterator path) {
         ArrayList<float[]> points = new ArrayList<>();
         ArrayList<Integer> types = new ArrayList<>();
 
