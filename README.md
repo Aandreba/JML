@@ -4,11 +4,13 @@ Java Library for mathematical computation
 ## Features
 - Complex numbers and Quaternions (Both single & double precision)
 - Native-level float math functions
+- BigDecimal math functions
 - Vectors and Matrices
-  - Single and double precision
+  - Single, double & big precision
   - Real and Complex
   - On CPU, OpenCL & CUDA
 - References for 1D & 2D float, double arrays
+- Real & Complex function interfaces, with integrals & derivatives
 
 ## Included libraries
 - <a href="https://github.com/gpu/JOCL">JOCL</a>
