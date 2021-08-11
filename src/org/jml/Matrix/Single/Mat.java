@@ -703,7 +703,27 @@ public class Mat extends Link2D implements Serializable {
     public static Mat identity (int k) {
         return foreach(k, k, (i, j) -> i == j ? 1 : 0);
     }
-    
+
+    public static Mat getTransform (Vec from, Vec to) {
+        int n = from.size();
+        if (n != to.size) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        Mat I = identity(n);
+        Mat A = Rand.getMat(n, n);
+        Mat last = null;
+
+        while (!A.equals(last)) {
+            Vec out = A.mul(from);
+
+            last = A;
+            A = A.add(I.scalMul(to.subtr(out)));
+        }
+
+        return A;
+    }
+
     public Mat clone() {
         Mat matrix = new Mat(rows(), cols());
         for (int i = 0; i< rows(); i++) {
@@ -720,7 +740,6 @@ public class Mat extends Link2D implements Serializable {
         return Arrays.equals(values, ref1Dfs.values);
     }
 
-    
     public int hashCode() {
         return Arrays.hashCode(values);
     }

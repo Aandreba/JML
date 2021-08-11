@@ -9,6 +9,7 @@ import org.jml.MT.TaskManager;
 import org.jml.Matrix.Single.Mat;
 import org.jml.Vector.Double.Vecd;
 import org.jml.Vector.Double.Vecid;
+import org.jml.Vector.Single.Vec;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -640,6 +641,26 @@ public class Matd implements Serializable {
 
     public static Matd identity (int k) {
         return foreach(k, k, (i, j) -> i == j ? 1 : 0);
+    }
+
+    public static Matd getTransform (Vecd from, Vecd to) {
+        int n = from.size();
+        if (n != to.size()) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        Matd I = identity(n);
+        Matd A = Rand.getMatd(n, n);
+        Matd last = null;
+
+        while (!A.equals(last)) {
+            Vecd out = A.mul(from);
+
+            last = A;
+            A = A.add(I.scalMul(to.subtr(out)));
+        }
+
+        return A;
     }
 
     public double[] rowMajor () {

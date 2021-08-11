@@ -4,8 +4,11 @@ import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Complex.Double.Compd;
 import org.jml.Mathx.Mathd;
 import org.jml.MT.TaskManager;
+import org.jml.Mathx.Rand;
+import org.jml.Matrix.Single.Mat;
 import org.jml.Matrix.Single.Mati;
 import org.jml.Vector.Double.Vecid;
+import org.jml.Vector.Single.Vec;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -472,6 +475,26 @@ public class Matid implements Serializable {
 
     public static Matid identity (int k) {
         return foreach(k, k, (i, j) -> i == j ? Compd.ONE : Compd.ZERO);
+    }
+
+    public static Matid getTransform (Vecid from, Vecid to) {
+        int n = from.size();
+        if (n != to.size()) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        Matid I = identity(n);
+        Matid A = Rand.getMatid(n, n);
+        Matid last = null;
+
+        while (!A.equals(last)) {
+            Vecid out = A.mul(from);
+
+            last = A;
+            A = A.add(I.scalMul(to.subtr(out)));
+        }
+
+        return A;
     }
 
     public Compd[] rowMajor () {

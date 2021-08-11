@@ -4,7 +4,9 @@ import org.jml.GPGPU.OpenCL.Context;
 import org.jml.Complex.Single.Comp;
 import org.jml.Mathx.Mathf;
 import org.jml.MT.TaskManager;
+import org.jml.Mathx.Rand;
 import org.jml.Matrix.Double.Matid;
+import org.jml.Vector.Single.Vec;
 import org.jml.Vector.Single.Veci;
 
 import java.io.Serializable;
@@ -539,7 +541,27 @@ public class Mati implements Serializable {
     public static Mati identity (int k) {
         return foreach(k, k, (i, j) -> i == j ? new Comp(1,0) : new Comp());
     }
-    
+
+    public static Mati getTransform (Veci from, Veci to) {
+        int n = from.size();
+        if (n != to.size) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        Mati I = identity(n);
+        Mati A = Rand.getMati(n, n);
+        Mati last = null;
+
+        while (!A.equals(last)) {
+            Veci out = A.mul(from);
+
+            last = A;
+            A = A.add(I.scalMul(to.subtr(out)));
+        }
+
+        return A;
+    }
+
     public Mati clone() {
         Mati matrix = new Mati(rows(), cols());
         for (int i = 0; i< rows(); i++) {
