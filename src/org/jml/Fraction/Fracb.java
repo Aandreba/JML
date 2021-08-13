@@ -2,14 +2,17 @@ package org.jml.Fraction;
 
 import org.jml.Mathx.Mathd;
 import org.jml.Mathx.Mathf;
+import org.jml.Number.DecimalNumber;
+import org.jml.Number.RealNumber;
+import org.jml.Number.Type.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 
-public class Fracb extends Number implements Comparable<Fracb> {
-    final private BigInteger num;
-    final private BigInteger denom;
+public class Fracb extends DecimalNumber {
+    final public BigInteger num;
+    final public BigInteger denom;
 
     public Fracb (BigInteger num, BigInteger denom) {
         this.num = num;
@@ -26,14 +29,6 @@ public class Fracb extends Number implements Comparable<Fracb> {
     }
 
     // PROPERTIES
-    public BigInteger getNum() {
-        return num;
-    }
-
-    public BigInteger getDenom() {
-        return denom;
-    }
-
     public boolean isSigned () {
         return (num.signum() < 0) ^ (denom.signum() < 0);
     }
@@ -100,28 +95,173 @@ public class Fracb extends Number implements Comparable<Fracb> {
         return new Fracb(num.divide(gcd), denom.divide(gcd));
     }
 
-    public Fracb inverse () {
-        return new Fracb(this.denom, this.num);
+    @Override
+    public Frac toInt() {
+        return new Frac(num.intValueExact(), denom.intValueExact());
     }
 
     @Override
-    public int intValue() {
-        return num.divide(denom).intValue();
+    public Fracl toLong() {
+        return new Fracl(num.longValueExact(), denom.longValueExact());
+    }
+
+    public Fracb toBig () {
+        return this;
+    }
+
+    // DecimalValue Override
+    @Override
+    public RealNumber add (RealNumber b) {
+        Class<? extends RealNumber> type = b.getClass();
+
+        if (type.equals(Int32.class)) {
+            return this.add(b.integerValue());
+        } else if (type.equals(Int64.class)) {
+            return this.add(b.integerValue());
+        } else if (type.equals(Float32.class)) {
+            return new Decimal(MathContext.DECIMAL128, decimalValue().add(b.decimalValue()));
+        } else if (type.equals(Float64.class)) {
+            return new Decimal(MathContext.DECIMAL128, decimalValue().add(b.decimalValue()));
+        } else if (type.equals(IntBig.class)) {
+            return this.add(b.integerValue());
+        } else if (type.equals(Decimal.class)) {
+            MathContext context = Decimal.getContext(MathContext.DECIMAL128, ((Decimal) b).context);
+            return new Decimal(context, decimalValue().add(((Decimal) b).value));
+        } else if (type.equals(Frac.class)) {
+            return this.add(((Frac) b).toBig());
+        } else if (type.equals(Fracl.class)) {
+            return this.add(((Fracl) b).toBig());
+        } else if (type.equals(Fracb.class)) {
+            return this.add((Fracb) b);
+        }
+
+        return b.add(this);
     }
 
     @Override
-    public long longValue() {
-        return num.divide(denom).longValue();
+    public RealNumber subtr (RealNumber b) {
+        Class<? extends RealNumber> type = b.getClass();
+
+        if (type.equals(Int32.class)) {
+            return this.subtr(b.integerValue());
+        } else if (type.equals(Int64.class)) {
+            return this.subtr(b.integerValue());
+        } else if (type.equals(Float32.class)) {
+            return new Decimal(MathContext.DECIMAL128, decimalValue().subtract(b.decimalValue()));
+        } else if (type.equals(Float64.class)) {
+            return new Decimal(MathContext.DECIMAL128, decimalValue().subtract(b.decimalValue()));
+        } else if (type.equals(IntBig.class)) {
+            return this.subtr(b.integerValue());
+        } else if (type.equals(Decimal.class)) {
+            MathContext context = Decimal.getContext(MathContext.DECIMAL128, ((Decimal) b).context);
+            return new Decimal(context, decimalValue().subtract(((Decimal) b).value));
+        } else if (type.equals(Frac.class)) {
+            return this.subtr(((Frac) b).toBig());
+        } else if (type.equals(Fracl.class)) {
+            return this.subtr(((Fracl) b).toBig());
+        } else if (type.equals(Fracb.class)) {
+            return this.subtr((Fracb) b);
+        }
+
+        return b.subtr(this).neg();
+    }
+
+    @Override
+    public RealNumber mul (RealNumber b) {
+        Class<? extends RealNumber> type = b.getClass();
+
+        if (type.equals(Int32.class)) {
+            return this.mul(b.integerValue());
+        } else if (type.equals(Int64.class)) {
+            return this.mul(b.integerValue());
+        } else if (type.equals(Float32.class)) {
+            return new Decimal(MathContext.DECIMAL128, decimalValue().multiply(b.decimalValue()));
+        } else if (type.equals(Float64.class)) {
+            return new Decimal(MathContext.DECIMAL128, decimalValue().multiply(b.decimalValue()));
+        } else if (type.equals(IntBig.class)) {
+            return this.mul(b.integerValue());
+        } else if (type.equals(Decimal.class)) {
+            MathContext context = Decimal.getContext(MathContext.DECIMAL128, ((Decimal) b).context);
+            return new Decimal(context, decimalValue().multiply(((Decimal) b).value));
+        } else if (type.equals(Frac.class)) {
+            return this.mul(((Frac) b).toBig());
+        } else if (type.equals(Fracl.class)) {
+            return this.mul(((Fracl) b).toBig());
+        } else if (type.equals(Fracb.class)) {
+            return this.mul((Fracb) b);
+        }
+
+        return b.mul(this);
+    }
+
+    @Override
+    public RealNumber div(RealNumber b) {
+        Class<? extends RealNumber> type = b.getClass();
+
+        if (type.equals(Int32.class)) {
+            return this.div(b.integerValue());
+        } else if (type.equals(Int64.class)) {
+            return this.div(b.integerValue());
+        } else if (type.equals(Float32.class)) {
+            return new Decimal(MathContext.DECIMAL128, decimalValue().divide(b.decimalValue(), MathContext.DECIMAL128));
+        } else if (type.equals(Float64.class)) {
+            return new Decimal(MathContext.DECIMAL128, decimalValue().divide(b.decimalValue(), MathContext.DECIMAL128));
+        } else if (type.equals(IntBig.class)) {
+            return this.div(b.integerValue());
+        } else if (type.equals(Decimal.class)) {
+            MathContext context = Decimal.getContext(MathContext.DECIMAL128, ((Decimal) b).context);
+            return new Decimal(context, decimalValue().divide(((Decimal) b).value, context));
+        } else if (type.equals(Frac.class)) {
+            return this.div(((Frac) b).toBig());
+        } else if (type.equals(Fracl.class)) {
+            return this.div(((Fracl) b).toBig());
+        } else if (type.equals(Fracb.class)) {
+            return this.div((Fracb) b);
+        }
+
+        return b.div(this).inv();
+    }
+
+    @Override
+    public int compareTo (RealNumber b) {
+        Class<? extends RealNumber> type = b.getClass();
+
+        if (type.equals(Int32.class)) {
+            return num.compareTo(denom.multiply(b.integerValue()));
+        } else if (type.equals(Int64.class)) {
+            return num.compareTo(denom.multiply(b.integerValue()));
+        } else if (type.equals(Float32.class)) {
+            return new BigDecimal(num).compareTo(new BigDecimal(denom).multiply(b.decimalValue()));
+        } else if (type.equals(Float64.class)) {
+            return new BigDecimal(num).compareTo(new BigDecimal(denom).multiply(b.decimalValue()));
+        } else if (type.equals(IntBig.class)) {
+            return num.compareTo(denom.multiply(b.integerValue()));
+        } else if (type.equals(Decimal.class)) {
+            return new BigDecimal(num).compareTo(new BigDecimal(denom).multiply(((Decimal) b).value));
+        } else if (type.equals(Frac.class)) {
+            return num.multiply(BigInteger.valueOf(((Frac) b).denom)).compareTo(denom.multiply(BigInteger.valueOf(((Frac) b).num)));
+        } else if (type.equals(Fracl.class)) {
+            return num.multiply(BigInteger.valueOf(((Fracl) b).denom)).compareTo(denom.multiply(BigInteger.valueOf(((Fracl) b).num)));
+        } else if (type.equals(Fracb.class)) {
+            return num.multiply(((Fracb) b).denom).compareTo(denom.multiply(((Fracb) b).num));
+        }
+
+        return -b.compareTo(this);
     }
 
     @Override
     public float floatValue() {
-        return decimalValue(MathContext.DECIMAL32).floatValue();
+        return num.floatValue() / denom.floatValue();
     }
 
     @Override
     public double doubleValue() {
-        return decimalValue(MathContext.DECIMAL64).doubleValue();
+        return num.doubleValue() / denom.doubleValue();
+    }
+
+    @Override
+    public BigDecimal decimalValue () {
+        return decimalValue(MathContext.DECIMAL128);
     }
 
     public BigDecimal decimalValue (MathContext context) {
@@ -129,28 +269,17 @@ public class Fracb extends Number implements Comparable<Fracb> {
     }
 
     @Override
-    public int compareTo (Fracb o) {
-        boolean sign1 = isSigned();
-        boolean sign2 = o.isSigned();
-
-        if (sign1 && !sign2) {
-            return -1;
-        } else if (!sign1 && sign2) {
-            return 1;
-        } else if (this.denom == o.denom) {
-            int comp = this.num.compareTo(o.num);
-            return sign1 ? comp : -comp;
-        }
-
-        return this.num.multiply(o.denom).compareTo(o.num.multiply(this.denom));
+    public Fracb neg() {
+        return new Fracb(num.negate(), denom);
     }
 
-    public Frac toInt() {
-        return new Frac(num.intValue(), denom.intValue());
+    @Override
+    public Fracb abs() {
+        return new Fracb(num.abs(), denom.abs());
     }
 
-    public Fracl toLong () {
-        return new Fracl(num.longValue(), denom.longValue());
+    public Fracb inv () {
+        return new Fracb(this.denom, this.num);
     }
 
     @Override

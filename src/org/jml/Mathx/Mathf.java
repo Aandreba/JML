@@ -75,9 +75,23 @@ final public class Mathf {
     public native static float log1p (float x);
     public native static float log2 (float x);
     public native static float log10 (float x);
-    public native static float sqrt (float x);
+    //public native static float sqrt (float x);
     public native static float cbrt (float x);
     public native static float hypot (float x, float y);
+
+    public static float sqrt (float a) {
+        int i;
+        float x2, y;
+        final float threehalfs = 1.5f;
+
+        x2 = a * 0.5F;
+        y  = a;
+        i  = Float.floatToIntBits(y);
+        i  = 0x5f3759df - ( i >> 1 );
+        y  = Float.intBitsToFloat(i);
+        y  = y * ( threehalfs - ( x2 * y * y ) );
+        return 1f / (y * ( threehalfs - ( x2 * y * y ) ));
+    }
 
     public static float toRadians (float x) {
         return x * TO_RADIANS;

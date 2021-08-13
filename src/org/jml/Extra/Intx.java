@@ -24,6 +24,16 @@ public class Intx {
         return -1;
     }
 
+    public static int leftMostBit (int a) {
+        for (int i=31;i>=0;i--) {
+            if (getBit(i, a)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
     public static boolean isOdd (int x) {
         return (x & 1) == 1;
     }
